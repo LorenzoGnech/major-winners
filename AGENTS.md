@@ -49,6 +49,16 @@ Contemporaries means a **documented elite LAN-pool distribution per rating versi
 
 `npm run calibrate` prints the leaderboard and fails if s1mple-2018, olofmeister-2015, and heaton-2003 leave the top 15, or if the top 10 is only CS:GO.
 
+## Team profile
+
+`buildTeamProfile` is the pure boundary from a `CompletedDraft`, player-season metadata, rated players, and the selected coach into the profile consumed by simulation. It exposes the five component scores, aggregate fit-adjusted attributes, tactical coach scores, strengths/weaknesses, and overall team OVR.
+
+- Base strength is the five-player average of `player OVR × assigned-role fit`.
+- Chemistry counts exact org-year teammate pairs. Each pair adds 4 to a neutral 50 score, capped at +32; its centered contribution to overall OVR is weighted at 0.08, so an intact five helps without eclipsing individual quality.
+- Communication uses a conservative static nationality-to-language-family heuristic. Same-nationality pairs score 1.0, a documented family/English bridge scores 0.92, and unknown pairs retain a 0.68 international baseline. The coach contributes only 10% of this component.
+- Structure rewards primary and secondary role coverage, applies a strong penalty when the IGL-slot player has neither primary nor secondary IGL experience, and subtracts 6 points per redundant primary AWPer.
+- Overall OVR starts at base strength and adds centered chemistry (`0.08`), communication (`0.05`), and structure (`0.12`) contributions. Coach modifiers add only `0.25` OVR each while also shaping comeback resilience, economy discipline, and anti-strat scores.
+
 ## Data conventions
 
 - The draftable atom is a player-season (`s1mple-2018`), not a career.

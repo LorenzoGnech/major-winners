@@ -3,11 +3,15 @@ import type { Coach, Dataset, Game, OrgTier, PlayerSeason, Role } from "../data"
 import { ROLES } from "../data";
 import {
 	applyAction,
+	buildTeamProfile,
 	currentCard,
 	type DraftState,
+	getCompletedDraft,
 	ratePlayer,
+	ratePlayers,
 	roleFit,
 	startDraft,
+	type TeamProfile,
 } from "../engine";
 
 const INITIAL_SEED = 0x4d_41_4a_4f;
@@ -300,6 +304,86 @@ function CoachCard({
 	);
 }
 
+function TeamProfilePanel({ profile }: { profile: TeamProfile }) {
+	const componentRows = [
+		["Base strength", profile.components.baseStrength],
+		["Chemistry", profile.components.chemistry],
+		["Communication", profile.components.communication],
+		["Structure", profile.components.structure],
+		["Coaching", profile.components.coaching],
+	] as const;
+	const attributeRows = Object.entries(profile.attributes) as [string, number][];
+
+	return (
+		<div className="mt-5 space-y-4">
+			<div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
+				<div className="flex flex-col justify-center rounded-xl border border-emerald-300/30 bg-emerald-300/10 p-4 text-center">
+					<span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-200">
+						Team OVR
+					</span>
+					<span className="mt-1 text-5xl font-bold tabular-nums text-white">{profile.overall}</span>
+				</div>
+				<dl className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+					{componentRows.map(([label, value]) => (
+						<div key={label} className="rounded-xl border border-white/10 bg-black/25 p-3">
+							<dt className="text-[9px] uppercase tracking-wide text-zinc-500">{label}</dt>
+							<dd className="mt-1 text-xl font-bold tabular-nums text-zinc-100">{value}</dd>
+						</div>
+					))}
+				</dl>
+			</div>
+
+			<div className="grid gap-3 sm:grid-cols-2">
+				<div className="rounded-xl border border-white/10 bg-black/25 p-4">
+					<h3 className="text-xs font-semibold uppercase tracking-wider text-emerald-300">
+						Strengths
+					</h3>
+					<ul className="mt-2 space-y-1.5 text-sm text-zinc-200">
+						{profile.strengths.map((strength) => (
+							<li key={strength}>+ {strength}</li>
+						))}
+					</ul>
+				</div>
+				<div className="rounded-xl border border-white/10 bg-black/25 p-4">
+					<h3 className="text-xs font-semibold uppercase tracking-wider text-amber-300">
+						Weaknesses
+					</h3>
+					{profile.weaknesses.length > 0 ? (
+						<ul className="mt-2 space-y-1.5 text-sm text-zinc-200">
+							{profile.weaknesses.map((weakness) => (
+								<li key={weakness}>– {weakness}</li>
+							))}
+						</ul>
+					) : (
+						<p className="mt-2 text-sm text-zinc-500">No major structural weakness.</p>
+					)}
+				</div>
+			</div>
+
+			<div className="rounded-xl border border-white/10 bg-black/25 p-4">
+				<div className="flex flex-wrap items-center justify-between gap-3">
+					<h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+						Aggregate attributes
+					</h3>
+					<p className="text-[10px] text-zinc-500">
+						Coach: {profile.coach.nick} · comeback {profile.details.coaching.comebackResilience} ·
+						economy {profile.details.coaching.economyDiscipline} · anti-strat{" "}
+						{profile.details.coaching.antiStrat}
+					</p>
+				</div>
+				<dl className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+					{attributeRows.map(([label, value]) => (
+						<div key={label} className="rounded-lg bg-white/5 p-2 text-center">
+							<dt className="text-[9px] uppercase tracking-wide text-zinc-500">{label}</dt>
+							<dd className="mt-1 font-bold tabular-nums text-zinc-100">{value}</dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		</div>
+	);
+}
+
 export function DraftGame({ dataset }: DraftGameProps) {
 	const [state, setState] = useState(() => startDraft(dataset, INITIAL_SEED));
 	const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
@@ -318,6 +402,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		() => new Map(dataset.coaches.map((coach) => [coach.id, coach])),
 		[dataset.coaches],
 	);
+	const ratedPlayers = useMemo(() => ratePlayers(dataset.playerSeasons), [dataset.playerSeasons]);
 
 	useEffect(() => {
 		setState(startDraft(dataset, freePlaySeed()));
@@ -375,6 +460,16 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const orgYear = card ? orgYearsById.get(card.orgYearId) : undefined;
 	const org = orgYear ? orgsById.get(orgYear.orgId) : undefined;
 	const chosenCoach = state.coachId ? coachesById.get(state.coachId) : undefined;
+	const completedDraft = getCompletedDraft(state);
+	const teamProfile =
+		completedDraft && chosenCoach
+			? buildTeamProfile({
+					draft: completedDraft,
+					playerSeasons: dataset.playerSeasons,
+					ratedPlayers,
+					coach: chosenCoach,
+				})
+			: null;
 
 	return (
 		<div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-8">
@@ -540,7 +635,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						</section>
 					)}
 
-					{state.phase.type === "complete" && chosenCoach && (
+					{state.phase.type === "complete" && chosenCoach && teamProfile && (
 						<section
 							aria-labelledby="complete-heading"
 							className="rounded-2xl border border-emerald-300/30 bg-emerald-300/7 p-5 motion-safe:animate-[draft-reveal_360ms_ease-out] sm:p-7"
@@ -555,27 +650,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								Your legends are ready
 							</h2>
 							<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-300">
-								Five players and {chosenCoach.nick} are locked in. Major simulation arrives in Phase
-								5; for now, run another draft and chase a higher fit-adjusted OVR.
+								Five players and {chosenCoach.nick} are locked in. This profile combines individual
+								quality, role fit, teammate history, communication, structure, and coaching.
 							</p>
-							<div className="mt-5 rounded-xl border border-white/10 bg-black/25 p-4">
-								<div className="flex flex-wrap items-center justify-between gap-4">
-									<div>
-										<p className="text-xs uppercase tracking-wider text-zinc-500">Coach</p>
-										<p className="mt-1 text-xl font-semibold text-white">{chosenCoach.nick}</p>
-									</div>
-									<div className="flex gap-2 text-center">
-										{Object.entries(chosenCoach.modifiers).map(([label, value]) => (
-											<div key={label} className="min-w-16 rounded-lg bg-white/5 px-2 py-2">
-												<span className="block text-[9px] uppercase text-zinc-500">{label}</span>
-												<span className="mt-1 block font-bold text-emerald-200">
-													{signedModifier(value)}
-												</span>
-											</div>
-										))}
-									</div>
-								</div>
-							</div>
+							<TeamProfilePanel profile={teamProfile} />
 							<button
 								type="button"
 								onClick={restart}

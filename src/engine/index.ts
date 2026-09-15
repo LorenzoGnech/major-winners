@@ -29,7 +29,6 @@ export type { Attributes } from "./ratings/attributes";
 export type { OvrBreakdown } from "./ratings/ovr";
 export { type RatedPlayer, ratePlayer, ratePlayers } from "./ratings/rate";
 export { ELITE_RATING_DISTRIBUTION } from "./ratings/reference";
-
 export {
 	createRng,
 	hashStringToSeed,
@@ -41,3 +40,19 @@ export {
 	shuffle,
 	utcDateKey,
 } from "./rng";
+export {
+	buildTeamProfile,
+	CHEMISTRY_BONUS_CAP,
+	CHEMISTRY_PAIR_BONUS,
+	type ChemistryDetail,
+	COACH_COMMUNICATION_WEIGHT,
+	COACH_OVR_PER_MODIFIER,
+	type CoachingDetail,
+	type CommunicationDetail,
+	type StructureDetail,
+	TEAM_PROFILE_BASELINES,
+	TEAM_PROFILE_WEIGHTS,
+	type TeamMemberProfile,
+	type TeamProfile,
+	type TeamProfileInputs,
+} from "./team";
