@@ -9,27 +9,27 @@ const ratedPlayers = ratePlayers(dataset.playerSeasons);
 const seasonsById = new Map(dataset.playerSeasons.map((season) => [season.id, season]));
 
 const ASTRALIS_ROSTER: Record<Role, string> = {
-	awp: "device-2018",
-	igl: "gla1ve-2018",
-	entry: "dupreeh-2018",
-	support: "xyp9x-2018",
-	lurker: "magisk-2018",
+	awp: "device-2018-astralis",
+	igl: "gla1ve-2018-astralis",
+	entry: "dupreeh-2018-astralis",
+	support: "xyp9x-2018-astralis",
+	lurker: "magisk-2018-astralis",
 };
 
 const MIXED_ALL_STARS: Record<Role, string> = {
-	awp: "s1mple-2018",
-	igl: "carn-2009",
-	entry: "rain-2022",
-	support: "krimz-2015",
-	lurker: "get_right-2013",
+	awp: "s1mple-2018-navi",
+	igl: "carn-2009-fnatic",
+	entry: "rain-2022-faze",
+	support: "krimz-2015-fnatic",
+	lurker: "get_right-2013-nip",
 };
 
 const FAZE_ROSTER: Record<Role, string> = {
-	awp: "broky-2022",
-	igl: "karrigan-2022",
-	entry: "rain-2022",
-	support: "twistzz-2022",
-	lurker: "ropz-2022",
+	awp: "broky-2022-faze",
+	igl: "karrigan-2022-faze",
+	entry: "rain-2022-faze",
+	support: "twistzz-2022-faze",
+	lurker: "ropz-2022-faze",
 };
 
 function coachById(id: string): Coach {
@@ -43,10 +43,12 @@ function completedDraft(rosterIds: Record<Role, string>, coachId: string): Compl
 		ROLES.map((role) => {
 			const season = seasonsById.get(rosterIds[role]);
 			if (!season) throw new Error(`missing season ${rosterIds[role]}`);
+			const roster = dataset.orgYears.find((row) => row.playerSeasonIds.includes(season.id));
+			if (!roster) throw new Error(`missing roster for ${season.id}`);
 			return [
 				role,
 				{
-					orgYearId: `${season.orgId}-${season.year}`,
+					orgYearId: roster.id,
 					playerSeasonId: season.id,
 					role,
 					fit: roleFit(season, role),
@@ -89,8 +91,8 @@ describe("buildTeamProfile", () => {
 	it("applies a strong structure penalty for an off-role IGL", () => {
 		const offRoleRoster = {
 			...ASTRALIS_ROSTER,
-			igl: "magisk-2018",
-			lurker: "gla1ve-2018",
+			igl: "magisk-2018-astralis",
+			lurker: "gla1ve-2018-astralis",
 		};
 		const natural = profile(ASTRALIS_ROSTER, coachById("zonic-2018"));
 		const offRole = profile(offRoleRoster, coachById("zonic-2018"));

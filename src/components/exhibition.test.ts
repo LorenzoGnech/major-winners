@@ -13,11 +13,11 @@ function astralisDraft(): CompletedDraft {
 	const dataset = loadDataset();
 	const playersById = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
 	const playerIds = {
-		awp: "device-2018",
-		igl: "gla1ve-2018",
-		entry: "dupreeh-2018",
-		support: "xyp9x-2018",
-		lurker: "magisk-2018",
+		awp: "device-2018-astralis",
+		igl: "gla1ve-2018-astralis",
+		entry: "dupreeh-2018-astralis",
+		support: "xyp9x-2018-astralis",
+		lurker: "magisk-2018-astralis",
 	} as const;
 
 	return {
@@ -32,7 +32,7 @@ function astralisDraft(): CompletedDraft {
 				return [
 					role,
 					{
-						orgYearId: "astralis-2018",
+						orgYearId: "astralis-faceit-london-2018",
 						playerSeasonId,
 						role,
 						fit: roleFit(player, role),

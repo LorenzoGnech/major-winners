@@ -1,4 +1,4 @@
-import { type Dataset, datasetSchema, ROLES, type Role } from "./schema";
+import { type Dataset, datasetSchema } from "./schema";
 
 export type DatasetIssue = {
 	path: string;
@@ -27,10 +27,16 @@ function uniqueIds(label: string, ids: string[], issues: DatasetIssue[]): void {
 
 export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 	const issues: DatasetIssue[] = [];
+	const majorById = new Map(data.majors.map((major) => [major.id, major]));
 	const orgIds = new Set(data.orgs.map((org) => org.id));
 	const seasonById = new Map(data.playerSeasons.map((season) => [season.id, season]));
 	const coachById = new Map(data.coaches.map((coach) => [coach.id, coach]));
 
+	uniqueIds(
+		"majors",
+		data.majors.map((major) => major.id),
+		issues,
+	);
 	uniqueIds(
 		"orgs",
 		data.orgs.map((org) => org.id),
@@ -53,6 +59,25 @@ export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 	);
 
 	for (const orgYear of data.orgYears) {
+		const major = orgYear.majorId ? majorById.get(orgYear.majorId) : undefined;
+		if (orgYear.kind === "major" && !major) {
+			issues.push({
+				path: `orgYears.${orgYear.id}.majorId`,
+				message: `unknown Major "${orgYear.majorId}"`,
+			});
+		}
+		if (major && (major.year !== orgYear.year || major.game !== orgYear.game)) {
+			issues.push({
+				path: `orgYears.${orgYear.id}`,
+				message: `does not match Major ${major.id} (year/game)`,
+			});
+		}
+		if (major && orgYear.placement && orgYear.placement > major.teamCount) {
+			issues.push({
+				path: `orgYears.${orgYear.id}.placement`,
+				message: `placement exceeds ${major.id} field size`,
+			});
+		}
 		if (!orgIds.has(orgYear.orgId)) {
 			issues.push({
 				path: `orgYears.${orgYear.id}.orgId`,
@@ -69,8 +94,7 @@ export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 			}
 		}
 
-		const fillable = new Set<Role>();
-		for (const seasonId of orgYear.playerSeasonIds) {
+		for (const seasonId of [...orgYear.playerSeasonIds, ...orgYear.substituteSeasonIds]) {
 			const season = seasonById.get(seasonId);
 			if (!season) {
 				issues.push({
@@ -89,17 +113,6 @@ export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 					message: `does not match org-year ${orgYear.id} (org/year/game)`,
 				});
 			}
-			for (const role of season.roles) {
-				fillable.add(role);
-			}
-		}
-		for (const role of ROLES) {
-			if (!fillable.has(role)) {
-				issues.push({
-					path: `orgYears.${orgYear.id}`,
-					message: `role "${role}" is not fillable without going fully off-role`,
-				});
-			}
 		}
 	}
 
@@ -110,7 +123,11 @@ export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 				message: `unknown org "${season.orgId}"`,
 			});
 		}
-		const referenced = data.orgYears.some((orgYear) => orgYear.playerSeasonIds.includes(season.id));
+		const referenced = data.orgYears.some(
+			(orgYear) =>
+				orgYear.playerSeasonIds.includes(season.id) ||
+				orgYear.substituteSeasonIds.includes(season.id),
+		);
 		if (!referenced) {
 			issues.push({
 				path: `playerSeasons.${season.id}`,

@@ -1,30 +1,28 @@
 import { describe, expect, it } from "vitest";
 import { loadDataset } from "./index";
-import { playerSeasonSchema, ROLES } from "./schema";
+import { playerSeasonSchema } from "./schema";
 import { assertValidDataset, collectDatasetIssues, DatasetValidationError } from "./validate";
 
 describe("seed dataset", () => {
-	it("loads 8 org-years and 40 player-seasons across all three regimes", () => {
+	it("loads Major and Legacy rosters across all three rating regimes", () => {
 		const dataset = loadDataset();
+		expect(dataset.majors).toHaveLength(5);
 		expect(dataset.orgYears).toHaveLength(8);
 		expect(dataset.playerSeasons).toHaveLength(40);
+		expect(dataset.orgYears.filter((roster) => roster.kind === "legacy")).toHaveLength(2);
 		expect(new Set(dataset.playerSeasons.map((season) => season.dataRegime))).toEqual(
 			new Set(["full", "partial", "none"]),
 		);
 	});
 
-	it("can fill every role on every org-year", () => {
+	it("resolves every Major and roster relationship", () => {
 		const dataset = loadDataset();
 		expect(collectDatasetIssues(dataset)).toEqual([]);
 		for (const orgYear of dataset.orgYears) {
-			const fillable = new Set(
-				orgYear.playerSeasonIds.flatMap((id) => {
-					const season = dataset.playerSeasons.find((row) => row.id === id);
-					return season?.roles ?? [];
-				}),
-			);
-			for (const role of ROLES) {
-				expect(fillable, orgYear.id).toContain(role);
+			if (orgYear.kind === "major") {
+				expect(dataset.majors.some((major) => major.id === orgYear.majorId)).toBe(true);
+			} else {
+				expect(orgYear.majorId).toBeUndefined();
 			}
 		}
 	});
@@ -33,7 +31,7 @@ describe("seed dataset", () => {
 describe("dataset validation", () => {
 	it("rejects a none-regime row without curated fields", () => {
 		const result = playerSeasonSchema.safeParse({
-			id: "heaton-2003",
+			id: "heaton-2003-sk",
 			playerId: "heaton",
 			nick: "HeatoN",
 			realName: "Emil Christensen",
@@ -44,6 +42,7 @@ describe("dataset validation", () => {
 			roles: ["awp"],
 			primaryRole: "awp",
 			dataRegime: "none",
+			ratingProvenance: { kind: "curated-legend" },
 			accolades: { majorWins: 0, majorMvps: 0, eventMvps: 0 },
 		});
 		expect(result.success).toBe(false);
@@ -54,10 +53,10 @@ describe("dataset validation", () => {
 		const broken = {
 			...dataset,
 			orgYears: dataset.orgYears.map((orgYear) =>
-				orgYear.id === "nip-2013"
+				orgYear.id === "nip-dreamhack-winter-2013"
 					? {
 							...orgYear,
-							playerSeasonIds: orgYear.playerSeasonIds.slice(0, 4).concat("pronax-2015"),
+							playerSeasonIds: orgYear.playerSeasonIds.slice(0, 4).concat("pronax-2015-fnatic"),
 						}
 					: orgYear,
 			),

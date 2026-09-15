@@ -29,7 +29,7 @@ describe("z-score mapping", () => {
 
 describe("accolades", () => {
 	it("caps at 5 even on a two-Major MVP season", () => {
-		expect(accoladeBonus(seasonById("coldzera-2016"))).toBe(5);
+		expect(accoladeBonus(seasonById("coldzera-2016-sk"))).toBe(5);
 	});
 });
 
@@ -38,19 +38,19 @@ describe("ratePlayer", () => {
 	const byId = Object.fromEntries(rated.map((row) => [row.id, row]));
 
 	it("keeps 2018 s1mple, 2015 olofmeister, and 2003 HeatoN in legend territory", () => {
-		expect(byId["s1mple-2018"].ovr).toBeGreaterThanOrEqual(95);
-		expect(byId["olofmeister-2015"].ovr).toBeGreaterThanOrEqual(90);
-		expect(byId["heaton-2003"].ovr).toBe(94);
+		expect(byId["s1mple-2018-navi"].ovr).toBeGreaterThanOrEqual(95);
+		expect(byId["olofmeister-2015-fnatic"].ovr).toBeGreaterThanOrEqual(90);
+		expect(byId["heaton-2003-sk"].ovr).toBe(94);
 	});
 
 	it("does not double-count trophies on regime none", () => {
-		expect(byId["heaton-2003"].breakdown.fromAccolades).toBe(0);
-		expect(byId["heaton-2003"].breakdown.fromCurated).toBe(94);
+		expect(byId["heaton-2003-sk"].breakdown.fromAccolades).toBe(0);
+		expect(byId["heaton-2003-sk"].breakdown.fromCurated).toBe(94);
 	});
 
 	it("ranks s1mple above a low-frag IGL even after Major bonuses", () => {
-		expect(byId["s1mple-2018"].ovr).toBeGreaterThan(byId["karrigan-2022"].ovr);
-		expect(byId["s1mple-2018"].ovr).toBeGreaterThan(byId["gla1ve-2018"].ovr);
+		expect(byId["s1mple-2018-navi"].ovr).toBeGreaterThan(byId["karrigan-2022-faze"].ovr);
+		expect(byId["s1mple-2018-navi"].ovr).toBeGreaterThan(byId["gla1ve-2018-astralis"].ovr);
 	});
 
 	it("always fills every attribute", () => {
@@ -63,14 +63,18 @@ describe("ratePlayer", () => {
 	});
 
 	it("gives IGLs high igl and stars high aim", () => {
-		expect(byId["gla1ve-2018"].attributes.igl).toBeGreaterThan(byId["s1mple-2018"].attributes.igl);
-		expect(byId["s1mple-2018"].attributes.aim).toBeGreaterThan(byId["gla1ve-2018"].attributes.aim);
+		expect(byId["gla1ve-2018-astralis"].attributes.igl).toBeGreaterThan(
+			byId["s1mple-2018-navi"].attributes.igl,
+		);
+		expect(byId["s1mple-2018-navi"].attributes.aim).toBeGreaterThan(
+			byId["gla1ve-2018-astralis"].attributes.aim,
+		);
 	});
 });
 
 describe("rateOvr errors", () => {
 	it("throws when a none-regime row lost its curated OVR", () => {
-		const heaton = seasonById("heaton-2003");
+		const heaton = seasonById("heaton-2003-sk");
 		expect(() => rateOvr({ ...heaton, curated: undefined })).toThrow(/curated.ovr/);
 	});
 });

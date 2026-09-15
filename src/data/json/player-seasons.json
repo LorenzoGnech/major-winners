@@ -1,6 +1,6 @@
 [
 	{
-		"id": "heaton-2003",
+		"id": "heaton-2003-sk",
 		"playerId": "heaton",
 		"nick": "HeatoN",
 		"realName": "Emil Christensen",
@@ -23,10 +23,18 @@
 			},
 			"rationale": "Peak of the defining 1.6 AWPer; SK's 2003 run (CPL Summer, WCG gold with the stand-in five, CPL Winter) is the era's benchmark."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 4 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 4
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "potti-2003",
+		"id": "potti-2003-sk",
 		"playerId": "potti",
 		"nick": "Potti",
 		"realName": "Tommy Ingemarsson",
@@ -49,10 +57,18 @@
 			},
 			"rationale": "In-game leader of the 2003 SK dynasty and the other half of the HeatoN/Potti core that already won CPL Winter 2001 with NiP."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 2 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "element-2003",
+		"id": "element-2003-sk",
 		"playerId": "element",
 		"nick": "elemeNt",
 		"realName": "Ola Moum",
@@ -75,10 +91,18 @@
 			},
 			"rationale": "Joined June 2003 and immediately completed the prize-money five; the missing piece of SK's unbeaten stretch after ESWC."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 2 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "ahl-2003",
+		"id": "ahl-2003-sk",
 		"playerId": "ahl",
 		"nick": "ahl",
 		"realName": "Michael Korduner",
@@ -101,10 +125,18 @@
 			},
 			"rationale": "Core SK.swe rifler from January 2003 through the dynasty year; space-maker next to HeatoN and elemeNt."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "fisker-2003",
+		"id": "fisker-2003-sk",
 		"playerId": "fisker",
 		"nick": "fisker",
 		"realName": "Christer Eriksson",
@@ -127,10 +159,18 @@
 			},
 			"rationale": "Joined with ahl in January 2003; the aggressive closer of the prize-money five that took CPL Summer and Winter."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "carn-2009",
+		"id": "carn-2009-fnatic",
 		"playerId": "carn",
 		"nick": "cArn",
 		"realName": "Patrik Sättermon",
@@ -153,10 +193,18 @@
 			},
 			"rationale": "The standard for 1.6 in-game leading; called fnatic to ESWC 2009 and a string of IEM titles."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 3 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 3
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "forest-2009",
+		"id": "forest-2009-fnatic",
 		"playerId": "forest",
 		"nick": "f0rest",
 		"realName": "Patrik Lindberg",
@@ -179,10 +227,18 @@
 			},
 			"rationale": "Already a superstar rifler before CS:GO; the offensive engine of ESWC 2009 fnatic."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 3 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 3
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "gux-2009",
+		"id": "gux-2009-fnatic",
 		"playerId": "gux",
 		"nick": "Gux",
 		"realName": "Christopher Högfeldt",
@@ -205,10 +261,18 @@
 			},
 			"rationale": "Primary AWPer on the 2009 world-champion fnatic side."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "dsn-2009",
+		"id": "dsn-2009-fnatic",
 		"playerId": "dsn",
 		"nick": "dsn",
 		"realName": "Harley Örwall",
@@ -231,10 +295,18 @@
 			},
 			"rationale": "Long-time fnatic rifler and glue player around cArn's calls during the late-1.6 peak."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "archi-2009",
+		"id": "archi-2009-fnatic",
 		"playerId": "archi",
 		"nick": "Archi",
 		"realName": "Oscar Torgersen",
@@ -257,10 +329,18 @@
 			},
 			"rationale": "Fifth member of the ESWC 2009 championship five; secondary star next to f0rest."
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "curated-legend",
+			"source": "Curated legacy rubric"
+		}
 	},
 	{
-		"id": "get_right-2013",
+		"id": "get_right-2013-nip",
 		"playerId": "get_right",
 		"nick": "GeT_RiGhT",
 		"realName": "Christopher Alesund",
@@ -271,11 +351,25 @@
 		"roles": ["lurker", "entry"],
 		"primaryRole": "lurker",
 		"dataRegime": "partial",
-		"stats": { "rating": 1.21, "ratingVersion": "1.0", "kpr": 0.81, "dpr": 0.58 },
-		"accolades": { "top20Rank": 1, "majorWins": 0, "majorMvps": 0, "eventMvps": 6 }
+		"stats": {
+			"rating": 1.21,
+			"ratingVersion": "1.0",
+			"kpr": 0.81,
+			"dpr": 0.58
+		},
+		"accolades": {
+			"top20Rank": 1,
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 6
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "forest-2013",
+		"id": "forest-2013-nip",
 		"playerId": "forest",
 		"nick": "f0rest",
 		"realName": "Patrik Lindberg",
@@ -286,11 +380,25 @@
 		"roles": ["entry", "lurker", "awp"],
 		"primaryRole": "entry",
 		"dataRegime": "partial",
-		"stats": { "rating": 1.18, "ratingVersion": "1.0", "kpr": 0.79, "dpr": 0.6 },
-		"accolades": { "top20Rank": 2, "majorWins": 0, "majorMvps": 0, "eventMvps": 4 }
+		"stats": {
+			"rating": 1.18,
+			"ratingVersion": "1.0",
+			"kpr": 0.79,
+			"dpr": 0.6
+		},
+		"accolades": {
+			"top20Rank": 2,
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 4
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "xizt-2013",
+		"id": "xizt-2013-nip",
 		"playerId": "xizt",
 		"nick": "Xizt",
 		"realName": "Richard Landström",
@@ -301,11 +409,25 @@
 		"roles": ["igl", "support"],
 		"primaryRole": "igl",
 		"dataRegime": "partial",
-		"stats": { "rating": 1.04, "ratingVersion": "1.0", "kpr": 0.69, "dpr": 0.64 },
-		"accolades": { "top20Rank": 6, "majorWins": 0, "majorMvps": 0, "eventMvps": 1 }
+		"stats": {
+			"rating": 1.04,
+			"ratingVersion": "1.0",
+			"kpr": 0.69,
+			"dpr": 0.64
+		},
+		"accolades": {
+			"top20Rank": 6,
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "friberg-2013",
+		"id": "friberg-2013-nip",
 		"playerId": "friberg",
 		"nick": "friberg",
 		"realName": "Adam Friberg",
@@ -316,11 +438,25 @@
 		"roles": ["entry", "support"],
 		"primaryRole": "entry",
 		"dataRegime": "partial",
-		"stats": { "rating": 1.08, "ratingVersion": "1.0", "kpr": 0.72, "dpr": 0.66 },
-		"accolades": { "top20Rank": 11, "majorWins": 0, "majorMvps": 0, "eventMvps": 1 }
+		"stats": {
+			"rating": 1.08,
+			"ratingVersion": "1.0",
+			"kpr": 0.72,
+			"dpr": 0.66
+		},
+		"accolades": {
+			"top20Rank": 11,
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "fifflaren-2013",
+		"id": "fifflaren-2013-nip",
 		"playerId": "fifflaren",
 		"nick": "Fifflaren",
 		"realName": "Robin Johansson",
@@ -331,11 +467,24 @@
 		"roles": ["support", "awp"],
 		"primaryRole": "support",
 		"dataRegime": "partial",
-		"stats": { "rating": 0.97, "ratingVersion": "1.0", "kpr": 0.64, "dpr": 0.67 },
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 0 }
+		"stats": {
+			"rating": 0.97,
+			"ratingVersion": "1.0",
+			"kpr": 0.64,
+			"dpr": 0.67
+		},
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 0
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "olofmeister-2015",
+		"id": "olofmeister-2015-fnatic",
 		"playerId": "olofmeister",
 		"nick": "olofmeister",
 		"realName": "Olof Kajbjer",
@@ -346,11 +495,25 @@
 		"roles": ["entry", "lurker"],
 		"primaryRole": "entry",
 		"dataRegime": "partial",
-		"stats": { "rating": 1.16, "ratingVersion": "1.0", "kpr": 0.78, "dpr": 0.61 },
-		"accolades": { "top20Rank": 1, "majorWins": 2, "majorMvps": 1, "eventMvps": 4 }
+		"stats": {
+			"rating": 1.16,
+			"ratingVersion": "1.0",
+			"kpr": 0.78,
+			"dpr": 0.61
+		},
+		"accolades": {
+			"top20Rank": 1,
+			"majorWins": 2,
+			"majorMvps": 1,
+			"eventMvps": 4
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "flusha-2015",
+		"id": "flusha-2015-fnatic",
 		"playerId": "flusha",
 		"nick": "flusha",
 		"realName": "Robin Rönnquist",
@@ -361,11 +524,25 @@
 		"roles": ["lurker", "igl"],
 		"primaryRole": "lurker",
 		"dataRegime": "partial",
-		"stats": { "rating": 1.12, "ratingVersion": "1.0", "kpr": 0.75, "dpr": 0.62 },
-		"accolades": { "top20Rank": 5, "majorWins": 2, "majorMvps": 0, "eventMvps": 2 }
+		"stats": {
+			"rating": 1.12,
+			"ratingVersion": "1.0",
+			"kpr": 0.75,
+			"dpr": 0.62
+		},
+		"accolades": {
+			"top20Rank": 5,
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "jw-2015",
+		"id": "jw-2015-fnatic",
 		"playerId": "jw",
 		"nick": "JW",
 		"realName": "Jesper Wecksell",
@@ -376,11 +553,25 @@
 		"roles": ["awp", "entry"],
 		"primaryRole": "awp",
 		"dataRegime": "partial",
-		"stats": { "rating": 1.1, "ratingVersion": "1.0", "kpr": 0.74, "dpr": 0.65 },
-		"accolades": { "top20Rank": 10, "majorWins": 2, "majorMvps": 0, "eventMvps": 2 }
+		"stats": {
+			"rating": 1.1,
+			"ratingVersion": "1.0",
+			"kpr": 0.74,
+			"dpr": 0.65
+		},
+		"accolades": {
+			"top20Rank": 10,
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "krimz-2015",
+		"id": "krimz-2015-fnatic",
 		"playerId": "krimz",
 		"nick": "KRIMZ",
 		"realName": "Freddy Johansson",
@@ -391,11 +582,25 @@
 		"roles": ["support", "lurker"],
 		"primaryRole": "support",
 		"dataRegime": "partial",
-		"stats": { "rating": 1.09, "ratingVersion": "1.0", "kpr": 0.72, "dpr": 0.6 },
-		"accolades": { "top20Rank": 7, "majorWins": 2, "majorMvps": 0, "eventMvps": 1 }
+		"stats": {
+			"rating": 1.09,
+			"ratingVersion": "1.0",
+			"kpr": 0.72,
+			"dpr": 0.6
+		},
+		"accolades": {
+			"top20Rank": 7,
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "pronax-2015",
+		"id": "pronax-2015-fnatic",
 		"playerId": "pronax",
 		"nick": "pronax",
 		"realName": "Markus Wallsten",
@@ -406,11 +611,24 @@
 		"roles": ["igl", "support"],
 		"primaryRole": "igl",
 		"dataRegime": "partial",
-		"stats": { "rating": 0.94, "ratingVersion": "1.0", "kpr": 0.62, "dpr": 0.66 },
-		"accolades": { "majorWins": 2, "majorMvps": 0, "eventMvps": 0 }
+		"stats": {
+			"rating": 0.94,
+			"ratingVersion": "1.0",
+			"kpr": 0.62,
+			"dpr": 0.66
+		},
+		"accolades": {
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 0
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "fallen-2016",
+		"id": "fallen-2016-sk",
 		"playerId": "fallen",
 		"nick": "FalleN",
 		"realName": "Gabriel Toledo",
@@ -431,10 +649,19 @@
 			"impact": 1.18,
 			"openingKpr": 0.12
 		},
-		"accolades": { "top20Rank": 4, "majorWins": 2, "majorMvps": 0, "eventMvps": 2 }
+		"accolades": {
+			"top20Rank": 4,
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "coldzera-2016",
+		"id": "coldzera-2016-sk",
 		"playerId": "coldzera",
 		"nick": "coldzera",
 		"realName": "Marcelo David",
@@ -455,10 +682,19 @@
 			"impact": 1.32,
 			"clutchRate": 0.32
 		},
-		"accolades": { "top20Rank": 1, "majorWins": 2, "majorMvps": 2, "eventMvps": 4 }
+		"accolades": {
+			"top20Rank": 1,
+			"majorWins": 2,
+			"majorMvps": 2,
+			"eventMvps": 4
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "fer-2016",
+		"id": "fer-2016-sk",
 		"playerId": "fer",
 		"nick": "fer",
 		"realName": "Fernando Alvarenga",
@@ -479,10 +715,18 @@
 			"impact": 1.2,
 			"openingKpr": 0.16
 		},
-		"accolades": { "majorWins": 2, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "taco-2016",
+		"id": "taco-2016-sk",
 		"playerId": "taco",
 		"nick": "TACO",
 		"realName": "Epitácio de Melo",
@@ -502,10 +746,18 @@
 			"kast": 71,
 			"impact": 0.95
 		},
-		"accolades": { "majorWins": 2, "majorMvps": 0, "eventMvps": 0 }
+		"accolades": {
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 0
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "fnx-2016",
+		"id": "fnx-2016-sk",
 		"playerId": "fnx",
 		"nick": "fnx",
 		"realName": "Lincoln Lau",
@@ -525,10 +777,18 @@
 			"kast": 71,
 			"impact": 1.14
 		},
-		"accolades": { "majorWins": 2, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "device-2018",
+		"id": "device-2018-astralis",
 		"playerId": "device",
 		"nick": "device",
 		"realName": "Nicolai Reedtz",
@@ -549,10 +809,19 @@
 			"impact": 1.35,
 			"openingKpr": 0.14
 		},
-		"accolades": { "top20Rank": 2, "majorWins": 2, "majorMvps": 1, "eventMvps": 3 }
+		"accolades": {
+			"top20Rank": 2,
+			"majorWins": 2,
+			"majorMvps": 1,
+			"eventMvps": 3
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "dupreeh-2018",
+		"id": "dupreeh-2018-astralis",
 		"playerId": "dupreeh",
 		"nick": "dupreeh",
 		"realName": "Peter Rasmussen",
@@ -573,10 +842,19 @@
 			"impact": 1.18,
 			"openingKpr": 0.15
 		},
-		"accolades": { "top20Rank": 8, "majorWins": 2, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"top20Rank": 8,
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "xyp9x-2018",
+		"id": "xyp9x-2018-astralis",
 		"playerId": "xyp9x",
 		"nick": "Xyp9x",
 		"realName": "Andreas Højsleth",
@@ -597,10 +875,18 @@
 			"impact": 1.05,
 			"clutchRate": 0.36
 		},
-		"accolades": { "majorWins": 2, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "gla1ve-2018",
+		"id": "gla1ve-2018-astralis",
 		"playerId": "gla1ve",
 		"nick": "gla1ve",
 		"realName": "Lukas Rossander",
@@ -620,10 +906,18 @@
 			"kast": 72,
 			"impact": 1.08
 		},
-		"accolades": { "majorWins": 2, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 2,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "magisk-2018",
+		"id": "magisk-2018-astralis",
 		"playerId": "magisk",
 		"nick": "Magisk",
 		"realName": "Emil Reif",
@@ -644,10 +938,19 @@
 			"impact": 1.22,
 			"clutchRate": 0.3
 		},
-		"accolades": { "top20Rank": 4, "majorWins": 2, "majorMvps": 1, "eventMvps": 2 }
+		"accolades": {
+			"top20Rank": 4,
+			"majorWins": 2,
+			"majorMvps": 1,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "s1mple-2018",
+		"id": "s1mple-2018-navi",
 		"playerId": "s1mple",
 		"nick": "s1mple",
 		"realName": "Oleksandr Kostyliev",
@@ -668,10 +971,19 @@
 			"impact": 1.55,
 			"openingKpr": 0.17
 		},
-		"accolades": { "top20Rank": 1, "majorWins": 0, "majorMvps": 0, "eventMvps": 5 }
+		"accolades": {
+			"top20Rank": 1,
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 5
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "electronic-2018",
+		"id": "electronic-2018-navi",
 		"playerId": "electronic",
 		"nick": "electronic",
 		"realName": "Denis Sharipov",
@@ -692,10 +1004,19 @@
 			"impact": 1.24,
 			"openingKpr": 0.14
 		},
-		"accolades": { "top20Rank": 3, "majorWins": 0, "majorMvps": 0, "eventMvps": 2 }
+		"accolades": {
+			"top20Rank": 3,
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "edward-2018",
+		"id": "edward-2018-navi",
 		"playerId": "edward",
 		"nick": "Edward",
 		"realName": "Ioann Sukhariev",
@@ -715,10 +1036,18 @@
 			"kast": 70,
 			"impact": 1.08
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 0 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 0
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "flamie-2018",
+		"id": "flamie-2018-navi",
 		"playerId": "flamie",
 		"nick": "flamie",
 		"realName": "Egor Vasilyev",
@@ -738,10 +1067,18 @@
 			"kast": 71,
 			"impact": 1.12
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "zeus-2018",
+		"id": "zeus-2018-navi",
 		"playerId": "zeus",
 		"nick": "Zeus",
 		"realName": "Danylo Teslenko",
@@ -761,10 +1098,18 @@
 			"kast": 69,
 			"impact": 0.94
 		},
-		"accolades": { "majorWins": 0, "majorMvps": 0, "eventMvps": 0 }
+		"accolades": {
+			"majorWins": 0,
+			"majorMvps": 0,
+			"eventMvps": 0
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "karrigan-2022",
+		"id": "karrigan-2022-faze",
 		"playerId": "karrigan",
 		"nick": "karrigan",
 		"realName": "Finn Andersen",
@@ -784,10 +1129,18 @@
 			"kast": 68,
 			"impact": 0.92
 		},
-		"accolades": { "majorWins": 1, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 1,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "broky-2022",
+		"id": "broky-2022-faze",
 		"playerId": "broky",
 		"nick": "broky",
 		"realName": "Helvijs Saukants",
@@ -807,10 +1160,18 @@
 			"kast": 73,
 			"impact": 1.2
 		},
-		"accolades": { "majorWins": 1, "majorMvps": 0, "eventMvps": 1 }
+		"accolades": {
+			"majorWins": 1,
+			"majorMvps": 0,
+			"eventMvps": 1
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "rain-2022",
+		"id": "rain-2022-faze",
 		"playerId": "rain",
 		"nick": "rain",
 		"realName": "Håvard Nygaard",
@@ -831,10 +1192,18 @@
 			"impact": 1.16,
 			"openingKpr": 0.15
 		},
-		"accolades": { "majorWins": 1, "majorMvps": 1, "eventMvps": 2 }
+		"accolades": {
+			"majorWins": 1,
+			"majorMvps": 1,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "twistzz-2022",
+		"id": "twistzz-2022-faze",
 		"playerId": "twistzz",
 		"nick": "Twistzz",
 		"realName": "Russel Van Dulken",
@@ -854,10 +1223,18 @@
 			"kast": 73,
 			"impact": 1.18
 		},
-		"accolades": { "majorWins": 1, "majorMvps": 0, "eventMvps": 2 }
+		"accolades": {
+			"majorWins": 1,
+			"majorMvps": 0,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	},
 	{
-		"id": "ropz-2022",
+		"id": "ropz-2022-faze",
 		"playerId": "ropz",
 		"nick": "ropz",
 		"realName": "Robin Kool",
@@ -878,6 +1255,14 @@
 			"impact": 1.21,
 			"clutchRate": 0.31
 		},
-		"accolades": { "majorWins": 1, "majorMvps": 0, "eventMvps": 2 }
+		"accolades": {
+			"majorWins": 1,
+			"majorMvps": 0,
+			"eventMvps": 2
+		},
+		"ratingProvenance": {
+			"kind": "verified-stats",
+			"source": "HLTV annual statistics"
+		}
 	}
 ]

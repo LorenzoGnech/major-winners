@@ -1,0 +1,92 @@
+[
+	{
+		"id": "dreamhack-winter-2013",
+		"name": "DreamHack Winter 2013",
+		"shortName": "DH Winter 2013",
+		"year": 2013,
+		"game": "csgo",
+		"startDate": "2013-11-28",
+		"endDate": "2013-11-30",
+		"location": "Jönköping, Sweden",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/DreamHack/2013/Winter",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "esl-one-cologne-2015",
+		"name": "ESL One Cologne 2015",
+		"shortName": "Cologne 2015",
+		"year": 2015,
+		"game": "csgo",
+		"startDate": "2015-08-20",
+		"endDate": "2015-08-23",
+		"location": "Cologne, Germany",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/ESL/One/2015/Cologne",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "esl-one-cologne-2016",
+		"name": "ESL One Cologne 2016",
+		"shortName": "Cologne 2016",
+		"year": 2016,
+		"game": "csgo",
+		"startDate": "2016-07-05",
+		"endDate": "2016-07-10",
+		"location": "Cologne, Germany",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/ESL/One/2016/Cologne",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "faceit-london-2018",
+		"name": "FACEIT Major: London 2018",
+		"shortName": "London 2018",
+		"year": 2018,
+		"game": "csgo",
+		"startDate": "2018-09-05",
+		"endDate": "2018-09-23",
+		"location": "London, United Kingdom",
+		"teamCount": 24,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/FACEIT/2018/Major",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "pgl-antwerp-2022",
+		"name": "PGL Major Antwerp 2022",
+		"shortName": "Antwerp 2022",
+		"year": 2022,
+		"game": "csgo",
+		"startDate": "2022-05-09",
+		"endDate": "2022-05-22",
+		"location": "Antwerp, Belgium",
+		"teamCount": 24,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/PGL/2022/Antwerp",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	}
+]

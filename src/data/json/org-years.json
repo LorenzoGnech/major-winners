@@ -1,87 +1,217 @@
 [
 	{
-		"id": "sk-2003",
+		"id": "sk-cpl-2003",
+		"kind": "legacy",
 		"orgId": "sk",
 		"year": 2003,
 		"game": "cs16",
 		"tier": "legendary",
-		"playerSeasonIds": ["heaton-2003", "potti-2003", "element-2003", "ahl-2003", "fisker-2003"],
+		"status": "played",
+		"placement": 1,
+		"playerSeasonIds": [
+			"heaton-2003-sk",
+			"potti-2003-sk",
+			"element-2003-sk",
+			"ahl-2003-sk",
+			"fisker-2003-sk"
+		],
+		"substituteSeasonIds": [],
+		"sources": [
+			{
+				"label": "Liquipedia SK Gaming history",
+				"url": "https://liquipedia.net/counterstrike/SK_Gaming",
+				"accessedAt": "2026-09-15"
+			}
+		],
 		"note": "Prize-money five of 2003 (CPL Summer through CPL Winter). SpawN stood in at WCG because elemeNt is Norwegian."
 	},
 	{
-		"id": "fnatic-2009",
+		"id": "fnatic-legacy-2009",
+		"kind": "legacy",
 		"orgId": "fnatic",
 		"year": 2009,
 		"game": "cs16",
 		"tier": "legendary",
-		"playerSeasonIds": ["carn-2009", "forest-2009", "gux-2009", "dsn-2009", "archi-2009"],
+		"status": "played",
+		"placement": 1,
+		"playerSeasonIds": [
+			"carn-2009-fnatic",
+			"forest-2009-fnatic",
+			"gux-2009-fnatic",
+			"dsn-2009-fnatic",
+			"archi-2009-fnatic"
+		],
+		"substituteSeasonIds": [],
+		"sources": [
+			{
+				"label": "Liquipedia Fnatic history",
+				"url": "https://liquipedia.net/counterstrike/Fnatic",
+				"accessedAt": "2026-09-15"
+			}
+		],
 		"note": "ESWC 2009 world champions. cArn called from inside the server; 1.6 sides rarely had a separate coach."
 	},
 	{
-		"id": "nip-2013",
+		"id": "nip-dreamhack-winter-2013",
+		"kind": "major",
+		"majorId": "dreamhack-winter-2013",
 		"orgId": "nip",
 		"year": 2013,
 		"game": "csgo",
 		"tier": "legendary",
+		"status": "played",
+		"placement": 2,
 		"playerSeasonIds": [
-			"get_right-2013",
-			"forest-2013",
-			"xizt-2013",
-			"friberg-2013",
-			"fifflaren-2013"
+			"get_right-2013-nip",
+			"forest-2013-nip",
+			"xizt-2013-nip",
+			"friberg-2013-nip",
+			"fifflaren-2013-nip"
 		],
-		"coachId": "threat-2013"
+		"substituteSeasonIds": [],
+		"coachId": "threat-2013",
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/DreamHack/2013/Winter",
+				"accessedAt": "2026-09-15"
+			}
+		]
 	},
 	{
-		"id": "fnatic-2015",
+		"id": "fnatic-esl-one-cologne-2015",
+		"kind": "major",
+		"majorId": "esl-one-cologne-2015",
 		"orgId": "fnatic",
 		"year": 2015,
 		"game": "csgo",
 		"tier": "legendary",
-		"playerSeasonIds": ["olofmeister-2015", "flusha-2015", "jw-2015", "krimz-2015", "pronax-2015"],
-		"coachId": "vuggo-2015"
+		"status": "played",
+		"placement": 1,
+		"playerSeasonIds": [
+			"olofmeister-2015-fnatic",
+			"flusha-2015-fnatic",
+			"jw-2015-fnatic",
+			"krimz-2015-fnatic",
+			"pronax-2015-fnatic"
+		],
+		"substituteSeasonIds": [],
+		"coachId": "vuggo-2015",
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/ESL/One/2015/Cologne",
+				"accessedAt": "2026-09-15"
+			}
+		]
 	},
 	{
-		"id": "sk-2016",
+		"id": "sk-esl-one-cologne-2016",
+		"kind": "major",
+		"majorId": "esl-one-cologne-2016",
 		"orgId": "sk",
 		"year": 2016,
 		"game": "csgo",
 		"tier": "legendary",
-		"playerSeasonIds": ["fallen-2016", "coldzera-2016", "fer-2016", "taco-2016", "fnx-2016"],
+		"status": "played",
+		"placement": 1,
+		"playerSeasonIds": [
+			"fallen-2016-sk",
+			"coldzera-2016-sk",
+			"fer-2016-sk",
+			"taco-2016-sk",
+			"fnx-2016-sk"
+		],
+		"substituteSeasonIds": [],
 		"coachId": "zews-2016",
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/ESL/One/2016/Cologne",
+				"accessedAt": "2026-09-15"
+			}
+		],
 		"note": "The Brazilian five that won MLG Columbus and ESL One Cologne as Luminosity, then SK."
 	},
 	{
-		"id": "astralis-2018",
+		"id": "astralis-faceit-london-2018",
+		"kind": "major",
+		"majorId": "faceit-london-2018",
 		"orgId": "astralis",
 		"year": 2018,
 		"game": "csgo",
 		"tier": "legendary",
-		"playerSeasonIds": ["device-2018", "dupreeh-2018", "xyp9x-2018", "gla1ve-2018", "magisk-2018"],
-		"coachId": "zonic-2018"
+		"status": "played",
+		"placement": 3,
+		"playerSeasonIds": [
+			"device-2018-astralis",
+			"dupreeh-2018-astralis",
+			"xyp9x-2018-astralis",
+			"gla1ve-2018-astralis",
+			"magisk-2018-astralis"
+		],
+		"substituteSeasonIds": [],
+		"coachId": "zonic-2018",
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/FACEIT/2018/Major",
+				"accessedAt": "2026-09-15"
+			}
+		]
 	},
 	{
-		"id": "navi-2018",
+		"id": "navi-faceit-london-2018",
+		"kind": "major",
+		"majorId": "faceit-london-2018",
 		"orgId": "navi",
 		"year": 2018,
 		"game": "csgo",
 		"tier": "legendary",
+		"status": "played",
+		"placement": 2,
 		"playerSeasonIds": [
-			"s1mple-2018",
-			"electronic-2018",
-			"edward-2018",
-			"flamie-2018",
-			"zeus-2018"
+			"s1mple-2018-navi",
+			"electronic-2018-navi",
+			"edward-2018-navi",
+			"flamie-2018-navi",
+			"zeus-2018-navi"
 		],
-		"coachId": "starix-2018"
+		"substituteSeasonIds": [],
+		"coachId": "starix-2018",
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/FACEIT/2018/Major",
+				"accessedAt": "2026-09-15"
+			}
+		]
 	},
 	{
-		"id": "faze-2022",
+		"id": "faze-pgl-antwerp-2022",
+		"kind": "major",
+		"majorId": "pgl-antwerp-2022",
 		"orgId": "faze",
 		"year": 2022,
 		"game": "csgo",
 		"tier": "legendary",
-		"playerSeasonIds": ["karrigan-2022", "broky-2022", "rain-2022", "twistzz-2022", "ropz-2022"],
-		"coachId": "robban-2022"
+		"status": "played",
+		"placement": 1,
+		"playerSeasonIds": [
+			"karrigan-2022-faze",
+			"broky-2022-faze",
+			"rain-2022-faze",
+			"twistzz-2022-faze",
+			"ropz-2022-faze"
+		],
+		"substituteSeasonIds": [],
+		"coachId": "robban-2022",
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/PGL/2022/Antwerp",
+				"accessedAt": "2026-09-15"
+			}
+		]
 	}
 ]

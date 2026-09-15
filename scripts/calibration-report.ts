@@ -2,7 +2,7 @@ import { loadDataset } from "../src/data";
 import { ratePlayers } from "../src/engine";
 
 const TOP_N = 15;
-const LEGEND_IDS = ["s1mple-2018", "olofmeister-2015", "heaton-2003"] as const;
+const LEGEND_IDS = ["s1mple-2018-navi", "olofmeister-2015-fnatic", "heaton-2003-sk"] as const;
 
 const dataset = loadDataset();
 const rated = ratePlayers(dataset.playerSeasons).sort((a, b) => b.ovr - a.ovr);

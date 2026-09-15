@@ -3,6 +3,7 @@ import { DatasetValidationError, loadDataset } from "../src/data";
 try {
 	const dataset = loadDataset();
 	const lines = [
+		`majors          ${dataset.majors.length}`,
 		`orgs            ${dataset.orgs.length}`,
 		`org-years       ${dataset.orgYears.length}`,
 		`player-seasons  ${dataset.playerSeasons.length}`,

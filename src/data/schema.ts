@@ -4,11 +4,41 @@ export const ROLES = ["awp", "igl", "entry", "support", "lurker"] as const;
 export const GAMES = ["cs16", "css", "csgo", "cs2"] as const;
 export const DATA_REGIMES = ["full", "partial", "none"] as const;
 export const ORG_TIERS = ["legendary", "strong", "cult"] as const;
+export const ROSTER_KINDS = ["major", "legacy"] as const;
+export const ROSTER_STATUSES = ["played", "withdrawn"] as const;
+export const RATING_PROVENANCE_KINDS = [
+	"verified-stats",
+	"curated-legend",
+	"curated-fallback",
+] as const;
 
 export const roleSchema = z.enum(ROLES);
 export const gameSchema = z.enum(GAMES);
 export const dataRegimeSchema = z.enum(DATA_REGIMES);
 export const orgTierSchema = z.enum(ORG_TIERS);
+export const rosterKindSchema = z.enum(ROSTER_KINDS);
+export const rosterStatusSchema = z.enum(ROSTER_STATUSES);
+export const ratingProvenanceKindSchema = z.enum(RATING_PROVENANCE_KINDS);
+
+export const sourceSchema = z.object({
+	label: z.string().min(1),
+	url: z.url(),
+	revision: z.string().min(1).optional(),
+	accessedAt: z.iso.date(),
+});
+
+export const majorSchema = z.object({
+	id: z.string().min(1),
+	name: z.string().min(1),
+	shortName: z.string().min(1),
+	year: z.number().int().min(2013),
+	game: z.enum(["csgo", "cs2"]),
+	startDate: z.iso.date(),
+	endDate: z.iso.date(),
+	location: z.string().min(1),
+	teamCount: z.number().int().min(16).max(32),
+	sources: z.array(sourceSchema).min(1),
+});
 
 export const attributesSchema = z.object({
 	aim: z.number().min(0).max(100).optional(),
@@ -50,16 +80,46 @@ export const orgSchema = z.object({
 	country: z.string().length(2),
 });
 
-export const orgYearSchema = z.object({
-	id: z.string().min(1),
-	orgId: z.string().min(1),
-	year: z.number().int(),
-	game: gameSchema,
-	tier: orgTierSchema,
-	playerSeasonIds: z.array(z.string().min(1)).length(5),
-	coachId: z.string().min(1).optional(),
-	note: z.string().optional(),
-});
+export const orgYearSchema = z
+	.object({
+		id: z.string().min(1),
+		kind: rosterKindSchema,
+		majorId: z.string().min(1).optional(),
+		orgId: z.string().min(1),
+		year: z.number().int(),
+		game: gameSchema,
+		tier: orgTierSchema,
+		status: rosterStatusSchema,
+		placement: z.number().int().positive().optional(),
+		playerSeasonIds: z.array(z.string().min(1)).length(5),
+		substituteSeasonIds: z.array(z.string().min(1)).default([]),
+		coachId: z.string().min(1).optional(),
+		sources: z.array(sourceSchema).min(1),
+		note: z.string().optional(),
+	})
+	.superRefine((row, ctx) => {
+		if (row.kind === "major" && !row.majorId) {
+			ctx.addIssue({
+				code: "custom",
+				path: ["majorId"],
+				message: "major roster requires majorId",
+			});
+		}
+		if (row.kind === "legacy" && row.majorId) {
+			ctx.addIssue({
+				code: "custom",
+				path: ["majorId"],
+				message: "legacy roster cannot reference a Valve Major",
+			});
+		}
+		if (row.status === "played" && row.placement === undefined) {
+			ctx.addIssue({
+				code: "custom",
+				path: ["placement"],
+				message: "played roster requires placement",
+			});
+		}
+	});
 
 export const coachSchema = z.object({
 	id: z.string().min(1),
@@ -88,16 +148,21 @@ export const playerSeasonSchema = z
 		roles: z.array(roleSchema).min(1),
 		primaryRole: roleSchema,
 		dataRegime: dataRegimeSchema,
+		ratingProvenance: z.object({
+			kind: ratingProvenanceKindSchema,
+			source: z.string().min(1).optional(),
+			note: z.string().min(1).optional(),
+		}),
 		stats: statsSchema.optional(),
 		curated: curatedSchema.optional(),
 		accolades: accoladesSchema,
 	})
 	.superRefine((row, ctx) => {
-		if (row.id !== `${row.playerId}-${row.year}`) {
+		if (row.id !== `${row.playerId}-${row.year}-${row.orgId}`) {
 			ctx.addIssue({
 				code: "custom",
 				path: ["id"],
-				message: `expected "${row.playerId}-${row.year}"`,
+				message: `expected "${row.playerId}-${row.year}-${row.orgId}"`,
 			});
 		}
 		if (!row.roles.includes(row.primaryRole)) {
@@ -139,6 +204,7 @@ export const playerSeasonSchema = z
 	});
 
 export const datasetSchema = z.object({
+	majors: z.array(majorSchema).min(1),
 	orgs: z.array(orgSchema).min(1),
 	orgYears: z.array(orgYearSchema).min(1),
 	playerSeasons: z.array(playerSeasonSchema).min(1),
@@ -149,6 +215,11 @@ export type Role = z.infer<typeof roleSchema>;
 export type Game = z.infer<typeof gameSchema>;
 export type DataRegime = z.infer<typeof dataRegimeSchema>;
 export type OrgTier = z.infer<typeof orgTierSchema>;
+export type RosterKind = z.infer<typeof rosterKindSchema>;
+export type RosterStatus = z.infer<typeof rosterStatusSchema>;
+export type RatingProvenanceKind = z.infer<typeof ratingProvenanceKindSchema>;
+export type Source = z.infer<typeof sourceSchema>;
+export type Major = z.infer<typeof majorSchema>;
 export type Org = z.infer<typeof orgSchema>;
 export type OrgYear = z.infer<typeof orgYearSchema>;
 export type PlayerSeason = z.infer<typeof playerSeasonSchema>;
