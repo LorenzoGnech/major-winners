@@ -30,23 +30,32 @@ type ParsedTeam = {
 
 const ORG_ALIASES: Record<string, string> = {
 	"natus vincere": "navi",
+	navi: "navi",
 	"ninjas in pyjamas": "nip",
+	nip: "nip",
 	"faze clan": "faze",
+	faze: "faze",
 	"sk gaming": "sk",
+	sk: "sk",
+	fnc: "fnatic",
 	"team vitality": "vitality",
+	vitality: "vitality",
 	"virtus pro": "virtus-pro",
 	"virtus.pro": "virtus-pro",
+	vp: "virtus-pro",
 	"g2 esports": "g2",
+	g2: "g2",
 	"team liquid": "liquid",
+	liquid: "liquid",
 	mousesports: "mouz",
 	mouz: "mouz",
 	"complexity gaming": "complexity",
 	complexity: "complexity",
+	col: "complexity",
 };
 
-const NON_PLAYING_CARDS: Readonly<Record<string, readonly string[]>> = {
+const REPLACED_SOURCE_CARDS: Readonly<Record<string, readonly string[]>> = {
 	"eleague-boston-2018": ["immortals", "tyloo"],
-	"starladder-berlin-2019": ["forfeited-slot"],
 	"pgl-copenhagen-2024": ["9pandas"],
 	"blast-austin-2025": ["bestia"],
 };
@@ -78,8 +87,18 @@ function normalizeTeam(value: string): string {
 			.replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, "$2")
 			.replace(/\[\[([^\]]+)\]\]/g, "$1")
 			.replace(/\{\{!}}/g, "|")
+			.replace(/\borig(?:inal)?\b/gi, "")
 			.trim(),
 	);
+}
+
+function teamAcronym(value: string): string {
+	return cleanWikiValue(value)
+		.toLowerCase()
+		.split(/[^a-z0-9]+/)
+		.filter((word) => word && !["team", "gaming", "esports", "e", "in", "the"].includes(word))
+		.map((word) => word[0])
+		.join("");
 }
 
 function extractTemplates(text: string, name: string): string[] {
@@ -193,7 +212,11 @@ function nationalityMap(wikitext: string): Map<string, string> {
 
 function placementMap(wikitext: string): Map<string, number> {
 	const output = new Map<string, number>();
-	const prizeSection = wikitext.split(/===Prize Pool===/i)[1]?.split(/\n==[^=]/)[0] ?? wikitext;
+	const prizeHeading = /^={2,4}Prize Pool={2,4}\s*$/im.exec(wikitext);
+	const afterHeading = prizeHeading
+		? wikitext.slice(prizeHeading.index + prizeHeading[0].length)
+		: wikitext;
+	const prizeSection = afterHeading.split(/\n==[^=]/)[0] ?? afterHeading;
 	for (const template of extractTemplates(prizeSection, "prize pool slot")) {
 		const params = templateParams(template);
 		const placement = Number.parseInt(params.get("place") ?? "", 10);
@@ -202,10 +225,53 @@ function placementMap(wikitext: string): Map<string, number> {
 			const candidate = cleanWikiValue(params.get(String(index)));
 			if (candidate && !/^(?:true|false|yes|no|\d)/i.test(candidate)) {
 				output.set(normalizeTeam(candidate), placement);
+				output.set(orgIdFor(candidate), placement);
 			}
 		}
 	}
 	return output;
+}
+
+function decodeHtml(value: string): string {
+	return value
+		.replace(/&#(\d+);/g, (_, code: string) => String.fromCharCode(Number.parseInt(code, 10)))
+		.replace(/&amp;/g, "&")
+		.replace(/&nbsp;/g, " ")
+		.replace(/<[^>]+>/g, "")
+		.trim();
+}
+
+function renderedPlacementMap(html: string): Map<string, number> {
+	const output = new Map<string, number>();
+	const tableStart = html.indexOf("prizepooltable prizepooltable-placement");
+	if (tableStart < 0) return output;
+	const tableEnd = html.indexOf("</table>", tableStart);
+	const table = html.slice(tableStart, tableEnd < 0 ? undefined : tableEnd);
+	let currentPlacement: number | undefined;
+	for (const row of table.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)) {
+		const body = row[1];
+		const placeText = /prizepooltable-badge[^>]*>([\s\S]*?)<\/span>/i.exec(body)?.[1];
+		if (placeText) currentPlacement = Number.parseInt(decodeHtml(placeText), 10);
+		const teamName = /<span class="name"[^>]*>[\s\S]*?<a\b[^>]*>([\s\S]*?)<\/a>/i.exec(body)?.[1];
+		if (!currentPlacement || !teamName) continue;
+		const name = decodeHtml(teamName);
+		output.set(normalizeTeam(name), currentPlacement);
+		output.set(orgIdFor(name), currentPlacement);
+	}
+	return output;
+}
+
+function resolvePlacement(name: string, placements: Map<string, number>): number | undefined {
+	const keys = [normalizeTeam(name), orgIdFor(name), teamAcronym(name)];
+	for (const key of keys) {
+		const placement = placements.get(key);
+		if (placement !== undefined) return placement;
+	}
+	const orgId = orgIdFor(name);
+	for (const [key, placement] of placements) {
+		if (key.length >= 4 && (key.includes(orgId) || orgId.includes(key))) return placement;
+	}
+	return undefined;
 }
 
 function rosterSection(wikitext: string): string {
@@ -287,7 +353,7 @@ function parseOpponentTeams(
 				.filter((person) => person.role !== "coach" && !person.played)
 				.map((person) => person.person);
 			if (activePlayers.length !== 5) return null;
-			const exactPlacement = placements.get(normalizeTeam(name));
+			const exactPlacement = resolvePlacement(name, placements);
 			return {
 				name,
 				players: activePlayers,
@@ -303,9 +369,17 @@ function parseOpponentTeams(
 		.filter((team): team is ParsedTeam => team !== null);
 }
 
-function parseTeams(page: WikiPage, teamCount: number, majorId: string): ParsedTeam[] {
+function parseTeams(
+	page: WikiPage,
+	teamCount: number,
+	majorId: string,
+	renderedHtml = "",
+): ParsedTeam[] {
 	const nationalities = nationalityMap(page.wikitext);
 	const placements = placementMap(page.wikitext);
+	for (const [team, placement] of renderedPlacementMap(renderedHtml)) {
+		placements.set(team, placement);
+	}
 	const participants = rosterSection(page.wikitext);
 	const opponentTeams = parseOpponentTeams(participants, nationalities, placements, teamCount);
 	if (opponentTeams.length > 0) return opponentTeams;
@@ -319,8 +393,10 @@ function parseTeams(page: WikiPage, teamCount: number, majorId: string): ParsedT
 				.filter((player): player is NonNullable<typeof player> => Boolean(player));
 			if (!name || players.length !== 5) return null;
 			const normalized = normalizeTeam(name);
-			const exactPlacement = placements.get(normalized);
-			if (NON_PLAYING_CARDS[majorId]?.includes(normalized)) return null;
+			const exactPlacement = resolvePlacement(name, placements);
+			if (normalized.endsWith("-slot") || REPLACED_SOURCE_CARDS[majorId]?.includes(normalized)) {
+				return null;
+			}
 			const substitutes = ["s", "s1", "s2"]
 				.map((key) => personFromParams(params, key, nationalities))
 				.filter((player): player is NonNullable<typeof player> => Boolean(player));
@@ -452,11 +528,43 @@ async function fetchPage(source: MajorSource): Promise<WikiPage> {
 	return page;
 }
 
+async function fetchRenderedPage(source: MajorSource): Promise<string> {
+	const cacheFile = new URL(`${source.id}.html.json`, CACHE_DIR);
+	try {
+		const cached = JSON.parse(await readFile(cacheFile, "utf8")) as { html: string };
+		return cached.html;
+	} catch {
+		if (OFFLINE) return "";
+	}
+	const url = new URL("https://liquipedia.net/counterstrike/api.php");
+	for (const [key, value] of Object.entries({
+		action: "parse",
+		page: source.page,
+		prop: "text",
+		format: "json",
+	})) {
+		url.searchParams.set(key, value);
+	}
+	const response = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+	if (!response.ok) throw new Error(`${source.page}: Liquipedia parse returned ${response.status}`);
+	const payload = (await response.json()) as { parse?: { text?: { "*": string } } };
+	const html = payload.parse?.text?.["*"];
+	if (!html) throw new Error(`${source.page}: rendered placement table is missing`);
+	await mkdir(CACHE_DIR, { recursive: true });
+	await writeFile(cacheFile, `${JSON.stringify({ html })}\n`);
+	await new Promise((resolve) => setTimeout(resolve, 30_100));
+	return html;
+}
+
 async function main() {
 	const existingPlayers = await readJson<PlayerSeason[]>("player-seasons.json");
 	const existingCoaches = await readJson<Coach[]>("coaches.json");
 	const existingRosters = await readJson<OrgYear[]>("org-years.json");
-	const playerById = new Map(existingPlayers.map((player) => [player.id, player]));
+	const playerById = new Map(
+		existingPlayers
+			.filter((player) => player.ratingProvenance.kind !== "curated-fallback")
+			.map((player) => [player.id, player]),
+	);
 	const coachById = new Map(existingCoaches.map((coach) => [coach.id, coach]));
 	const existingCoachByIdentity = new Map(
 		existingCoaches.map((coach) => [
@@ -473,7 +581,8 @@ async function main() {
 	for (const source of MAJOR_SOURCES) {
 		const page = await fetchPage(source);
 		const major = majorFromPage(source, page);
-		const teams = parseTeams(page, major.teamCount, major.id);
+		const renderedHtml = await fetchRenderedPage(source);
+		const teams = parseTeams(page, major.teamCount, major.id, renderedHtml);
 		if (teams.length !== major.teamCount) {
 			throw new Error(
 				`${major.id}: expected ${major.teamCount} played TeamCards, parsed ${teams.length}`,
@@ -485,9 +594,9 @@ async function main() {
 			const orgId = orgIdFor(team.name);
 			const playerSeasonIds = team.players.map((player, slot) => {
 				const id = `${playerSlug(player.canonical)}-${major.year}-${orgId}`;
+				const role = ROLE_BY_SLOT[slot] ?? "support";
+				const ovr = fallbackOvr(team.placement, major.teamCount, slot);
 				if (!playerById.has(id)) {
-					const role = ROLE_BY_SLOT[slot] ?? "support";
-					const ovr = fallbackOvr(team.placement, major.teamCount, slot);
 					playerById.set(id, {
 						id,
 						playerId: playerSlug(player.canonical),
@@ -512,6 +621,29 @@ async function main() {
 						},
 						accolades: { majorWins: 0, majorMvps: 0, eventMvps: 0 },
 					});
+				} else {
+					const existing = playerById.get(id);
+					if (
+						existing?.ratingProvenance.kind === "curated-fallback" &&
+						existing.curated &&
+						(ovr > existing.curated.ovr ||
+							existing.ratingProvenance.source?.endsWith(" substitute"))
+					) {
+						playerById.set(id, {
+							...existing,
+							roles: [role],
+							primaryRole: role,
+							ratingProvenance: {
+								...existing.ratingProvenance,
+								source: `${major.name} placement and TeamCard order`,
+							},
+							curated: {
+								...existing.curated,
+								ovr,
+								rationale: `Best placement-based fallback for ${team.name} in ${major.year}, from ${major.name}; TeamCard slot supplies the provisional role.`,
+							},
+						});
+					}
 				}
 				return id;
 			});
@@ -587,7 +719,9 @@ async function main() {
 				note: team.note,
 			});
 		}
-		console.log(`${major.id.padEnd(30)} ${teams.length} teams · rev ${page.revision}`);
+		console.log(
+			`${major.id.padEnd(30)} ${teams.length} teams · ${teams.filter((team) => team.placementVerified).length} exact placements · rev ${page.revision}`,
+		);
 	}
 
 	const referencedIds = new Set(

@@ -1,6 +1,6 @@
 # Major Winners
 
-A Counter-Strike legends draft game. Roll six org-year cards, fill five role slots plus a coach, then simulate a Major run and try to go 9-0.
+A Counter-Strike legends draft game. Roll five historical Major team cards plus a coach, fill the role slots, then simulate a Major run and try to go 9-0.
 
 ## Stack
 
@@ -27,11 +27,15 @@ Path alias: `@/` maps to `src/`.
 - Engine modules import neither React, React DOM, Astro, nor DOM APIs. UI is a thin renderer of engine output.
 - All randomness flows through `src/engine/rng` (Mulberry32). `createRng` takes a uint32 or string (FNV-1a). `seedFromUtcDate` hashes the UTC `YYYY-MM-DD` day. A given seed must produce the same draft, matches, and tournament.
 - Prefer reducers and pure functions. Side effects (localStorage, fetch) live outside `src/engine/`.
-- Invalid draft actions return `{ ok: false, error: DraftError }` and leave state unchanged. `startDraft` throws `DraftError` when the pool cannot supply five org-year cards or a coach.
+- Invalid draft actions return `{ ok: false, error: DraftError }` and leave state unchanged. `startDraft` throws `DraftError` when the pool cannot supply five Major cards or a coach.
 
 ## Draft
 
-Six rounds. The first five reveal **distinct** org-year cards sampled without replacement with integer tier weights: `legendary` 5, `strong` 3, `cult` 1 (`TIER_WEIGHTS`). Each player pick takes one of that card's five player-seasons and assigns it to an empty role slot. The sixth round picks one coach from the **full** coach pool (order shuffled on the same RNG stream after the five cards). Completed state is five picks covering every role plus a coach.
+Six rounds. Each of the first five rolls a distinct completed Valve Major, then samples one of its participating five-player rosters with integer tier weights: `legendary` 5, `strong` 3, `cult` 1 (`TIER_WEIGHTS`). A 5% roll may replace one Major with a pre-2013 Legacy wildcard. The sixth round picks one coach from the full coach pool.
+
+- A draft has one Major reroll and one team reroll. The Major reroll replaces the current event and team; the team reroll keeps the current event. Both are legal only before the current player pick, exclude already shown cards, and derive from the root seed, round, and action type.
+- `RolledOrgYearCard` snapshots its Major/Legacy identity and five players. `applyAction` needs the committed dataset only for reroll actions.
+- Completed state is five picks covering every role plus a coach.
 
 ## Roles
 
@@ -39,15 +43,16 @@ Starters: `awp`, `igl`, `entry`, `support`, `lurker`. Off-role placement is alwa
 
 ## Player strength
 
-Each `PlayerSeason` carries `dataRegime`: `full` (CS:GO 2016+ / CS2 stats), `partial` (CS:GO 2013–2015 Rating 1.0), or `none` (1.6 / Source, accolade rubric). OVR is relative to contemporaries, not raw HLTV rating.
+Each `PlayerSeason` carries `dataRegime`: `full` (CS:GO 2016+ / CS2 stats), `partial` (CS:GO 2013–2015 Rating 1.0), `none` (1.6 / Source accolade rubric), or `fallback` (Major participant without verified individual stats). OVR is relative to contemporaries, not raw HLTV rating.
 
 Contemporaries means a **documented elite LAN-pool distribution per rating version** (`src/engine/ratings/reference.ts`), not the other four people on the same org-year card. Z-scoring inside a roster would punish IGLs.
 
 - `full` / `partial`: z-score season rating against that reference, map to OVR, then add a **modest accolade bonus capped at +5**.
 - `none`: use `curated.ovr` as-is. Do not add the accolade bonus again; the rubric already priced trophies.
+- `fallback`: use a conservative placement-based curated OVR and provisional TeamCard-order role. `ratingProvenance.kind` makes estimates explicit; fallback OVR is capped below verified all-time peaks.
 - Attributes (aim, entry, clutch, utility, consistency, igl) are what the sim consumes. Derived from stats when present; `curated.attributes` overlays. `igl` is role-driven unless curated.
 
-`npm run calibrate` prints the leaderboard and fails if s1mple-2018, olofmeister-2015, and heaton-2003 leave the top 15, or if the top 10 is only CS:GO.
+`npm run calibrate` prints the top leaderboard and fails if s1mple-2018-navi, olofmeister-2015-fnatic, and heaton-2003-sk leave the top 15, if the top 10 is only CS:GO/CS2, or if fallback ratings crowd out verified legends.
 
 ## Team profile
 
@@ -79,28 +84,29 @@ Contemporaries means a **documented elite LAN-pool distribution per rating versi
 
 - The deliberate fantasy format is Challengers Swiss, Legends Swiss, then Champions quarterfinal/semifinal/final. Three Swiss wins advance, three losses eliminate, and the perfect title path is exactly 9–0.
 - Swiss matches are BO1 unless either team-facing record is on two wins or two losses; advancement and elimination matches are BO3. Every playoff match is BO3 and a playoff loss eliminates.
-- `buildHistoricalOpponents` turns each intact org-year into a natural best-fit role assignment. It uses that roster's coach when available and deterministically selects a compatible fallback otherwise.
+- `buildHistoricalOpponents` turns every Major/Legacy roster into a natural best-fit role assignment, labels it with its event, and returns a stable strength-sorted index. It uses that roster's coach when available and deterministically selects a compatible fallback otherwise.
 - Opponent choice is deterministic, generally rises with stage and record, excludes an identical player roster when alternatives exist, and avoids immediate repeats whenever the pool permits.
-- Free Play persists completed drafts and tournaments under `major-winners:tournament:v1`.
+- Free Play persists completed drafts and tournaments under `major-winners:tournament:v2`.
 
 ## Daily challenge
 
 Today's Challenge uses the UTC day and `seedFromUtcDate`, making the draft, coach order, opponents, and results deterministic for identical choices. Restarting uses the same daily seed; Free Play remains random.
 
 - Pure identity, stats, streak, result, and spoiler-free share calculations live in `src/engine/daily/`.
-- Daily attempts use `major-winners:daily-attempt:v1`; local stats use `major-winners:daily-stats:v1`. Both are separate from Free Play.
+- Daily attempts use `major-winners:daily-attempt:v2`; local stats use `major-winners:daily-stats:v1`. Rerolled cards and remaining budgets survive reloads. Both are separate from Free Play.
 - One terminal result is counted per UTC day. Streaks use consecutive UTC completion days across calendar boundaries.
 - Storage, clipboard, and native-share side effects stay in components. Defensive parsing and unavailable storage never block play.
 - Static social metadata uses the generic `/social-card.svg`; no dynamic daily Open Graph image is claimed.
 
 ## Data conventions
 
-- The draftable atom is a player-season (`s1mple-2018`), not a career.
-- An org-year has exactly five players.
-- Roles are curated. Stats are transcribed once from HLTV in a browser session; never scraped at runtime.
+- The draftable atom is a player-org-season (`s1mple-2018-navi`), not a career. This permits same-year transfers.
+- `majors.json` contains 24 completed Valve Majors through Cologne 2026. `org-years.json` contains 511 teams that actually played plus two Legacy wildcards; replaced source cards are not game entities.
+- Every roster appearance has exactly five starters, optional registered substitutes, placement, Major/Legacy identity, and source metadata. Roles may be provisional; off-role placement is always available.
+- `npm run import:majors -- --write` performs the one-time, rate-limited Liquipedia MediaWiki import and caches source revisions under ignored `.cache/`. The shipped app has no runtime network dependency.
 - No org logos or player photos. Text crests and abstract art only.
 - JSON lives in `src/data/json/`. Contracts live in `src/data/schema.ts`. Provenance and the transcription workflow live in `docs/DATA.md`.
-- `npm run validate-data` must stay green. It enforces regime-consistency, five-man org-years, and fillable roles.
+- `npm run validate-data` must stay green. It enforces regime consistency, 24 revision-pinned Majors, each played field size, five unique starters, and relational integrity.
 
 ## Commands
 
@@ -112,6 +118,7 @@ npm run lint
 npm run typecheck
 npm run check
 npm run validate-data
+npm run import:majors -- --offline
 npm run calibrate
 npm run sim:harness
 ```

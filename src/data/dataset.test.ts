@@ -21,6 +21,10 @@ describe("complete Major dataset", () => {
 		for (const major of dataset.majors) {
 			const rosters = dataset.orgYears.filter((roster) => roster.majorId === major.id);
 			expect(rosters, major.id).toHaveLength(major.teamCount);
+			expect(
+				rosters.every((roster) => roster.note === undefined),
+				`${major.id} placement coverage`,
+			).toBe(true);
 			expect(major.sources[0]?.revision, major.id).toMatch(/^\d+$/);
 		}
 		for (const legacy of dataset.orgYears.filter((roster) => roster.kind === "legacy")) {

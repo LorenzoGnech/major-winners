@@ -91,8 +91,9 @@ export function buildHistoricalOpponents(
 	const playersById = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
 	const coachesById = new Map(dataset.coaches.map((coach) => [coach.id, coach]));
 	const orgsById = new Map(dataset.orgs.map((org) => [org.id, org]));
+	const majorsById = new Map(dataset.majors.map((major) => [major.id, major]));
 
-	return dataset.orgYears.map((orgYear) => {
+	const opponents = dataset.orgYears.map((orgYear) => {
 		const players = orgYear.playerSeasonIds.map((id) => {
 			const player = playersById.get(id);
 			if (!player) throw new Error(`missing historical player "${id}"`);
@@ -131,7 +132,11 @@ export function buildHistoricalOpponents(
 		};
 		return {
 			id: orgYear.id,
-			label: `${orgsById.get(orgYear.orgId)?.name ?? orgYear.orgId} ${orgYear.year}`,
+			label: `${orgsById.get(orgYear.orgId)?.name ?? orgYear.orgId} · ${
+				orgYear.majorId
+					? (majorsById.get(orgYear.majorId)?.shortName ?? orgYear.year)
+					: `Legacy ${orgYear.year}`
+			}`,
 			profile: buildTeamProfile({
 				draft,
 				playerSeasons: dataset.playerSeasons,
@@ -140,4 +145,8 @@ export function buildHistoricalOpponents(
 			}),
 		};
 	});
+	return opponents.sort(
+		(left, right) =>
+			left.profile.overall - right.profile.overall || left.id.localeCompare(right.id),
+	);
 }

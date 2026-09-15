@@ -55,13 +55,8 @@ function chooseOpponent(
 	const record = state.stage === "champions" ? null : swissRecord(state);
 	const recordAdjustment = record ? (record.wins - record.losses) * 0.08 : 0;
 	const desired = Math.max(0, Math.min(1, STAGE_DIFFICULTY[state.stage] + recordAdjustment));
-	const ranked = [...candidates].sort((left, right) => {
-		const overallDifference = left.profile.overall - right.profile.overall;
-		if (overallDifference !== 0) return overallDifference;
-		const leftTie = hashStringToSeed(`${state.rootSeed}:${state.history.length}:${left.id}`);
-		const rightTie = hashStringToSeed(`${state.rootSeed}:${state.history.length}:${right.id}`);
-		return leftTie - rightTie;
-	});
+	// buildHistoricalOpponents returns a stable strength index; filtering preserves that order.
+	const ranked = candidates;
 	const baseIndex = Math.round(desired * (ranked.length - 1));
 	const jitter = hashStringToSeed(
 		`${state.rootSeed}:opponent:${state.stage}:${state.history.length}`,

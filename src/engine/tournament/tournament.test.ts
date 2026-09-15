@@ -30,6 +30,16 @@ function play(
 }
 
 describe("Major tournament runner", () => {
+	it("indexes every historical roster by stable ascending strength", () => {
+		expect(opponents).toHaveLength(dataset.orgYears.length);
+		expect(opponents.every((opponent) => opponent.label.includes(" · "))).toBe(true);
+		for (let index = 1; index < opponents.length; index++) {
+			expect(opponents[index].profile.overall).toBeGreaterThanOrEqual(
+				opponents[index - 1].profile.overall,
+			);
+		}
+	});
+
 	it("represents the exact 9-0 perfect path and playoff progression", () => {
 		let state = createTournament({ rootSeed: 42, playerTeam, opponents });
 		expect(state.nextMatch?.format).toBe("BO1");
