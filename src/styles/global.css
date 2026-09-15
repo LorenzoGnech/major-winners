@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@keyframes draft-reveal {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+::selection {
+	background: color-mix(in oklab, var(--color-emerald-300) 35%, transparent);
+}
