@@ -69,6 +69,10 @@ Contemporaries means a **documented elite LAN-pool distribution per rating versi
 - Kills are generated from actual rounds and weighted by fit-adjusted player aim, entry, clutch, and role. Every kill has an opposing death; scoreboard ADR, KAST-like participation, and rating are rounded display estimates rather than extra simulation inputs.
 - Highlights are seeded facts tied to generated rounds and known player/coach IDs. BO3 stops immediately at two map wins. All randomness shares the supplied Mulberry32 stream.
 
+## Match UI
+
+`src/components/MatchPlayback.tsx` is the reusable React renderer for a completed `SeriesResult`. It owns replay progress and accessibility announcements but performs no simulation; callers supply the result and two display labels. The completed-draft exhibition adapter lives separately in `src/components/exhibition.ts` so tournament flow can replace opponent selection without changing playback.
+
 ## Data conventions
 
 - The draftable atom is a player-season (`s1mple-2018`), not a career.

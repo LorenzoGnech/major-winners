@@ -13,6 +13,8 @@ import {
 	startDraft,
 	type TeamProfile,
 } from "../engine";
+import { createExhibitionMatch, type ExhibitionMatch } from "./exhibition";
+import { MatchPlayback } from "./MatchPlayback";
 
 const INITIAL_SEED = 0x4d_41_4a_4f;
 
@@ -388,6 +390,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [state, setState] = useState(() => startDraft(dataset, INITIAL_SEED));
 	const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [exhibition, setExhibition] = useState<ExhibitionMatch | null>(null);
 
 	const playersById = useMemo(
 		() => new Map(dataset.playerSeasons.map((player) => [player.id, player])),
@@ -427,6 +430,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setState(startDraft(dataset, freePlaySeed()));
 		setSelectedPlayerId(null);
 		setError(null);
+		setExhibition(null);
 	}
 
 	function assignRole(role: Role) {
@@ -470,6 +474,18 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					coach: chosenCoach,
 				})
 			: null;
+
+	function playExhibition() {
+		if (!completedDraft || !teamProfile) return;
+		setExhibition(
+			createExhibitionMatch({
+				dataset,
+				draft: completedDraft,
+				draftedTeam: teamProfile,
+				ratedPlayers,
+			}),
+		);
+	}
 
 	return (
 		<div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-8">
@@ -654,13 +670,27 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								quality, role fit, teammate history, communication, structure, and coaching.
 							</p>
 							<TeamProfilePanel profile={teamProfile} />
-							<button
-								type="button"
-								onClick={restart}
-								className="mt-5 rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-							>
-								Start another draft
-							</button>
+							<div className="mt-5 flex flex-wrap gap-2">
+								{!exhibition && (
+									<button
+										type="button"
+										onClick={playExhibition}
+										className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+									>
+										Play exhibition
+									</button>
+								)}
+								<button
+									type="button"
+									onClick={restart}
+									className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+								>
+									Start another draft
+								</button>
+							</div>
+							{exhibition && (
+								<MatchPlayback result={exhibition.result} teamLabels={exhibition.teamLabels} />
+							)}
 						</section>
 					)}
 
