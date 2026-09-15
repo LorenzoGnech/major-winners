@@ -59,6 +59,16 @@ Contemporaries means a **documented elite LAN-pool distribution per rating versi
 - Structure rewards primary and secondary role coverage, applies a strong penalty when the IGL-slot player has neither primary nor secondary IGL experience, and subtracts 6 points per redundant primary AWPer.
 - Overall OVR starts at base strength and adds centered chemistry (`0.08`), communication (`0.05`), and structure (`0.12`) contributions. Coach modifiers add only `0.25` OVR each while also shaping comeback resilience, economy discipline, and anti-strat scores.
 
+## Match simulation
+
+`simulateSeries` is the pure deterministic boundary under `src/engine/sim`. It takes two `TeamProfile`s, a stable seed, `BO1`/`BO3`, and optional opaque `mapContext`; it returns every round, economy snapshot, scoreboard row, highlight, and map/series result. Map metadata has no competitive effect yet, so the maps phase can extend the context without changing this contract.
+
+- Regulation is MR12: sides switch after 12 rounds, first to 13 wins, and 12-12 enters overtime. Overtime runs MR3 six-round blocks, swaps after three, and ends when a team wins four rounds in a block. Twelve tied blocks trigger one deterministic full-buy safety round.
+- Team A round probability is `0.5 + overall delta × 0.006 + tactical side matchup × 0.001 + CT edge ±0.018 + equipment delta × 0.15`, plus small pistol and trailing-team comeback terms, clamped to `0.16–0.84`.
+- Economy starts at `$800` each regulation half. Full/force/eco costs are rough abstractions; losses advance the `$1400–$3400` loss bonus, wins reset it, and coach economy discipline shifts buy thresholds. Overtime halves reset to `$10,000`.
+- Kills are generated from actual rounds and weighted by fit-adjusted player aim, entry, clutch, and role. Every kill has an opposing death; scoreboard ADR, KAST-like participation, and rating are rounded display estimates rather than extra simulation inputs.
+- Highlights are seeded facts tied to generated rounds and known player/coach IDs. BO3 stops immediately at two map wins. All randomness shares the supplied Mulberry32 stream.
+
 ## Data conventions
 
 - The draftable atom is a player-season (`s1mple-2018`), not a career.
@@ -79,4 +89,5 @@ npm run typecheck
 npm run check
 npm run validate-data
 npm run calibrate
+npm run sim:harness
 ```

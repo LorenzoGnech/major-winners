@@ -41,6 +41,28 @@ export {
 	utcDateKey,
 } from "./rng";
 export {
+	type BuyType,
+	chooseBuy,
+	type EconomyRound,
+	type EconomyState,
+	EQUIPMENT_STRENGTH,
+	type HighlightEvent,
+	INITIAL_ECONOMY,
+	type KillEvent,
+	type MapContext,
+	type MapResult,
+	type PlayerMapStats,
+	type RoundPhase,
+	type RoundResult,
+	resolveEconomyRound,
+	roundWinProbability,
+	type SeriesFormat,
+	type SeriesResult,
+	type Side,
+	type SimulateSeriesInput,
+	simulateSeries,
+} from "./sim";
+export {
 	buildTeamProfile,
 	CHEMISTRY_BONUS_CAP,
 	CHEMISTRY_PAIR_BONUS,

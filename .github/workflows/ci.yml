@@ -19,5 +19,6 @@ jobs:
       - run: npm run typecheck
       - run: npm run validate-data
       - run: npm run calibrate
+      - run: npm run sim:harness
       - run: npm test
       - run: npm run build

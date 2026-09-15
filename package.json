@@ -19,7 +19,8 @@
 		"test:watch": "vitest",
 		"typecheck": "astro check",
 		"validate-data": "tsx scripts/validate-data.ts",
-		"calibrate": "tsx scripts/calibration-report.ts"
+		"calibrate": "tsx scripts/calibration-report.ts",
+		"sim:harness": "tsx scripts/sim-harness.ts"
 	},
 	"dependencies": {
 		"@astrojs/react": "^6.0.5",
