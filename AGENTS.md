@@ -25,8 +25,13 @@ Path alias: `@/` maps to `src/`.
 ## Engine invariants
 
 - Engine modules import neither React, React DOM, Astro, nor DOM APIs. UI is a thin renderer of engine output.
-- All randomness flows through a seeded PRNG. A given seed must produce the same draft, matches, and tournament. Shareable runs depend on this.
+- All randomness flows through `src/engine/rng` (Mulberry32). `createRng` takes a uint32 or string (FNV-1a). `seedFromUtcDate` hashes the UTC `YYYY-MM-DD` day. A given seed must produce the same draft, matches, and tournament.
 - Prefer reducers and pure functions. Side effects (localStorage, fetch) live outside `src/engine/`.
+- Invalid draft actions return `{ ok: false, error: DraftError }` and leave state unchanged. `startDraft` throws `DraftError` when the pool cannot supply five org-year cards or a coach.
+
+## Draft
+
+Six rounds. The first five reveal **distinct** org-year cards sampled without replacement with integer tier weights: `legendary` 5, `strong` 3, `cult` 1 (`TIER_WEIGHTS`). Each player pick takes one of that card's five player-seasons and assigns it to an empty role slot. The sixth round picks one coach from the **full** coach pool (order shuffled on the same RNG stream after the five cards). Completed state is five picks covering every role plus a coach.
 
 ## Roles
 

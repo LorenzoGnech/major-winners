@@ -148,6 +148,7 @@ export const datasetSchema = z.object({
 export type Role = z.infer<typeof roleSchema>;
 export type Game = z.infer<typeof gameSchema>;
 export type DataRegime = z.infer<typeof dataRegimeSchema>;
+export type OrgTier = z.infer<typeof orgTierSchema>;
 export type Org = z.infer<typeof orgSchema>;
 export type OrgYear = z.infer<typeof orgYearSchema>;
 export type PlayerSeason = z.infer<typeof playerSeasonSchema>;
