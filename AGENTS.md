@@ -1,0 +1,55 @@
+# Major Winners
+
+A Counter-Strike legends draft game. Roll six org-year cards, fill five role slots plus a coach, then simulate a Major run and try to go 9-0.
+
+## Stack
+
+Astro (static) + React islands + Tailwind CSS v4 + TypeScript strict. Tests are Vitest. Lint/format is Biome. Deploy is Vercel static via `@astrojs/vercel` with `output: "static"`.
+
+No live HLTV (or other) network dependency. Player data is committed JSON under `src/data/`. A backend (Supabase) is deferred until community features.
+
+## Layout
+
+| Path | Role |
+| --- | --- |
+| `src/engine/` | Pure game logic: rng, ratings, draft, team, sim, tournament |
+| `src/data/` | Committed JSON datasets and Zod schemas |
+| `src/components/` | React islands only |
+| `src/pages/` | Astro routes |
+| `src/layouts/` | Shared Astro chrome |
+| `scripts/` | Dataset validation, calibration, sim harness |
+| `docs/` | Data provenance (`DATA.md` from Phase 1) |
+
+Path alias: `@/` maps to `src/`.
+
+## Engine invariants
+
+- Engine modules import neither React, React DOM, Astro, nor DOM APIs. UI is a thin renderer of engine output.
+- All randomness flows through a seeded PRNG. A given seed must produce the same draft, matches, and tournament. Shareable runs depend on this.
+- Prefer reducers and pure functions. Side effects (localStorage, fetch) live outside `src/engine/`.
+
+## Roles
+
+Starters: `awp`, `igl`, `entry`, `support`, `lurker`. Off-role placement is always allowed (fit `1.0` / `0.9` / `0.75`). A sixth draft round is the coach.
+
+## Player strength
+
+Each `PlayerSeason` carries `dataRegime`: `full` (CS:GO 2016+ / CS2 stats), `partial` (CS:GO 2013–2015 Rating 1.0), or `none` (1.6 / Source, accolade rubric). OVR is relative to contemporaries in the same year and game, not raw HLTV rating.
+
+## Data conventions
+
+- The draftable atom is a player-season (`s1mple-2018`), not a career.
+- An org-year has exactly five players.
+- Roles are curated. Stats are transcribed once from HLTV in a browser session; never scraped at runtime.
+- No org logos or player photos. Text crests and abstract art only.
+
+## Commands
+
+```
+npm run dev
+npm run build
+npm test
+npm run lint
+npm run typecheck
+npm run check
+```
