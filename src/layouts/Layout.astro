@@ -10,6 +10,8 @@ const {
 	title = "Major Winners",
 	description = "Draft an all-time CS squad from historic org-years and try to go 9-0 at a Major.",
 } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const socialImage = new URL("/social-card.svg", Astro.site);
 ---
 
 <!doctype html>
@@ -20,6 +22,16 @@ const {
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={socialImage} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={socialImage} />
 		<title>{title}</title>
 	</head>
 	<body class="min-h-dvh bg-zinc-950 text-zinc-100 antialiased">

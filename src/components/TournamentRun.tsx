@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import type { HistoricalOpponent, TeamProfile, TournamentState } from "../engine";
 import { runNextMatch } from "../engine";
 import { MatchPlayback } from "./MatchPlayback";
@@ -21,6 +21,7 @@ type TournamentRunProps = {
 	opponents: readonly HistoricalOpponent[];
 	onChange: (state: TournamentState) => void;
 	onAbandon: () => void;
+	terminalExtras?: ReactNode;
 };
 
 function RecordCard({
@@ -50,6 +51,7 @@ export function TournamentRun({
 	opponents,
 	onChange,
 	onAbandon,
+	terminalExtras,
 }: TournamentRunProps) {
 	const latestMatch = state.history.at(-1);
 	const [playbackMatchNumber, setPlaybackMatchNumber] = useState<number | null>(
@@ -181,17 +183,20 @@ export function TournamentRun({
 				)}
 
 				{!playbackMatch && state.status !== "active" && (
-					<div className="mt-5 rounded-xl border border-white/10 bg-black/25 p-4">
-						<p className="text-lg font-semibold text-white">
-							{state.status === "champion"
-								? "You won the Major."
-								: `Eliminated in ${STAGE_LABELS[state.stage]}.`}
-						</p>
-						<p className="mt-1 text-sm text-zinc-400">
-							Final record: {state.history.filter((match) => match.won).length}–
-							{state.history.filter((match) => !match.won).length}.
-						</p>
-					</div>
+					<>
+						<div className="mt-5 rounded-xl border border-white/10 bg-black/25 p-4">
+							<p className="text-lg font-semibold text-white">
+								{state.status === "champion"
+									? "You won the Major."
+									: `Eliminated in ${STAGE_LABELS[state.stage]}.`}
+							</p>
+							<p className="mt-1 text-sm text-zinc-400">
+								Final record: {state.history.filter((match) => match.won).length}–
+								{state.history.filter((match) => !match.won).length}.
+							</p>
+						</div>
+						{terminalExtras}
+					</>
 				)}
 
 				{error && (

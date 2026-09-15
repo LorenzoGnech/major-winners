@@ -8,15 +8,33 @@ import {
 	type CompletedDraft,
 	createTournament,
 	currentCard,
+	type DailyResult,
+	type DailyStats,
 	type DraftState,
+	dailyIdentity,
+	dailyResultFromTournament,
+	EMPTY_DAILY_STATS,
+	formatDailyShare,
 	getCompletedDraft,
+	markDailyPlayed,
 	ratePlayer,
 	ratePlayers,
+	recordDailyResult,
 	roleFit,
 	startDraft,
+	summarizeDailyStats,
 	type TeamProfile,
 	type TournamentState,
 } from "../engine";
+import {
+	clearDailyAttempt,
+	DAILY_ATTEMPT_STORAGE_VERSION,
+	fallbackDailyStats,
+	loadDailyAttempt,
+	loadDailyStats,
+	saveDailyAttempt,
+	saveDailyStats,
+} from "./dailyPersistence";
 import { TournamentRun } from "./TournamentRun";
 import {
 	parsePersistedTournamentRun,
@@ -25,6 +43,7 @@ import {
 } from "./tournamentPersistence";
 
 const INITIAL_SEED = 0x4d_41_4a_4f;
+type GameMode = "daily" | "free";
 
 const ROLE_LABELS: Record<Role, string> = {
 	awp: "AWP",
@@ -394,11 +413,119 @@ function TeamProfilePanel({ profile }: { profile: TeamProfile }) {
 	);
 }
 
+function DailyStatsPanel({ stats }: { stats: DailyStats }) {
+	const summary = summarizeDailyStats(stats);
+	const rows = [
+		["Days played", summary.playedDays],
+		["Completed", summary.completedRuns],
+		["Championships", summary.championships],
+		["Perfect 9–0s", summary.perfectRuns],
+		["Current streak", summary.currentStreak],
+		["Max streak", summary.maxStreak],
+		["Win rate", `${summary.winRate}%`],
+		["Best finish", summary.bestFinish],
+	] as const;
+	return (
+		<section
+			aria-labelledby="stats-heading"
+			className="rounded-2xl border border-white/10 bg-black/25 p-4"
+		>
+			<h2 id="stats-heading" className="font-semibold text-white">
+				Daily challenge stats
+			</h2>
+			<p className="mt-1 text-xs text-zinc-500">Stored only in this browser.</p>
+			<dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+				{rows.map(([label, value]) => (
+					<div key={label} className="rounded-lg bg-white/5 p-3">
+						<dt className="text-[10px] uppercase text-zinc-500">{label}</dt>
+						<dd className="mt-1 font-bold tabular-nums text-white">{value}</dd>
+					</div>
+				))}
+			</dl>
+		</section>
+	);
+}
+function DailySharePanel({ result, stats }: { result: DailyResult; stats: DailyStats }) {
+	const [status, setStatus] = useState("");
+	const url =
+		typeof window === "undefined"
+			? "https://major-winners.vercel.app/"
+			: new URL("/", window.location.href).href;
+	const text = formatDailyShare(result, url);
+	async function copy() {
+		try {
+			if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+			else {
+				const field = document.createElement("textarea");
+				field.value = text;
+				field.style.position = "fixed";
+				field.style.opacity = "0";
+				document.body.appendChild(field);
+				field.select();
+				const copied = document.execCommand("copy");
+				field.remove();
+				if (!copied) throw new Error("copy failed");
+			}
+			setStatus("Result copied.");
+		} catch {
+			setStatus("Copy failed. Select the result below to copy it.");
+		}
+	}
+	async function share() {
+		try {
+			await navigator.share({ title: `Major Winners · ${result.day}`, text, url });
+		} catch (error) {
+			if (!(error instanceof DOMException && error.name === "AbortError"))
+				setStatus("Could not open the share sheet.");
+		}
+	}
+	return (
+		<div className="mt-4 space-y-4">
+			<section
+				aria-labelledby="share-heading"
+				className="rounded-xl border border-emerald-300/25 p-4"
+			>
+				<h3 id="share-heading" className="font-semibold text-white">
+					Share today’s result
+				</h3>
+				<pre className="mt-3 whitespace-pre-wrap rounded-lg bg-black/30 p-3 text-xs leading-6 text-zinc-200">
+					{text}
+				</pre>
+				<div className="mt-3 flex flex-wrap gap-2">
+					<button
+						type="button"
+						onClick={copy}
+						className="rounded-lg bg-emerald-300 px-4 py-2 font-bold text-zinc-950"
+					>
+						Copy result
+					</button>
+					{typeof navigator !== "undefined" && typeof navigator.share === "function" && (
+						<button
+							type="button"
+							onClick={share}
+							className="rounded-lg border border-white/15 px-4 py-2"
+						>
+							Share…
+						</button>
+					)}
+				</div>
+				<p aria-live="polite" className="mt-2 min-h-5 text-xs text-zinc-400">
+					{status}
+				</p>
+			</section>
+			<DailyStatsPanel stats={stats} />
+		</div>
+	);
+}
+
 export function DraftGame({ dataset }: DraftGameProps) {
 	const [state, setState] = useState(() => startDraft(dataset, INITIAL_SEED));
 	const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [tournament, setTournament] = useState<TournamentState | null>(null);
+	const [mode, setMode] = useState<GameMode | null>(null);
+	const [identity, setIdentity] = useState(() => dailyIdentity());
+	const [dailyStats, setDailyStats] = useState<DailyStats>(EMPTY_DAILY_STATS);
 
 	const playersById = useMemo(
 		() => new Map(dataset.playerSeasons.map((player) => [player.id, player])),
@@ -420,6 +547,32 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	);
 
 	useEffect(() => {
+		setIdentity(dailyIdentity());
+		try {
+			setDailyStats(loadDailyStats(window.localStorage));
+		} catch {}
+	}, []);
+	function chooseMode(nextMode: GameMode) {
+		setSelectedPlayerId(null);
+		setError(null);
+		if (nextMode === "daily") {
+			const today = dailyIdentity();
+			let attempt = null;
+			let stats = dailyStats;
+			try {
+				attempt = loadDailyAttempt(window.localStorage, dataset, today.day, today.seed);
+				stats = markDailyPlayed(loadDailyStats(window.localStorage), today.day);
+				saveDailyStats(window.localStorage, stats);
+			} catch {
+				stats = markDailyPlayed(fallbackDailyStats(), today.day);
+			}
+			setIdentity(today);
+			setDailyStats(stats);
+			setState(attempt?.draft ?? startDraft(dataset, today.seed));
+			setTournament(attempt?.tournament ?? null);
+			setMode("daily");
+			return;
+		}
 		let persisted = null;
 		try {
 			persisted = parsePersistedTournamentRun(
@@ -438,15 +591,12 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				coachId: draft.coachId,
 			});
 			setTournament(persisted.tournament);
-			return;
+		} else {
+			setState(startDraft(dataset, freePlaySeed()));
+			setTournament(null);
 		}
-		try {
-			window.localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
-		} catch {
-			// A fresh in-memory draft still works without persistence.
-		}
-		setState(startDraft(dataset, freePlaySeed()));
-	}, [dataset]);
+		setMode("free");
+	}
 
 	const card = currentCard(state);
 	const selectedPlayer = selectedPlayerId ? playersById.get(selectedPlayerId) : undefined;
@@ -464,12 +614,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				) / pickedPlayers.length;
 
 	function restart() {
-		setState(startDraft(dataset, freePlaySeed()));
+		setState(startDraft(dataset, mode === "daily" ? identity.seed : freePlaySeed()));
 		setSelectedPlayerId(null);
 		setError(null);
 		setTournament(null);
 		try {
-			window.localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
+			if (mode === "daily") clearDailyAttempt(window.localStorage);
+			else window.localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
 		} catch {
 			// The in-memory reset is authoritative.
 		}
@@ -529,7 +680,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	}
 
 	useEffect(() => {
-		if (!tournament || !completedDraft) return;
+		if (mode !== "free" || !tournament || !completedDraft) return;
 		try {
 			window.localStorage.setItem(
 				TOURNAMENT_STORAGE_KEY,
@@ -543,14 +694,90 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		} catch {
 			// The run remains playable if storage is unavailable or full.
 		}
-	}, [completedDraft, tournament]);
+	}, [completedDraft, mode, tournament]);
+	useEffect(() => {
+		if (mode !== "daily") return;
+		try {
+			saveDailyAttempt(window.localStorage, {
+				version: DAILY_ATTEMPT_STORAGE_VERSION,
+				day: identity.day,
+				seed: identity.seed,
+				draft: state,
+				tournament,
+			});
+		} catch {}
+	}, [identity, mode, state, tournament]);
+	useEffect(() => {
+		if (mode !== "daily" || !tournament) return;
+		const result = dailyResultFromTournament(identity.day, tournament);
+		if (!result) return;
+		setDailyStats((stats) => {
+			const next = recordDailyResult(stats, result);
+			try {
+				saveDailyStats(window.localStorage, next);
+			} catch {}
+			return next;
+		});
+	}, [identity.day, mode, tournament]);
+	const dailyResult =
+		mode === "daily" && tournament ? dailyResultFromTournament(identity.day, tournament) : null;
+	if (mode === null) {
+		return (
+			<div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+				<header>
+					<p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
+						Counter-Strike legends draft
+					</p>
+					<h1 className="mt-2 text-4xl font-semibold text-white sm:text-5xl">Major Winners</h1>
+					<p className="mt-3 text-sm text-zinc-400">
+						Choose today’s shared challenge or a random run.
+					</p>
+				</header>
+				<main className="mt-8 space-y-6">
+					<section aria-labelledby="mode-heading">
+						<h2 id="mode-heading" className="font-semibold text-white">
+							Choose a mode
+						</h2>
+						<div className="mt-3 grid gap-3 sm:grid-cols-2">
+							<button
+								type="button"
+								onClick={() => chooseMode("daily")}
+								className="rounded-2xl border border-emerald-300/35 bg-emerald-300/8 p-5 text-left focus-visible:outline-2 focus-visible:outline-emerald-300"
+							>
+								<strong className="text-xl text-white">Today’s Challenge</strong>
+								<span className="mt-2 block text-sm text-zinc-300">
+									Same UTC seed for everyone. Refreshes restore your attempt.
+								</span>
+								<span className="mt-4 block text-xs font-semibold tabular-nums text-emerald-200">
+									{identity.day} UTC · {identity.id}
+								</span>
+							</button>
+							<button
+								type="button"
+								onClick={() => chooseMode("free")}
+								className="rounded-2xl border border-white/10 bg-white/5 p-5 text-left focus-visible:outline-2 focus-visible:outline-emerald-300"
+							>
+								<strong className="text-xl text-white">Free Play</strong>
+								<span className="mt-2 block text-sm text-zinc-400">
+									A random draft, separate from today’s attempt.
+								</span>
+							</button>
+						</div>
+					</section>
+					<DailyStatsPanel stats={dailyStats} />
+				</main>
+			</div>
+		);
+	}
 
 	return (
 		<div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-8">
 			<header className="flex items-start justify-between gap-4">
 				<div>
 					<p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300">
-						Free Play
+						{mode === "daily"
+							? `Today’s Challenge · ${identity.day} UTC · ${identity.id}`
+							: "Free Play"}
 					</p>
 					<h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 						Major Winners
@@ -583,6 +810,11 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							opponents={opponents}
 							onChange={setTournament}
 							onAbandon={restart}
+							terminalExtras={
+								dailyResult ? (
+									<DailySharePanel result={dailyResult} stats={dailyStats} />
+								) : undefined
+							}
 						/>
 					)}
 
@@ -772,7 +1004,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				<aside className="sticky top-5 hidden lg:block">
 					<RosterPanel state={state} playersById={playersById} previewOvr={previewOvr} />
 					<p className="mt-3 text-center text-[10px] tabular-nums text-zinc-600">
-						Seed {state.seed}
+						{mode === "daily" ? `${identity.id} · UTC seed ${state.seed}` : `Seed ${state.seed}`}
 					</p>
 				</aside>
 			</div>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Major Winners</title><desc id="desc">Build a Counter-Strike legends roster.</desc>
+  <rect width="1200" height="630" fill="#09090b"/><circle cx="1050" cy="0" r="430" fill="#6ee7b7" opacity=".14"/>
+  <text x="90" y="170" fill="#6ee7b7" font-family="Arial,sans-serif" font-size="25" font-weight="700" letter-spacing="7">COUNTER-STRIKE LEGENDS DRAFT</text>
+  <text x="84" y="315" fill="#fafafa" font-family="Arial,sans-serif" font-size="102" font-weight="800">MAJOR WINNERS</text>
+  <text x="90" y="390" fill="#a1a1aa" font-family="Arial,sans-serif" font-size="34">Five picks. One coach. Chase the perfect 90.</text>
+  <g transform="translate(90 474)" fill="#6ee7b7"><rect width="68" height="68" rx="12"/><rect x="84" width="68" height="68" rx="12"/><rect x="252" width="68" height="68" rx="12"/><rect x="336" width="68" height="68" rx="12"/></g>
+  <rect x="258" y="474" width="68" height="68" rx="12" fill="#f87171"/>
+</svg>

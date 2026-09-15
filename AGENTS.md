@@ -81,7 +81,17 @@ Contemporaries means a **documented elite LAN-pool distribution per rating versi
 - Swiss matches are BO1 unless either team-facing record is on two wins or two losses; advancement and elimination matches are BO3. Every playoff match is BO3 and a playoff loss eliminates.
 - `buildHistoricalOpponents` turns each intact org-year into a natural best-fit role assignment. It uses that roster's coach when available and deterministically selects a compatible fallback otherwise.
 - Opponent choice is deterministic, generally rises with stage and record, excludes an identical player roster when alternatives exist, and avoids immediate repeats whenever the pool permits.
-- The UI persists the completed draft, root seed, and tournament state under the versioned `major-winners:tournament:v1` localStorage key. Parsing and storage failures are ignored in the UI layer; engine modules never access browser APIs.
+- Free Play persists completed drafts and tournaments under `major-winners:tournament:v1`.
+
+## Daily challenge
+
+Today's Challenge uses the UTC day and `seedFromUtcDate`, making the draft, coach order, opponents, and results deterministic for identical choices. Restarting uses the same daily seed; Free Play remains random.
+
+- Pure identity, stats, streak, result, and spoiler-free share calculations live in `src/engine/daily/`.
+- Daily attempts use `major-winners:daily-attempt:v1`; local stats use `major-winners:daily-stats:v1`. Both are separate from Free Play.
+- One terminal result is counted per UTC day. Streaks use consecutive UTC completion days across calendar boundaries.
+- Storage, clipboard, and native-share side effects stay in components. Defensive parsing and unavailable storage never block play.
+- Static social metadata uses the generic `/social-card.svg`; no dynamic daily Open Graph image is claimed.
 
 ## Data conventions
 

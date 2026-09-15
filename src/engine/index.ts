@@ -1,4 +1,19 @@
 export {
+	DAILY_STATS_VERSION,
+	type DailyIdentity,
+	type DailyResult,
+	type DailyStats,
+	dailyFinish,
+	dailyIdentity,
+	dailyResultFromTournament,
+	EMPTY_DAILY_STATS,
+	formatDailyShare,
+	markDailyPlayed,
+	parseDailyStats,
+	recordDailyResult,
+	summarizeDailyStats,
+} from "./daily";
+export {
 	applyAction,
 	type CompletedDraft,
 	currentCard,
