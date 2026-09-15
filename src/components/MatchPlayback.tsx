@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { HighlightEvent, MapResult, RoundResult, SeriesResult } from "../engine";
 
 type MatchPlaybackProps = {
 	result: SeriesResult;
 	teamLabels: readonly [string, string];
+	eyebrow?: string;
+	onComplete?: () => void;
 };
 
 const CONTROL_CLASS =
@@ -164,7 +166,12 @@ function Scoreboard({
 	);
 }
 
-export function MatchPlayback({ result, teamLabels }: MatchPlaybackProps) {
+export function MatchPlayback({
+	result,
+	teamLabels,
+	eyebrow = `${result.format} exhibition`,
+	onComplete,
+}: MatchPlaybackProps) {
 	const playbackRounds = useMemo(
 		() =>
 			result.maps.flatMap((map, mapIndex) =>
@@ -175,6 +182,7 @@ export function MatchPlayback({ result, teamLabels }: MatchPlaybackProps) {
 	const [revealedCount, setRevealedCount] = useState(0);
 	const [playing, setPlaying] = useState(false);
 	const [announcement, setAnnouncement] = useState("Replay ready.");
+	const completionReported = useRef(false);
 	const complete = revealedCount >= playbackRounds.length;
 
 	useEffect(() => {
@@ -193,6 +201,13 @@ export function MatchPlayback({ result, teamLabels }: MatchPlaybackProps) {
 			);
 		}
 	}, [complete, playing, result.maps, teamLabels]);
+
+	useEffect(() => {
+		if (complete && !completionReported.current) {
+			completionReported.current = true;
+			onComplete?.();
+		}
+	}, [complete, onComplete]);
 
 	const lastRevealed = playbackRounds[revealedCount - 1];
 	const activeMapIndex = complete
@@ -254,7 +269,7 @@ export function MatchPlayback({ result, teamLabels }: MatchPlaybackProps) {
 			<div className="flex flex-wrap items-start justify-between gap-4">
 				<div>
 					<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-						{result.format} exhibition
+						{eyebrow}
 					</p>
 					<h3 id="match-heading" className="mt-1 text-xl font-semibold tracking-tight text-white">
 						{teamLabels[0]} <span className="text-zinc-600">vs</span> {teamLabels[1]}

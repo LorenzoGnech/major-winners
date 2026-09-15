@@ -78,3 +78,20 @@ export {
 	type TeamProfile,
 	type TeamProfileInputs,
 } from "./team";
+export {
+	buildHistoricalOpponents,
+	createTournament,
+	type HistoricalOpponent,
+	type PlayoffRound,
+	runNextMatch,
+	type SeriesResolver,
+	type SwissRecord,
+	TournamentError,
+	type TournamentErrorCode,
+	type TournamentMatch,
+	type TournamentNextMatch,
+	type TournamentResult,
+	type TournamentStage,
+	type TournamentState,
+	type TournamentStatus,
+} from "./tournament";

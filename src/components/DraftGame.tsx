@@ -3,7 +3,10 @@ import type { Coach, Dataset, Game, OrgTier, PlayerSeason, Role } from "../data"
 import { ROLES } from "../data";
 import {
 	applyAction,
+	buildHistoricalOpponents,
 	buildTeamProfile,
+	type CompletedDraft,
+	createTournament,
 	currentCard,
 	type DraftState,
 	getCompletedDraft,
@@ -12,9 +15,14 @@ import {
 	roleFit,
 	startDraft,
 	type TeamProfile,
+	type TournamentState,
 } from "../engine";
-import { createExhibitionMatch, type ExhibitionMatch } from "./exhibition";
-import { MatchPlayback } from "./MatchPlayback";
+import { TournamentRun } from "./TournamentRun";
+import {
+	parsePersistedTournamentRun,
+	TOURNAMENT_STORAGE_KEY,
+	TOURNAMENT_STORAGE_VERSION,
+} from "./tournamentPersistence";
 
 const INITIAL_SEED = 0x4d_41_4a_4f;
 
@@ -390,7 +398,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [state, setState] = useState(() => startDraft(dataset, INITIAL_SEED));
 	const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
-	const [exhibition, setExhibition] = useState<ExhibitionMatch | null>(null);
+	const [tournament, setTournament] = useState<TournamentState | null>(null);
 
 	const playersById = useMemo(
 		() => new Map(dataset.playerSeasons.map((player) => [player.id, player])),
@@ -406,8 +414,37 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		[dataset.coaches],
 	);
 	const ratedPlayers = useMemo(() => ratePlayers(dataset.playerSeasons), [dataset.playerSeasons]);
+	const opponents = useMemo(
+		() => buildHistoricalOpponents(dataset, ratedPlayers),
+		[dataset, ratedPlayers],
+	);
 
 	useEffect(() => {
+		let persisted = null;
+		try {
+			persisted = parsePersistedTournamentRun(
+				window.localStorage.getItem(TOURNAMENT_STORAGE_KEY) ?? "",
+				dataset,
+			);
+		} catch {
+			// Storage may be unavailable in privacy-restricted browser contexts.
+		}
+		if (persisted) {
+			const draft = persisted.draft;
+			setState({
+				...draft,
+				phase: { type: "complete" },
+				coachIds: dataset.coaches.map((coach) => coach.id),
+				coachId: draft.coachId,
+			});
+			setTournament(persisted.tournament);
+			return;
+		}
+		try {
+			window.localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
+		} catch {
+			// A fresh in-memory draft still works without persistence.
+		}
 		setState(startDraft(dataset, freePlaySeed()));
 	}, [dataset]);
 
@@ -430,7 +467,12 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setState(startDraft(dataset, freePlaySeed()));
 		setSelectedPlayerId(null);
 		setError(null);
-		setExhibition(null);
+		setTournament(null);
+		try {
+			window.localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
+		} catch {
+			// The in-memory reset is authoritative.
+		}
 	}
 
 	function assignRole(role: Role) {
@@ -475,17 +517,33 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				})
 			: null;
 
-	function playExhibition() {
+	function startMajor() {
 		if (!completedDraft || !teamProfile) return;
-		setExhibition(
-			createExhibitionMatch({
-				dataset,
-				draft: completedDraft,
-				draftedTeam: teamProfile,
-				ratedPlayers,
+		setTournament(
+			createTournament({
+				rootSeed: completedDraft.seed,
+				playerTeam: teamProfile,
+				opponents,
 			}),
 		);
 	}
+
+	useEffect(() => {
+		if (!tournament || !completedDraft) return;
+		try {
+			window.localStorage.setItem(
+				TOURNAMENT_STORAGE_KEY,
+				JSON.stringify({
+					version: TOURNAMENT_STORAGE_VERSION,
+					rootSeed: tournament.rootSeed,
+					draft: completedDraft satisfies CompletedDraft,
+					tournament,
+				}),
+			);
+		} catch {
+			// The run remains playable if storage is unavailable or full.
+		}
+	}, [completedDraft, tournament]);
 
 	return (
 		<div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-8">
@@ -501,13 +559,15 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
 					</p>
 				</div>
-				<button
-					type="button"
-					onClick={restart}
-					className="shrink-0 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-				>
-					New draft
-				</button>
+				{!tournament && (
+					<button
+						type="button"
+						onClick={restart}
+						className="shrink-0 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+					>
+						New draft
+					</button>
+				)}
 			</header>
 
 			<div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start">
@@ -516,7 +576,17 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						<RosterPanel state={state} playersById={playersById} previewOvr={previewOvr} />
 					</div>
 
-					{state.phase.type === "player" && card && orgYear && org && (
+					{tournament && teamProfile && (
+						<TournamentRun
+							state={tournament}
+							playerTeam={teamProfile}
+							opponents={opponents}
+							onChange={setTournament}
+							onAbandon={restart}
+						/>
+					)}
+
+					{!tournament && state.phase.type === "player" && card && orgYear && org && (
 						<section
 							key={`round-${state.phase.round}`}
 							aria-labelledby="round-heading"
@@ -615,7 +685,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						</section>
 					)}
 
-					{state.phase.type === "coach" && (
+					{!tournament && state.phase.type === "coach" && (
 						<section
 							aria-labelledby="coach-heading"
 							className="motion-safe:animate-[draft-reveal_360ms_ease-out]"
@@ -651,7 +721,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						</section>
 					)}
 
-					{state.phase.type === "complete" && chosenCoach && teamProfile && (
+					{!tournament && state.phase.type === "complete" && chosenCoach && teamProfile && (
 						<section
 							aria-labelledby="complete-heading"
 							className="rounded-2xl border border-emerald-300/30 bg-emerald-300/7 p-5 motion-safe:animate-[draft-reveal_360ms_ease-out] sm:p-7"
@@ -671,15 +741,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							</p>
 							<TeamProfilePanel profile={teamProfile} />
 							<div className="mt-5 flex flex-wrap gap-2">
-								{!exhibition && (
-									<button
-										type="button"
-										onClick={playExhibition}
-										className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-									>
-										Play exhibition
-									</button>
-								)}
+								<button
+									type="button"
+									onClick={startMajor}
+									className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+								>
+									Start Major run
+								</button>
 								<button
 									type="button"
 									onClick={restart}
@@ -688,9 +756,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 									Start another draft
 								</button>
 							</div>
-							{exhibition && (
-								<MatchPlayback result={exhibition.result} teamLabels={exhibition.teamLabels} />
-							)}
 						</section>
 					)}
 

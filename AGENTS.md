@@ -71,7 +71,17 @@ Contemporaries means a **documented elite LAN-pool distribution per rating versi
 
 ## Match UI
 
-`src/components/MatchPlayback.tsx` is the reusable React renderer for a completed `SeriesResult`. It owns replay progress and accessibility announcements but performs no simulation; callers supply the result and two display labels. The completed-draft exhibition adapter lives separately in `src/components/exhibition.ts` so tournament flow can replace opponent selection without changing playback.
+`src/components/MatchPlayback.tsx` is the reusable React renderer for a completed `SeriesResult`. It owns replay progress, skip controls, and accessibility announcements but performs no simulation; callers supply the result and two display labels. `TournamentRun` orchestrates one completed match at a time and keeps simulation outside playback. The completed-draft exhibition adapter remains a secondary standalone helper.
+
+## Major tournament
+
+`createTournament` and `runNextMatch` under `src/engine/tournament` form the pure tournament state machine. State is serialization-safe and carries the root seed, both Swiss records, playoff round, next-match metadata, and complete `SeriesResult` history. Invalid transitions return `TournamentError` results; all match and opponent seeds derive from the root seed.
+
+- The deliberate fantasy format is Challengers Swiss, Legends Swiss, then Champions quarterfinal/semifinal/final. Three Swiss wins advance, three losses eliminate, and the perfect title path is exactly 9–0.
+- Swiss matches are BO1 unless either team-facing record is on two wins or two losses; advancement and elimination matches are BO3. Every playoff match is BO3 and a playoff loss eliminates.
+- `buildHistoricalOpponents` turns each intact org-year into a natural best-fit role assignment. It uses that roster's coach when available and deterministically selects a compatible fallback otherwise.
+- Opponent choice is deterministic, generally rises with stage and record, excludes an identical player roster when alternatives exist, and avoids immediate repeats whenever the pool permits.
+- The UI persists the completed draft, root seed, and tournament state under the versioned `major-winners:tournament:v1` localStorage key. Parsing and storage failures are ignored in the UI layer; engine modules never access browser APIs.
 
 ## Data conventions
 
