@@ -1,0 +1,8 @@
+[
+	{ "id": "sk", "name": "SK Gaming", "country": "DE" },
+	{ "id": "fnatic", "name": "fnatic", "country": "GB" },
+	{ "id": "nip", "name": "Ninjas in Pyjamas", "country": "SE" },
+	{ "id": "astralis", "name": "Astralis", "country": "DK" },
+	{ "id": "navi", "name": "Natus Vincere", "country": "UA" },
+	{ "id": "faze", "name": "FaZe Clan", "country": "US" }
+]

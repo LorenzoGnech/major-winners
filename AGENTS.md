@@ -34,7 +34,15 @@ Starters: `awp`, `igl`, `entry`, `support`, `lurker`. Off-role placement is alwa
 
 ## Player strength
 
-Each `PlayerSeason` carries `dataRegime`: `full` (CS:GO 2016+ / CS2 stats), `partial` (CS:GO 2013–2015 Rating 1.0), or `none` (1.6 / Source, accolade rubric). OVR is relative to contemporaries in the same year and game, not raw HLTV rating.
+Each `PlayerSeason` carries `dataRegime`: `full` (CS:GO 2016+ / CS2 stats), `partial` (CS:GO 2013–2015 Rating 1.0), or `none` (1.6 / Source, accolade rubric). OVR is relative to contemporaries, not raw HLTV rating.
+
+Contemporaries means a **documented elite LAN-pool distribution per rating version** (`src/engine/ratings/reference.ts`), not the other four people on the same org-year card. Z-scoring inside a roster would punish IGLs.
+
+- `full` / `partial`: z-score season rating against that reference, map to OVR, then add a **modest accolade bonus capped at +5**.
+- `none`: use `curated.ovr` as-is. Do not add the accolade bonus again; the rubric already priced trophies.
+- Attributes (aim, entry, clutch, utility, consistency, igl) are what the sim consumes. Derived from stats when present; `curated.attributes` overlays. `igl` is role-driven unless curated.
+
+`npm run calibrate` prints the leaderboard and fails if s1mple-2018, olofmeister-2015, and heaton-2003 leave the top 15, or if the top 10 is only CS:GO.
 
 ## Data conventions
 
@@ -42,6 +50,8 @@ Each `PlayerSeason` carries `dataRegime`: `full` (CS:GO 2016+ / CS2 stats), `par
 - An org-year has exactly five players.
 - Roles are curated. Stats are transcribed once from HLTV in a browser session; never scraped at runtime.
 - No org logos or player photos. Text crests and abstract art only.
+- JSON lives in `src/data/json/`. Contracts live in `src/data/schema.ts`. Provenance and the transcription workflow live in `docs/DATA.md`.
+- `npm run validate-data` must stay green. It enforces regime-consistency, five-man org-years, and fillable roles.
 
 ## Commands
 
@@ -52,4 +62,6 @@ npm test
 npm run lint
 npm run typecheck
 npm run check
+npm run validate-data
+npm run calibrate
 ```

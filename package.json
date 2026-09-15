@@ -17,7 +17,9 @@
 		"lint:fix": "biome check --write .",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"typecheck": "astro check"
+		"typecheck": "astro check",
+		"validate-data": "tsx scripts/validate-data.ts",
+		"calibrate": "tsx scripts/calibration-report.ts"
 	},
 	"dependencies": {
 		"@astrojs/react": "^6.0.5",
@@ -28,7 +30,8 @@
 		"astro": "^7.3.2",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0",
-		"tailwindcss": "^4.3.3"
+		"tailwindcss": "^4.3.3",
+		"zod": "^4.6.5"
 	},
 	"allowScripts": {
 		"esbuild": true
@@ -37,6 +40,7 @@
 		"@astrojs/check": "^0.9.10",
 		"@biomejs/biome": "^2.5.13",
 		"@types/node": "^26.5.1",
+		"tsx": "^4.23.13",
 		"typescript": "^5.9.3",
 		"vitest": "^5.0.1"
 	}

@@ -1,0 +1,56 @@
+[
+	{
+		"id": "threat-2013",
+		"nick": "THREAT",
+		"realName": "Björn Pers",
+		"nationality": "SE",
+		"year": 2013,
+		"orgId": "nip",
+		"modifiers": { "comeback": 0, "economy": 1, "antistrat": 1 }
+	},
+	{
+		"id": "vuggo-2015",
+		"nick": "vuggo",
+		"realName": "Viktor Hallgrenstedt",
+		"nationality": "SE",
+		"year": 2015,
+		"orgId": "fnatic",
+		"modifiers": { "comeback": 1, "economy": 0, "antistrat": 1 }
+	},
+	{
+		"id": "zews-2016",
+		"nick": "zews",
+		"realName": "Wilton Prado",
+		"nationality": "BR",
+		"year": 2016,
+		"orgId": "sk",
+		"modifiers": { "comeback": 1, "economy": 1, "antistrat": 1 }
+	},
+	{
+		"id": "zonic-2018",
+		"nick": "zonic",
+		"realName": "Danny Sørensen",
+		"nationality": "DK",
+		"year": 2018,
+		"orgId": "astralis",
+		"modifiers": { "comeback": 2, "economy": 2, "antistrat": 2 }
+	},
+	{
+		"id": "starix-2018",
+		"nick": "starix",
+		"realName": "Sergey Ischuk",
+		"nationality": "UA",
+		"year": 2018,
+		"orgId": "navi",
+		"modifiers": { "comeback": 1, "economy": 0, "antistrat": 1 }
+	},
+	{
+		"id": "robban-2022",
+		"nick": "RobbaN",
+		"realName": "Robert Dahlström",
+		"nationality": "SE",
+		"year": 2022,
+		"orgId": "faze",
+		"modifiers": { "comeback": 2, "economy": 1, "antistrat": 2 }
+	}
+]
