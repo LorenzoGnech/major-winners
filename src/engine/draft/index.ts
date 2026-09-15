@@ -17,6 +17,8 @@ export type {
 	PickCoachAction,
 	PickPlayerAction,
 	PlayerPick,
+	RerollMajorAction,
+	RerollTeamAction,
 	RolledOrgYearCard,
 } from "./types";
 export { orgYearWeight, PLAYER_CARD_COUNT, TIER_WEIGHTS } from "./weights";

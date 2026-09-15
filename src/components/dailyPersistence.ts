@@ -9,11 +9,11 @@ import {
 	type TournamentState,
 } from "../engine";
 import { parsePersistedTournamentRun, TOURNAMENT_STORAGE_VERSION } from "./tournamentPersistence";
-export const DAILY_ATTEMPT_STORAGE_KEY = "major-winners:daily-attempt:v1";
-export const DAILY_ATTEMPT_STORAGE_VERSION = 1;
+export const DAILY_ATTEMPT_STORAGE_KEY = "major-winners:daily-attempt:v2";
+export const DAILY_ATTEMPT_STORAGE_VERSION = 2;
 export const DAILY_STATS_STORAGE_KEY = "major-winners:daily-stats:v1";
 export type PersistedDailyAttempt = {
-	version: 1;
+	version: typeof DAILY_ATTEMPT_STORAGE_VERSION;
 	day: string;
 	seed: number;
 	draft: DraftState;
@@ -27,20 +27,59 @@ function validDraft(value: unknown, dataset: Dataset, seed: number): value is Dr
 	const canonical = startDraft(dataset, seed);
 	if (
 		value.seed !== seed ||
-		JSON.stringify(value.cards) !== JSON.stringify(canonical.cards) ||
 		JSON.stringify(value.coachIds) !== JSON.stringify(canonical.coachIds) ||
+		!Array.isArray(value.cards) ||
+		value.cards.length !== 5 ||
+		!isObject(value.rerolls) ||
+		typeof value.rerolls.majorRemaining !== "boolean" ||
+		typeof value.rerolls.teamRemaining !== "boolean" ||
 		!isObject(value.roster) ||
 		!isObject(value.phase) ||
 		!["player", "coach", "complete"].includes(String(value.phase.type))
 	)
 		return false;
+	const cardIds = new Set<string>();
+	for (const card of value.cards) {
+		if (!isObject(card) || typeof card.orgYearId !== "string" || !Array.isArray(card.players)) {
+			return false;
+		}
+		const roster = dataset.orgYears.find((row) => row.id === card.orgYearId);
+		if (
+			!roster ||
+			cardIds.has(roster.id) ||
+			card.majorId !== (roster.majorId ?? null) ||
+			card.kind !== roster.kind ||
+			card.tier !== roster.tier ||
+			card.players.length !== 5 ||
+			card.players.some(
+				(player) =>
+					!isObject(player) ||
+					typeof player.id !== "string" ||
+					!roster.playerSeasonIds.includes(player.id),
+			)
+		) {
+			return false;
+		}
+		cardIds.add(roster.id);
+	}
 	const picks = Object.values(value.roster);
 	for (const role of ROLES) {
 		const pick = value.roster[role];
 		if (pick === undefined) continue;
 		if (!isObject(pick) || pick.role !== role || typeof pick.orgYearId !== "string") return false;
-		const card = canonical.cards.find(({ orgYearId }) => orgYearId === pick.orgYearId);
-		const player = card?.players.find(({ id }) => id === pick.playerSeasonId);
+		const card = value.cards.find(
+			(candidate) => isObject(candidate) && candidate.orgYearId === pick.orgYearId,
+		);
+		const cardPlayers: unknown[] =
+			isObject(card) && Array.isArray(card.players) ? card.players : [];
+		const player =
+			cardPlayers.length > 0
+				? dataset.playerSeasons.find(
+						(candidate) =>
+							candidate.id === pick.playerSeasonId &&
+							cardPlayers.some((snapshot) => isObject(snapshot) && snapshot.id === candidate.id),
+					)
+				: undefined;
 		if (!player || pick.fit !== roleFit(player, role)) return false;
 	}
 	if (value.phase.type === "player")
@@ -65,7 +104,7 @@ export function parsePersistedDailyAttempt(
 		const value: unknown = JSON.parse(raw);
 		if (
 			!isObject(value) ||
-			value.version !== 1 ||
+			value.version !== DAILY_ATTEMPT_STORAGE_VERSION ||
 			value.day !== day ||
 			value.seed !== seed ||
 			!validDraft(value.draft, dataset, seed) ||

@@ -1,4 +1,4 @@
-import type { OrgTier, Role } from "../../data/schema";
+import type { OrgTier, Role, RosterKind } from "../../data/schema";
 import type { RoleFit } from "./fit";
 
 export type DraftablePlayer = {
@@ -9,6 +9,8 @@ export type DraftablePlayer = {
 
 export type RolledOrgYearCard = {
 	orgYearId: string;
+	majorId: string | null;
+	kind: RosterKind;
 	tier: OrgTier;
 	players: readonly DraftablePlayer[];
 };
@@ -30,6 +32,10 @@ export type DraftState = {
 	phase: DraftPhase;
 	cards: readonly RolledOrgYearCard[];
 	coachIds: readonly string[];
+	rerolls: {
+		majorRemaining: boolean;
+		teamRemaining: boolean;
+	};
 	roster: Partial<Record<Role, PlayerPick>>;
 	coachId: string | null;
 };
@@ -52,4 +58,12 @@ export type PickCoachAction = {
 	coachId: string;
 };
 
-export type DraftAction = PickPlayerAction | PickCoachAction;
+export type RerollMajorAction = {
+	type: "rerollMajor";
+};
+
+export type RerollTeamAction = {
+	type: "rerollTeam";
+};
+
+export type DraftAction = PickPlayerAction | PickCoachAction | RerollMajorAction | RerollTeamAction;

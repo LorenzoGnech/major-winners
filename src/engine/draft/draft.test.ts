@@ -106,6 +106,46 @@ describe("startDraft", () => {
 });
 
 describe("applyAction", () => {
+	it("offers one deterministic Major reroll and one team reroll", () => {
+		const initial = startDraft(dataset, "two-rerolls");
+		const original = currentCard(initial);
+		expect(original?.majorId).not.toBeNull();
+
+		const teamResult = applyAction(initial, { type: "rerollTeam" }, dataset);
+		expect(teamResult.ok).toBe(true);
+		if (!teamResult.ok || !original) return;
+		const afterTeam = currentCard(teamResult.value);
+		expect(afterTeam?.majorId).toBe(original.majorId);
+		expect(afterTeam?.orgYearId).not.toBe(original.orgYearId);
+		expect(teamResult.value.rerolls).toEqual({
+			majorRemaining: true,
+			teamRemaining: false,
+		});
+
+		const repeatTeam = applyAction(teamResult.value, { type: "rerollTeam" }, dataset);
+		expect(repeatTeam.ok).toBe(false);
+		if (!repeatTeam.ok) expect(repeatTeam.error.code).toBe("reroll_exhausted");
+
+		const majorResult = applyAction(teamResult.value, { type: "rerollMajor" }, dataset);
+		expect(majorResult.ok).toBe(true);
+		if (!majorResult.ok) return;
+		expect(currentCard(majorResult.value)?.majorId).not.toBe(afterTeam?.majorId);
+		expect(majorResult.value.rerolls).toEqual({
+			majorRemaining: false,
+			teamRemaining: false,
+		});
+
+		const replayTeam = applyAction(
+			startDraft(dataset, "two-rerolls"),
+			{ type: "rerollTeam" },
+			dataset,
+		);
+		expect(replayTeam.ok).toBe(true);
+		if (!replayTeam.ok) return;
+		const replay = applyAction(replayTeam.value, { type: "rerollMajor" }, dataset);
+		expect(replay).toEqual(majorResult);
+	});
+
 	it("allows off-role picks and yields a valid completed roster", () => {
 		const state = completeDraft("off-role-legal", (_round, current) => {
 			const player = currentCard(current)?.players[0];

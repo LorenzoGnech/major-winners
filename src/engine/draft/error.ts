@@ -5,7 +5,9 @@ export type DraftErrorCode =
 	| "invalid_phase"
 	| "player_not_on_card"
 	| "role_occupied"
-	| "unknown_coach";
+	| "unknown_coach"
+	| "reroll_exhausted"
+	| "reroll_unavailable";
 
 export class DraftError extends Error {
 	readonly code: DraftErrorCode;

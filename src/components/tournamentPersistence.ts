@@ -1,8 +1,8 @@
 import { type Dataset, ROLES } from "../data";
 import type { CompletedDraft, TournamentState } from "../engine";
 
-export const TOURNAMENT_STORAGE_KEY = "major-winners:tournament:v1";
-export const TOURNAMENT_STORAGE_VERSION = 1;
+export const TOURNAMENT_STORAGE_KEY = "major-winners:tournament:v2";
+export const TOURNAMENT_STORAGE_VERSION = 2;
 
 export type PersistedTournamentRun = {
 	version: typeof TOURNAMENT_STORAGE_VERSION;

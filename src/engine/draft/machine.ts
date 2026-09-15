@@ -1,9 +1,8 @@
 import type { Dataset } from "../../data/schema";
 import { ROLES, type Role } from "../../data/schema";
-import { createRng, shuffle } from "../rng";
+import { createRng, pickWeighted, shuffle } from "../rng";
 import { DraftError, type DraftResult, fail, ok } from "./error";
 import { roleFit } from "./fit";
-import { sampleOrgYears } from "./sample";
 import type {
 	CompletedDraft,
 	DraftAction,
@@ -14,7 +13,7 @@ import type {
 	PlayerPick,
 	RolledOrgYearCard,
 } from "./types";
-import { PLAYER_CARD_COUNT } from "./weights";
+import { orgYearWeight, PLAYER_CARD_COUNT } from "./weights";
 
 function snapshotPlayer(season: Dataset["playerSeasons"][number]): DraftablePlayer {
 	return {
@@ -40,9 +39,50 @@ function snapshotCard(
 	});
 	return {
 		orgYearId: orgYear.id,
+		majorId: orgYear.majorId ?? null,
+		kind: orgYear.kind,
 		tier: orgYear.tier,
 		players,
 	};
+}
+
+function pickRoster<T extends Dataset["orgYears"][number]>(
+	rosters: readonly T[],
+	rng: ReturnType<typeof createRng>,
+): T {
+	if (rosters.length === 0) {
+		throw new DraftError("insufficient_org_years", "selected Major has no playable rosters");
+	}
+	return pickWeighted(rosters, (roster) => orgYearWeight(roster.tier), rng);
+}
+
+function initialRosters(dataset: Dataset, rng: ReturnType<typeof createRng>) {
+	if (dataset.majors.length < PLAYER_CARD_COUNT) {
+		throw new DraftError(
+			"insufficient_org_years",
+			`need ${PLAYER_CARD_COUNT} Majors to roll player cards, got ${dataset.majors.length}`,
+		);
+	}
+	const majors = shuffle(dataset.majors, rng);
+	const legacy = dataset.orgYears.filter((roster) => roster.kind === "legacy");
+	const picked: Dataset["orgYears"][number][] = [];
+	let usedLegacy = false;
+	for (let round = 0; round < PLAYER_CARD_COUNT; round++) {
+		const shouldUseLegacy = !usedLegacy && legacy.length > 0 && rng.nextInt(20) === 0;
+		if (shouldUseLegacy) {
+			const card = pickRoster(
+				legacy.filter((roster) => !picked.some((pickedRoster) => pickedRoster.id === roster.id)),
+				rng,
+			);
+			picked.push(card);
+			usedLegacy = true;
+			continue;
+		}
+		const major = majors[round];
+		const rosters = dataset.orgYears.filter((roster) => roster.majorId === major.id);
+		picked.push(pickRoster(rosters, rng));
+	}
+	return picked;
 }
 
 export function startDraft(dataset: Dataset, seed: number | string): DraftState {
@@ -51,9 +91,7 @@ export function startDraft(dataset: Dataset, seed: number | string): DraftState 
 	}
 	const rng = createRng(seed);
 	const seasons = new Map(dataset.playerSeasons.map((season) => [season.id, season]));
-	const cards = sampleOrgYears(dataset.orgYears, rng).map((orgYear) =>
-		snapshotCard(orgYear, seasons),
-	);
+	const cards = initialRosters(dataset, rng).map((orgYear) => snapshotCard(orgYear, seasons));
 	const coachIds = shuffle(
 		dataset.coaches.map((coach) => coach.id),
 		rng,
@@ -63,9 +101,66 @@ export function startDraft(dataset: Dataset, seed: number | string): DraftState 
 		phase: { type: "player", round: 0 },
 		cards,
 		coachIds,
+		rerolls: { majorRemaining: true, teamRemaining: true },
 		roster: {},
 		coachId: null,
 	};
+}
+
+function rerollCard(
+	state: DraftState,
+	dataset: Dataset | undefined,
+	type: "major" | "team",
+): DraftResult<DraftState> {
+	if (state.phase.type !== "player") {
+		return fail("invalid_phase", "rerolls are only legal before a player pick");
+	}
+	const budgetKey = type === "major" ? "majorRemaining" : "teamRemaining";
+	if (!state.rerolls[budgetKey]) {
+		return fail("reroll_exhausted", `${type} reroll has already been used`);
+	}
+	if (!dataset) {
+		return fail("reroll_unavailable", "reroll requires the current historical dataset");
+	}
+	const round = state.phase.round;
+	const current = state.cards[round];
+	if (!current) return fail("reroll_unavailable", "current draft card is missing");
+	const otherCards = state.cards.filter((_, index) => index !== round);
+	const shownRosterIds = new Set(otherCards.map((card) => card.orgYearId));
+	const rng = createRng(`${state.seed}:reroll-${type}:${round}`);
+	let candidates: Dataset["orgYears"];
+	if (type === "team") {
+		candidates = dataset.orgYears.filter(
+			(roster) =>
+				(roster.majorId ?? null) === current.majorId &&
+				roster.kind === current.kind &&
+				roster.id !== current.orgYearId &&
+				!shownRosterIds.has(roster.id),
+		);
+	} else {
+		const usedMajorIds = new Set(otherCards.map((card) => card.majorId).filter(Boolean));
+		const majors = dataset.majors.filter(
+			(major) => major.id !== current.majorId && !usedMajorIds.has(major.id),
+		);
+		if (majors.length === 0) {
+			return fail("reroll_unavailable", "no different Major remains");
+		}
+		const major = majors[rng.nextInt(majors.length)];
+		candidates = dataset.orgYears.filter(
+			(roster) => roster.majorId === major.id && !shownRosterIds.has(roster.id),
+		);
+	}
+	if (candidates.length === 0) {
+		return fail("reroll_unavailable", `no alternative ${type} card remains`);
+	}
+	const seasons = new Map(dataset.playerSeasons.map((season) => [season.id, season]));
+	const replacement = snapshotCard(pickRoster(candidates, rng), seasons);
+	const cards = state.cards.map((card, index) => (index === round ? replacement : card));
+	return ok({
+		...state,
+		cards,
+		rerolls: { ...state.rerolls, [budgetKey]: false },
+	});
 }
 
 export function currentCard(state: DraftState): RolledOrgYearCard | undefined {
@@ -152,11 +247,19 @@ function pickCoach(state: DraftState, action: PickCoachAction): DraftResult<Draf
 	});
 }
 
-export function applyAction(state: DraftState, action: DraftAction): DraftResult<DraftState> {
+export function applyAction(
+	state: DraftState,
+	action: DraftAction,
+	dataset?: Dataset,
+): DraftResult<DraftState> {
 	switch (action.type) {
 		case "pickPlayer":
 			return pickPlayer(state, action);
 		case "pickCoach":
 			return pickCoach(state, action);
+		case "rerollMajor":
+			return rerollCard(state, dataset, "major");
+		case "rerollTeam":
+			return rerollCard(state, dataset, "team");
 	}
 }

@@ -535,6 +535,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		() => new Map(dataset.orgYears.map((orgYear) => [orgYear.id, orgYear])),
 		[dataset.orgYears],
 	);
+	const majorsById = useMemo(
+		() => new Map(dataset.majors.map((major) => [major.id, major])),
+		[dataset.majors],
+	);
 	const orgsById = useMemo(() => new Map(dataset.orgs.map((org) => [org.id, org])), [dataset.orgs]);
 	const coachesById = useMemo(
 		() => new Map(dataset.coaches.map((coach) => [coach.id, coach])),
@@ -588,6 +592,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				...draft,
 				phase: { type: "complete" },
 				coachIds: dataset.coaches.map((coach) => coach.id),
+				rerolls: { majorRemaining: false, teamRemaining: false },
 				coachId: draft.coachId,
 			});
 			setTournament(persisted.tournament);
@@ -654,8 +659,20 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setError(null);
 	}
 
+	function reroll(type: "rerollMajor" | "rerollTeam") {
+		const result = applyAction(state, { type }, dataset);
+		if (!result.ok) {
+			setError(result.error.message);
+			return;
+		}
+		setState(result.value);
+		setSelectedPlayerId(null);
+		setError(null);
+	}
+
 	const orgYear = card ? orgYearsById.get(card.orgYearId) : undefined;
 	const org = orgYear ? orgsById.get(orgYear.orgId) : undefined;
+	const major = orgYear?.majorId ? majorsById.get(orgYear.majorId) : undefined;
 	const chosenCoach = state.coachId ? coachesById.get(state.coachId) : undefined;
 	const completedDraft = getCompletedDraft(state);
 	const teamProfile =
@@ -828,7 +845,8 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								<div className="flex flex-wrap items-start justify-between gap-4">
 									<div>
 										<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-											Player round {state.phase.round + 1} of 5
+											Player round {state.phase.round + 1} of 5 ·{" "}
+											{major ? major.shortName : "Legacy wildcard"}
 										</p>
 										<h2
 											id="round-heading"
@@ -836,13 +854,37 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										>
 											{org.name} <span className="text-zinc-500">{orgYear.year}</span>
 										</h2>
-										<p className="mt-1 text-sm text-zinc-400">{GAME_LABELS[orgYear.game]}</p>
+										<p className="mt-1 text-sm text-zinc-400">
+											{GAME_LABELS[orgYear.game]}
+											{major ? ` · placed #${orgYear.placement}` : " · pre-Major legend"}
+										</p>
 									</div>
 									<span
 										className={`rounded-full border px-3 py-1 text-xs font-semibold ${TIER_STYLES[orgYear.tier]}`}
 									>
 										{TIER_LABELS[orgYear.tier]} tier
 									</span>
+								</div>
+								<div className="mt-4 flex flex-wrap gap-2 border-t border-white/8 pt-4">
+									<button
+										type="button"
+										disabled={!state.rerolls.majorRemaining}
+										onClick={() => reroll("rerollMajor")}
+										className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-sky-300/50 enabled:hover:bg-sky-300/10 disabled:cursor-not-allowed disabled:opacity-40"
+									>
+										{state.rerolls.majorRemaining ? "Reroll Major · 1 left" : "Major reroll used"}
+									</button>
+									<button
+										type="button"
+										disabled={!state.rerolls.teamRemaining}
+										onClick={() => reroll("rerollTeam")}
+										className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-emerald-300/50 enabled:hover:bg-emerald-300/10 disabled:cursor-not-allowed disabled:opacity-40"
+									>
+										{state.rerolls.teamRemaining ? "Reroll team · 1 left" : "Team reroll used"}
+									</button>
+									<p className="self-center text-[10px] text-zinc-500">
+										One of each per draft. Rerolls apply to this card before you pick.
+									</p>
 								</div>
 							</div>
 

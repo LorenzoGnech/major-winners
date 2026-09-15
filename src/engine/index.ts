@@ -31,6 +31,8 @@ export {
 	type PickPlayerAction,
 	PLAYER_CARD_COUNT,
 	type PlayerPick,
+	type RerollMajorAction,
+	type RerollTeamAction,
 	ROLE_FIT,
 	type RoleFit,
 	type RolledOrgYearCard,
