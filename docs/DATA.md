@@ -16,7 +16,7 @@ The game never talks to HLTV (or any other live stats API). Everything draftable
 
 ## Provenance
 
-- **Majors, rosters, placements:** revision-pinned [Liquipedia Counter-Strike](https://liquipedia.net/counterstrike) pages (CC-BY-SA 3.0), imported through the supported MediaWiki API with the required User-Agent and rate limits.
+- **Majors, rosters, placements:** revision-pinned [Liquipedia Counter-Strike](https://liquipedia.net/counterstrike) pages (CC BY-SA 3.0 US), imported through the supported MediaWiki API with the required User-Agent and rate limits. The adapted committed dataset is distributed under [`DATA-LICENSE.md`](../DATA-LICENSE.md).
 - **Accolades:** HLTV Top 20 Players of the Year lists (2013–2025; 2010–2011 for 1.6; no 2012 list) plus Major MVPs.
 - **Season stats:** HLTV player stats filtered to a calendar year, e.g. `https://www.hltv.org/stats/players?startDate=2018-01-01&endDate=2018-12-31`. Prefer the LAN / big-events filter when it exists.
 

@@ -105,7 +105,7 @@ Today's Challenge uses the UTC day and `seedFromUtcDate`, making the draft, coac
 - Every roster appearance has exactly five starters, optional registered substitutes, placement, Major/Legacy identity, and source metadata. Roles may be provisional; off-role placement is always available.
 - `npm run import:majors -- --write` performs the one-time, rate-limited Liquipedia MediaWiki import and caches source revisions under ignored `.cache/`. The shipped app has no runtime network dependency.
 - No org logos or player photos. Text crests and abstract art only.
-- JSON lives in `src/data/json/`. Contracts live in `src/data/schema.ts`. Provenance and the transcription workflow live in `docs/DATA.md`.
+- JSON lives in `src/data/json/` under the separate `DATA-LICENSE.md` terms. Contracts live in `src/data/schema.ts`. Provenance and the transcription workflow live in `docs/DATA.md`.
 - `npm run validate-data` must stay green. It enforces regime consistency, 24 revision-pinned Majors, each played field size, five unique starters, and relational integrity.
 
 ## Commands
