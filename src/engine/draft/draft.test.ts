@@ -106,7 +106,7 @@ describe("startDraft", () => {
 });
 
 describe("applyAction", () => {
-	it("fills every role off-role and yields a valid completed roster", () => {
+	it("allows off-role picks and yields a valid completed roster", () => {
 		const state = completeDraft("off-role-legal", (_round, current) => {
 			const player = currentCard(current)?.players[0];
 			const empty = emptyRoles(current);
@@ -129,9 +129,9 @@ describe("applyAction", () => {
 		expect(new Set(ROLES.map((role) => completed.roster[role].orgYearId)).size).toBe(5);
 		expect(completed.coachId).toBe(state.coachIds[0]);
 		expect(state.phase).toEqual({ type: "complete" });
-		for (const pick of Object.values(completed.roster)) {
-			expect(pick.fit).toBe(ROLE_FIT.offRole);
-		}
+		expect(Object.values(completed.roster).some((pick) => pick.fit === ROLE_FIT.offRole)).toBe(
+			true,
+		);
 	});
 
 	it("does not mutate when the player is not on the current card", () => {

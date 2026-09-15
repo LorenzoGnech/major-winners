@@ -2,7 +2,7 @@
 	{
 		"id": "dreamhack-winter-2013",
 		"name": "DreamHack Winter 2013",
-		"shortName": "DH Winter 2013",
+		"shortName": "DreamHack Winter 2013",
 		"year": 2013,
 		"game": "csgo",
 		"startDate": "2013-11-28",
@@ -13,14 +13,91 @@
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/DreamHack/2013/Winter",
+				"revision": "3422235",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "ems-one-katowice-2014",
+		"name": "ESL Major Series One Katowice 2014",
+		"shortName": "ESL Series One Katowice 2014",
+		"year": 2014,
+		"game": "csgo",
+		"startDate": "2014-03-13",
+		"endDate": "2014-03-16",
+		"location": "Katowice, Poland",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/ESL/Major_Series_One/2014/Katowice",
+				"revision": "3390850",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "esl-one-cologne-2014",
+		"name": "ESL One: Cologne 2014",
+		"shortName": "ESL One: Cologne 2014",
+		"year": 2014,
+		"game": "csgo",
+		"startDate": "2014-08-14",
+		"endDate": "2014-08-17",
+		"location": "Cologne, Germany",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/ESL/One/2014/Cologne",
+				"revision": "3390742",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "dreamhack-winter-2014",
+		"name": "DreamHack Winter 2014",
+		"shortName": "DreamHack Winter 2014",
+		"year": 2014,
+		"game": "csgo",
+		"startDate": "2014-11-27",
+		"endDate": "2014-11-29",
+		"location": "Jönköping, Sweden",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/DreamHack/2014/Winter",
+				"revision": "3418408",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "esl-one-katowice-2015",
+		"name": "ESL One: Katowice 2015",
+		"shortName": "ESL One: Katowice 2015",
+		"year": 2015,
+		"game": "csgo",
+		"startDate": "2015-03-12",
+		"endDate": "2015-03-15",
+		"location": "Katowice, Poland",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/ESL/One/2015/Katowice",
+				"revision": "3406720",
 				"accessedAt": "2026-09-15"
 			}
 		]
 	},
 	{
 		"id": "esl-one-cologne-2015",
-		"name": "ESL One Cologne 2015",
-		"shortName": "Cologne 2015",
+		"name": "ESL One: Cologne 2015",
+		"shortName": "ESL One: Cologne 2015",
 		"year": 2015,
 		"game": "csgo",
 		"startDate": "2015-08-20",
@@ -31,14 +108,53 @@
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/ESL/One/2015/Cologne",
+				"revision": "3406744",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "dreamhack-cluj-napoca-2015",
+		"name": "DreamHack Open Cluj&#8288;-&#8288;Napoca 2015",
+		"shortName": "DreamHack Open Cluj&#8288;-&#8288;Napoca 2015",
+		"year": 2015,
+		"game": "csgo",
+		"startDate": "2015-10-28",
+		"endDate": "2015-11-01",
+		"location": "Cluj-Napoca, Romania",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/DreamHack/2015/Cluj-Napoca",
+				"revision": "3406638",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "mlg-columbus-2016",
+		"name": "MLG Major Championship: Columbus 2016",
+		"shortName": "MLG Columbus 2016",
+		"year": 2016,
+		"game": "csgo",
+		"startDate": "2016-03-29",
+		"endDate": "2016-04-03",
+		"location": "Columbus, United States",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/MLG/2016/Columbus",
+				"revision": "3405906",
 				"accessedAt": "2026-09-15"
 			}
 		]
 	},
 	{
 		"id": "esl-one-cologne-2016",
-		"name": "ESL One Cologne 2016",
-		"shortName": "Cologne 2016",
+		"name": "ESL One: Cologne 2016",
+		"shortName": "ESL One: Cologne 2016",
 		"year": 2016,
 		"game": "csgo",
 		"startDate": "2016-07-05",
@@ -49,6 +165,64 @@
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/ESL/One/2016/Cologne",
+				"revision": "3391866",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "eleague-atlanta-2017",
+		"name": "ELEAGUE Major Atlanta 2017",
+		"shortName": "ELEAGUE Atlanta 2017",
+		"year": 2017,
+		"game": "csgo",
+		"startDate": "2017-01-22",
+		"endDate": "2017-01-29",
+		"location": "Atlanta, United States",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/ELEAGUE/2017/Major",
+				"revision": "3405422",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "pgl-krakow-2017",
+		"name": "PGL Major Kraków 2017",
+		"shortName": "PGL Kraków 2017",
+		"year": 2017,
+		"game": "csgo",
+		"startDate": "2017-07-16",
+		"endDate": "2017-07-23",
+		"location": "Kraków, Poland",
+		"teamCount": 16,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/PGL/2017/Krakow",
+				"revision": "3405423",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "eleague-boston-2018",
+		"name": "ELEAGUE Major Boston 2018",
+		"shortName": "ELEAGUE Boston 2018",
+		"year": 2018,
+		"game": "csgo",
+		"startDate": "2018-01-12",
+		"endDate": "2018-01-28",
+		"location": "Atlanta, United States",
+		"teamCount": 23,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/ELEAGUE/2018/Major",
+				"revision": "3427886",
 				"accessedAt": "2026-09-15"
 			}
 		]
@@ -56,7 +230,7 @@
 	{
 		"id": "faceit-london-2018",
 		"name": "FACEIT Major: London 2018",
-		"shortName": "London 2018",
+		"shortName": "FACEIT London 2018",
 		"year": 2018,
 		"game": "csgo",
 		"startDate": "2018-09-05",
@@ -67,6 +241,64 @@
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/FACEIT/2018/Major",
+				"revision": "3394956",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "iem-katowice-2019",
+		"name": "Intel Extreme Masters XIII - Katowice Major 2019",
+		"shortName": "Intel Extreme Masters XIII - Katowice 2019",
+		"year": 2019,
+		"game": "csgo",
+		"startDate": "2019-02-13",
+		"endDate": "2019-03-03",
+		"location": "Katowice, Poland",
+		"teamCount": 24,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/Intel_Extreme_Masters/Season_XIII/World_Championship",
+				"revision": "3405426",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "starladder-berlin-2019",
+		"name": "StarLadder Berlin Major 2019",
+		"shortName": "StarLadder Berlin 2019",
+		"year": 2019,
+		"game": "csgo",
+		"startDate": "2019-08-23",
+		"endDate": "2019-09-08",
+		"location": "Berlin, Germany",
+		"teamCount": 24,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/StarLadder/2019/Major",
+				"revision": "3428320",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "pgl-stockholm-2021",
+		"name": "PGL Major Stockholm 2021",
+		"shortName": "PGL Stockholm 2021",
+		"year": 2021,
+		"game": "csgo",
+		"startDate": "2021-10-26",
+		"endDate": "2021-11-07",
+		"location": "Stockholm, Sweden",
+		"teamCount": 24,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/PGL/2021/Stockholm",
+				"revision": "3423059",
 				"accessedAt": "2026-09-15"
 			}
 		]
@@ -74,7 +306,7 @@
 	{
 		"id": "pgl-antwerp-2022",
 		"name": "PGL Major Antwerp 2022",
-		"shortName": "Antwerp 2022",
+		"shortName": "PGL Antwerp 2022",
 		"year": 2022,
 		"game": "csgo",
 		"startDate": "2022-05-09",
@@ -85,6 +317,140 @@
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/PGL/2022/Antwerp",
+				"revision": "3423058",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "iem-rio-2022",
+		"name": "Intel Extreme Masters Rio Major 2022",
+		"shortName": "Intel Extreme Masters Rio 2022",
+		"year": 2022,
+		"game": "csgo",
+		"startDate": "2022-10-31",
+		"endDate": "2022-11-13",
+		"location": "Rio de Janeiro, Brazil",
+		"teamCount": 24,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/Intel_Extreme_Masters/2022/Rio",
+				"revision": "3422465",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "blast-paris-2023",
+		"name": "BLAST.tv Paris Major 2023",
+		"shortName": "BLAST.tv Paris 2023",
+		"year": 2023,
+		"game": "csgo",
+		"startDate": "2023-05-08",
+		"endDate": "2023-05-21",
+		"location": "Paris, France",
+		"teamCount": 24,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/BLAST/Major/2023/Paris",
+				"revision": "3348914",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "pgl-copenhagen-2024",
+		"name": "PGL Major Copenhagen 2024",
+		"shortName": "PGL Copenhagen 2024",
+		"year": 2024,
+		"game": "cs2",
+		"startDate": "2024-03-17",
+		"endDate": "2024-03-31",
+		"location": "Copenhagen, Denmark",
+		"teamCount": 24,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/PGL/2024/Copenhagen",
+				"revision": "3417622",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "perfect-world-shanghai-2024",
+		"name": "Perfect World Shanghai&nbsp;Major&nbsp;2024",
+		"shortName": "Perfect World Shanghai&nbsp;&nbsp;2024",
+		"year": 2024,
+		"game": "cs2",
+		"startDate": "2024-11-30",
+		"endDate": "2024-12-15",
+		"location": "Shanghai, China",
+		"teamCount": 24,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/Perfect_World/Major/2024/Shanghai",
+				"revision": "3389933",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "blast-austin-2025",
+		"name": "BLAST.tv Austin Major 2025",
+		"shortName": "BLAST.tv Austin 2025",
+		"year": 2025,
+		"game": "cs2",
+		"startDate": "2025-06-03",
+		"endDate": "2025-06-22",
+		"location": "Austin, United States",
+		"teamCount": 32,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/BLAST/Major/2025/Austin",
+				"revision": "3417010",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "starladder-budapest-2025",
+		"name": "StarLadder Budapest Major 2025",
+		"shortName": "StarLadder Budapest 2025",
+		"year": 2025,
+		"game": "cs2",
+		"startDate": "2025-11-24",
+		"endDate": "2025-12-14",
+		"location": "Budapest, Hungary",
+		"teamCount": 32,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/StarLadder/2025/Major",
+				"revision": "3420743",
+				"accessedAt": "2026-09-15"
+			}
+		]
+	},
+	{
+		"id": "iem-cologne-2026",
+		"name": "Intel Extreme Masters Cologne Major 2026",
+		"shortName": "Intel Extreme Masters Cologne 2026",
+		"year": 2026,
+		"game": "cs2",
+		"startDate": "2026-06-02",
+		"endDate": "2026-06-21",
+		"location": "Cologne, Germany",
+		"teamCount": 32,
+		"sources": [
+			{
+				"label": "Liquipedia",
+				"url": "https://liquipedia.net/counterstrike/Intel_Extreme_Masters/2026/Cologne",
+				"revision": "3443244",
 				"accessedAt": "2026-09-15"
 			}
 		]

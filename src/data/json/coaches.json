@@ -1,48 +1,2811 @@
 [
 	{
-		"id": "threat-2013",
-		"nick": "THREAT",
-		"realName": "Björn Pers",
-		"nationality": "SE",
+		"id": "3k2-2013-copenhagen-wolves",
+		"nick": "3k2",
+		"realName": "3k2",
+		"nationality": "ZZ",
 		"year": 2013,
-		"orgId": "nip",
-		"modifiers": { "comeback": 0, "economy": 1, "antistrat": 1 }
+		"orgId": "copenhagen-wolves",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
 	},
 	{
-		"id": "vuggo-2015",
-		"nick": "vuggo",
-		"realName": "Viktor Hallgrenstedt",
-		"nationality": "SE",
+		"id": "3k2-2014-team-dignitas",
+		"nick": "3k2",
+		"realName": "3k2",
+		"nationality": "ZZ",
+		"year": 2014,
+		"orgId": "team-dignitas",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "abdi-2025-metizport",
+		"nick": "abdi",
+		"realName": "abdi",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "metizport",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "adr-2026-legacy",
+		"nick": "adr",
+		"realName": "adr",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "legacy",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "adren-2019-liquid",
+		"nick": "adreN",
+		"realName": "adreN",
+		"nationality": "KZ",
+		"year": 2019,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "adren-2022-liquid",
+		"nick": "adreN",
+		"realName": "adreN",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "adren-2025-complexity",
+		"nick": "adreN",
+		"realName": "adreN",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "complexity",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ami-2019-hellraisers",
+		"nick": "ami",
+		"realName": "ami",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "hellraisers",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "andi-2017-navi",
+		"nick": "Andi",
+		"realName": "Andi",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "andi-2018-gambit-esports",
+		"nick": "Andi",
+		"realName": "Andi",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "gambit-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "andre_akkari-2022-furia-esports",
+		"nick": "André Akkari",
+		"realName": "André Akkari",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "furia-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "apoka-2019-intz-esports",
+		"nick": "Apoka",
+		"realName": "Apoka",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "intz-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ashhh-2022-team-gamerlegion",
+		"nick": "ashhh",
+		"realName": "ashhh",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "team-gamerlegion",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ashhh-2023-gamerlegion",
+		"nick": "ashhh",
+		"realName": "ashhh",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "gamerlegion",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ashhh-2024-gamerlegion",
+		"nick": "ashhh",
+		"realName": "ashhh",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "gamerlegion",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ashhh-2025-gamerlegion",
+		"nick": "ashhh",
+		"realName": "ashhh",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "gamerlegion",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ave-2018-north",
+		"nick": "ave",
+		"realName": "ave",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "north",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "azr-2025-flyquest",
+		"nick": "AZR",
+		"realName": "AZR",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "flyquest",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "azr-2026-flyquest",
+		"nick": "AZR",
+		"realName": "AZR",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "flyquest",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "b1ad3-2014-hellraisers",
+		"nick": "B1ad3",
+		"realName": "B1ad3",
+		"nationality": "ZZ",
+		"year": 2014,
+		"orgId": "hellraisers",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "b1ad3-2018-gambit-esports",
+		"nick": "B1ad3",
+		"realName": "B1ad3",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "gambit-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "b1ad3-2021-navi",
+		"nick": "B1ad3",
+		"realName": "B1ad3",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "b1ad3-2022-navi",
+		"nick": "B1ad3",
+		"realName": "B1ad3",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "b1ad3-2023-navi",
+		"nick": "B1ad3",
+		"realName": "B1ad3",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "b1ad3-2024-navi",
+		"nick": "B1ad3",
+		"realName": "B1ad3",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "b1ad3-2025-navi",
+		"nick": "B1ad3",
+		"realName": "B1ad3",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "b1ad3-2026-navi",
+		"nick": "B1ad3",
+		"realName": "B1ad3",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "beast-2016-gambit-gaming",
+		"nick": "beAst",
+		"realName": "beAst",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "gambit-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "berry-2022-sprout",
+		"nick": "BERRY",
+		"realName": "BERRY",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "sprout",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "bfull-2026-sinners-esports",
+		"nick": "bfull",
+		"realName": "bfull",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "sinners-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "bishop-2022-eternal-fire",
+		"nick": "bishop",
+		"realName": "bishop",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "eternal-fire",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "bit-2022-mibr",
+		"nick": "BIT",
+		"realName": "BIT",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "mibr",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "bit-2026-9z-team",
+		"nick": "BIT",
+		"realName": "BIT",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "9z-team",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "blade-2021-movistar-riders",
+		"nick": "bladE",
+		"realName": "bladE",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "movistar-riders",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "bobz-2025-fluxo",
+		"nick": "bobz",
+		"realName": "bobz",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "fluxo",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "box-2025-nemiga-gaming",
+		"nick": "boX",
+		"realName": "boX",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "nemiga-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "carn-2013-fnatic",
+		"nick": "cArn",
+		"realName": "cArn",
+		"nationality": "ZZ",
+		"year": 2013,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "carn-2014-fnatic",
+		"nick": "cArn",
+		"realName": "cArn",
+		"nationality": "ZZ",
+		"year": 2014,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "carnage-2025-chinggis-warriors",
+		"nick": "carnage",
+		"realName": "carnage",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "chinggis-warriors",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "carnage-2025-the-huns-esports",
+		"nick": "carnage",
+		"realName": "carnage",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "the-huns-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "casle-2024-ecstatic",
+		"nick": "casle",
+		"realName": "casle",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "ecstatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "certus-2018-team-spirit",
+		"nick": "Certus",
+		"realName": "Certus",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "team-spirit",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "certus-2019-team-spirit",
+		"nick": "Certus",
+		"realName": "Certus",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "team-spirit",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "certus-2021-team-spirit",
+		"nick": "Certus",
+		"realName": "Certus",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "team-spirit",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "chucky-2024-legacy",
+		"nick": "chucky",
+		"realName": "chucky",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "legacy",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "chucky-2025-legacy",
+		"nick": "chucky",
+		"realName": "chucky",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "legacy",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "cky-2021-godsent",
+		"nick": "cky",
+		"realName": "cky",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "godsent",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "cky-2022-00-nation",
+		"nick": "cky",
+		"realName": "cky",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "00-nation",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "coachi-2021-sharks-esports",
+		"nick": "coachi",
+		"realName": "coachi",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "sharks-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "coachi-2026-sharks-esports",
+		"nick": "coachi",
+		"realName": "coachi",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "sharks-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "coolio-2026-fut-esports",
+		"nick": "coolio",
+		"realName": "coolio",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "fut-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "crusad3-2018-tyloo",
+		"nick": "CruSad3",
+		"realName": "CruSad3",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "tyloo",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "daps-2021-evil-geniuses",
+		"nick": "daps",
+		"realName": "daps",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "evil-geniuses",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "daps-2022-liquid",
+		"nick": "daps",
+		"realName": "daps",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "daps-2023-liquid",
+		"nick": "daps",
+		"realName": "daps",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "daps-2025-nrg",
+		"nick": "daps",
+		"realName": "daps",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "nrg",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "daps-2026-nrg",
+		"nick": "daps",
+		"realName": "daps",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "nrg",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dastan-2018-avangar",
+		"nick": "dastan",
+		"realName": "dastan",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "avangar",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dastan-2019-avangar",
+		"nick": "dastan",
+		"realName": "dastan",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "avangar",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dastan-2021-virtus-pro",
+		"nick": "dastan",
+		"realName": "dastan",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "virtus-pro",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dastan-2022-outsiders",
+		"nick": "dastan",
+		"realName": "dastan",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "outsiders",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dastan-2024-virtus-pro",
+		"nick": "dastan",
+		"realName": "dastan",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "virtus-pro",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dastan-2025-parivision",
+		"nick": "dastan",
+		"realName": "dastan",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "parivision",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dastan-2026-parivision",
+		"nick": "dastan",
+		"realName": "dastan",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "parivision",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dead-2017-sk",
+		"nick": "dead",
+		"realName": "dead",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "sk",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dead-2018-sk",
+		"nick": "dead",
+		"realName": "dead",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "sk",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "delonge-2024-koi",
+		"nick": "deLonge",
+		"realName": "deLonge",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "koi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "demars_derover-2025-liquid",
+		"nick": "DeMars DeRover",
+		"realName": "DeMars DeRover",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dephh-2025-m80",
+		"nick": "dephh",
+		"realName": "dephh",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "m80",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "dephh-2026-m80",
+		"nick": "dephh",
+		"realName": "dephh",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "m80",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "devilwalk-2014-fnatic",
+		"nick": "Devilwalk",
+		"realName": "Devilwalk",
+		"nationality": "ZZ",
+		"year": 2014,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "devilwalk-2015-fnatic",
+		"nick": "Devilwalk",
+		"realName": "Devilwalk",
+		"nationality": "ZZ",
 		"year": 2015,
 		"orgId": "fnatic",
-		"modifiers": { "comeback": 1, "economy": 0, "antistrat": 1 }
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
 	},
 	{
-		"id": "zews-2016",
-		"nick": "zews",
-		"realName": "Wilton Prado",
-		"nationality": "BR",
-		"year": 2016,
-		"orgId": "sk",
-		"modifiers": { "comeback": 1, "economy": 1, "antistrat": 1 }
+		"id": "devilwalk-2023-bad-news-eagles",
+		"nick": "Devilwalk",
+		"realName": "Devilwalk",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "bad-news-eagles",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
 	},
 	{
-		"id": "zonic-2018",
-		"nick": "zonic",
-		"realName": "Danny Sørensen",
-		"nationality": "DK",
+		"id": "djl-2022-nip",
+		"nick": "djL",
+		"realName": "djL",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "djl-2023-nip",
+		"nick": "djL",
+		"realName": "djL",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "eddie-2022-faze",
+		"nick": "Eddie",
+		"realName": "Eddie",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "faze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "emi-2019-cr4zy",
+		"nick": "emi",
+		"realName": "emi",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "cr4zy",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "enkay_j-2017-team-envyus",
+		"nick": "enkay J",
+		"realName": "enkay J",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "team-envyus",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "erkast-2024-flyquest",
+		"nick": "erkaSt",
+		"realName": "erkaSt",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "flyquest",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "erkast-2025-flyquest",
+		"nick": "erkaSt",
+		"realName": "erkaSt",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "flyquest",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "f_1n-2025-virtus-pro",
+		"nick": "F_1N",
+		"realName": "F_1N",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "virtus-pro",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "fabre-2024-eternal-fire",
+		"nick": "Fabre",
+		"realName": "Fabre",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "eternal-fire",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "fabre-2025-aurora-gaming",
+		"nick": "Fabre",
+		"realName": "Fabre",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "aurora-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "fabre-2026-aurora-gaming",
+		"nick": "Fabre",
+		"realName": "Fabre",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "aurora-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "felippe1-2021-pain-gaming",
+		"nick": "felippe1",
+		"realName": "felippe1",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "pain-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "fierce-2018-vega-squadron",
+		"nick": "Fierce",
+		"realName": "Fierce",
+		"nationality": "ZZ",
 		"year": 2018,
-		"orgId": "astralis",
-		"modifiers": { "comeback": 2, "economy": 2, "antistrat": 2 }
+		"orgId": "vega-squadron",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
 	},
 	{
-		"id": "starix-2018",
-		"nick": "starix",
-		"realName": "Sergey Ischuk",
-		"nationality": "UA",
+		"id": "fierce-2019-vega-squadron",
+		"nick": "Fierce",
+		"realName": "Fierce",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "vega-squadron",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "fierce-2022-forze",
+		"nick": "Fierce",
+		"realName": "Fierce",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "forze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "fierce-2023-forze-esports",
+		"nick": "Fierce",
+		"realName": "Fierce",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "forze-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "fierce-2026-betboom-team",
+		"nick": "Fierce",
+		"realName": "Fierce",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "betboom-team",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "flashie-2025-liquid",
+		"nick": "flashie",
+		"realName": "flashie",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "flashie-2026-liquid",
+		"nick": "flashie",
+		"realName": "flashie",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "fnx-2022-imperial-esports",
+		"nick": "fnx",
+		"realName": "fnx",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "imperial-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "gbjame_s-2015-liquid",
+		"nick": "GBJame^s",
+		"realName": "GBJame^s",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "gbjame_s-2016-liquid",
+		"nick": "GBJame^s",
+		"realName": "GBJame^s",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "gob_b-2022-big",
+		"nick": "gob b",
+		"realName": "gob b",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "big",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "groove-2021-gambit-esports",
+		"nick": "groove",
+		"realName": "groove",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "gambit-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "groove-2022-cloud9",
+		"nick": "groove",
+		"realName": "groove",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "cloud9",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "groove-2024-cloud9",
+		"nick": "groove",
+		"realName": "groove",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "cloud9",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "grt-2016-splyce",
+		"nick": "Grt",
+		"realName": "Grt",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "splyce",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "guerri-2019-furia-esports",
+		"nick": "guerri",
+		"realName": "guerri",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "furia-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "guerri-2023-furia-esports",
+		"nick": "guerri",
+		"realName": "guerri",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "furia-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "guerri-2024-furia-esports",
+		"nick": "guerri",
+		"realName": "guerri",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "furia-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "gum-2024-lynn-vision-gaming",
+		"nick": "Gum",
+		"realName": "Gum",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "lynn-vision-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "gum-2025-lynn-vision-gaming",
+		"nick": "Gum",
+		"realName": "Gum",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "lynn-vision-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "gum-2026-lynn-vision-gaming",
+		"nick": "GUM",
+		"realName": "GUM",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "lynn-vision-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "hally-2022-team-spirit",
+		"nick": "hally",
+		"realName": "hally",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "team-spirit",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "hally-2024-team-spirit",
+		"nick": "hally",
+		"realName": "hally",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "team-spirit",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "hally-2025-team-spirit",
+		"nick": "hally",
+		"realName": "hally",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "team-spirit",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "hardstyle-2018-space-soldiers",
+		"nick": "hardstyle",
+		"realName": "hardstyle",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "space-soldiers",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "hooch-2021-entropiq",
+		"nick": "hooch",
+		"realName": "hooch",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "entropiq",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "horvy-2026-gaimin-gladiators",
+		"nick": "horvy",
+		"realName": "horvy",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "gaimin-gladiators",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "iksou-2018-quantum-bellator-fire",
+		"nick": "iksou",
+		"realName": "iksou",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "quantum-bellator-fire",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "iksou-2018-winstrike-team",
+		"nick": "iksou",
+		"realName": "iksou",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "winstrike-team",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "iksou-2019-winstrike-team",
+		"nick": "iksou",
+		"realName": "iksou",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "winstrike-team",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "imapet-2019-nrg-esports",
+		"nick": "ImAPet",
+		"realName": "ImAPet",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "nrg-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "imd-2026-gamerlegion",
+		"nick": "imd",
+		"realName": "imd",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "gamerlegion",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "independent-2025-fnatic",
+		"nick": "Independent",
+		"realName": "Independent",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "innersh1ne-2021-faze",
+		"nick": "innersh1ne",
+		"realName": "innersh1ne",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "faze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "irukandji-2014-team-ibuypower",
+		"nick": "Irukandji",
+		"realName": "Irukandji",
+		"nationality": "ZZ",
+		"year": 2014,
+		"orgId": "team-ibuypower",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "jnt-2025-mibr",
+		"nick": "jnt",
+		"realName": "jnt",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "mibr",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "johnta-2015-flipsid3-tactics",
+		"nick": "Johnta",
+		"realName": "Johnta",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "flipsid3-tactics",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "johnta-2017-hellraisers",
+		"nick": "Johnta",
+		"realName": "Johnta",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "hellraisers",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "johnta-2018-hellraisers",
+		"nick": "Johnta",
+		"realName": "Johnta",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "hellraisers",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "johnta-2019-tyloo",
+		"nick": "Johnta",
+		"realName": "Johnta",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "tyloo",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "jokasteve-2021-liquid",
+		"nick": "jokasteve",
+		"realName": "jokasteve",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "jumpy-2017-fnatic",
+		"nick": "Jumpy",
+		"realName": "Jumpy",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "jumpy-2018-fnatic",
+		"nick": "Jumpy",
+		"realName": "Jumpy",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "jumpy-2019-fnatic",
+		"nick": "Jumpy",
+		"realName": "Jumpy",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "juve-2023-into-the-breach",
+		"nick": "Juve",
+		"realName": "Juve",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "into-the-breach",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kakafu-2017-big",
+		"nick": "kakafu",
+		"realName": "kakafu",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "big",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kakafu-2018-big",
+		"nick": "kakafu",
+		"realName": "kakafu",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "big",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kakafu-2024-big",
+		"nick": "kakafu",
+		"realName": "kakafu",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "big",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kakafu-2026-monte",
+		"nick": "kakafu",
+		"realName": "kakafu",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "monte",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kane-2016-flipsid3-tactics",
+		"nick": "kane",
+		"realName": "kane",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "flipsid3-tactics",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kane-2017-gambit-esports",
+		"nick": "kane",
+		"realName": "kane",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "gambit-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kane-2018-navi",
+		"nick": "kane",
+		"realName": "kane",
+		"nationality": "ZZ",
 		"year": 2018,
 		"orgId": "navi",
-		"modifiers": { "comeback": 1, "economy": 0, "antistrat": 1 }
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kane-2019-navi",
+		"nick": "kane",
+		"realName": "kane",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kane-2024-passion-ua",
+		"nick": "kane",
+		"realName": "kane",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "passion-ua",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kapio-2016-mouz",
+		"nick": "Kapio",
+		"realName": "Kapio",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "karsa-2021-tyloo",
+		"nick": "Karsa",
+		"realName": "Karsa",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "tyloo",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kassad-2014-team-wolf",
+		"nick": "kassad",
+		"realName": "kassad",
+		"nationality": "ZZ",
+		"year": 2014,
+		"orgId": "team-wolf",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kassad-2016-mouz",
+		"nick": "kassad",
+		"realName": "kassad",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kassad-2018-renegades",
+		"nick": "kassad",
+		"realName": "kassad",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "renegades",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kassad-2019-renegades",
+		"nick": "kassad",
+		"realName": "kassad",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "renegades",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "keita-2019-complexity",
+		"nick": "keita",
+		"realName": "keita",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "complexity",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "keita-2022-fnatic",
+		"nick": "keita",
+		"realName": "keita",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "keita-2023-fnatic",
+		"nick": "keita",
+		"realName": "keita",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "keita-2024-fnatic",
+		"nick": "keita",
+		"realName": "keita",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kingfisher-2021-renegades",
+		"nick": "Kingfisher",
+		"realName": "Kingfisher",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "renegades",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kingfisher-2022-grayhound-gaming",
+		"nick": "Kingfisher",
+		"realName": "Kingfisher",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "grayhound-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kingfisher-2022-renegades",
+		"nick": "Kingfisher",
+		"realName": "Kingfisher",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "renegades",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kuben-2015-virtus-pro",
+		"nick": "kuben",
+		"realName": "kuben",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "virtus-pro",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kuben-2016-virtus-pro",
+		"nick": "kuben",
+		"realName": "kuben",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "virtus-pro",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kuben-2017-virtus-pro",
+		"nick": "kuben",
+		"realName": "kuben",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "virtus-pro",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kuben-2018-virtus-pro",
+		"nick": "kuben",
+		"realName": "kuben",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "virtus-pro",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kuben-2023-apeks",
+		"nick": "kuben",
+		"realName": "kuben",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "apeks",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "kuben-2024-ence",
+		"nick": "kuben",
+		"realName": "kuben",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "ence",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "lambert-2025-og",
+		"nick": "Lambert",
+		"realName": "Lambert",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "og",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "legija-2015-team-kinguin",
+		"nick": "LEGIJA",
+		"realName": "LEGIJA",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "team-kinguin",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "legija-2018-big",
+		"nick": "LEGIJA",
+		"realName": "LEGIJA",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "big",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "legija-2021-big",
+		"nick": "LEGIJA",
+		"realName": "LEGIJA",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "big",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "letn1-2026-mibr",
+		"nick": "LETN1",
+		"realName": "LETN1",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "mibr",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "lk-2017-vega-squadron",
+		"nick": "Lk-",
+		"realName": "Lk-",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "vega-squadron",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "lmbt-2017-mouz",
+		"nick": "lmbt",
+		"realName": "lmbt",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "lmbt-2018-mouz",
+		"nick": "lmbt",
+		"realName": "lmbt",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "maaraa-2022-ihc-esports",
+		"nick": "maaRaa",
+		"realName": "maaRaa",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "ihc-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "maaraa-2023-the-mongolz",
+		"nick": "maaRaa",
+		"realName": "maaRaa",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "the-mongolz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "maaraa-2024-the-mongolz",
+		"nick": "maaRaa",
+		"realName": "maaRaa",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "the-mongolz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "maaraa-2025-the-mongolz",
+		"nick": "maaRaa",
+		"realName": "maaRaa",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "the-mongolz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "maaraa-2026-the-mongolz",
+		"nick": "maaRaa",
+		"realName": "maaRaa",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "the-mongolz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "maddened-2025-b8",
+		"nick": "Maddened",
+		"realName": "Maddened",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "b8",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "malek-2018-team-envy",
+		"nick": "maLeK",
+		"realName": "maLeK",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "team-envy",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "malek-2019-g2",
+		"nick": "maLeK",
+		"realName": "maLeK",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "malek-2021-g2",
+		"nick": "maLeK",
+		"realName": "maLeK",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "maniac-2016-team-envyus",
+		"nick": "Maniac",
+		"realName": "Maniac",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "team-envyus",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "mce-2018-rogue",
+		"nick": "mCe",
+		"realName": "mCe",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "rogue",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "mithr-2019-north",
+		"nick": "mithR",
+		"realName": "mithR",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "north",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "mithr-2021-mouz",
+		"nick": "mithR",
+		"realName": "mithR",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "mithr-2024-apeks",
+		"nick": "mithR",
+		"realName": "mithR",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "apeks",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "mithr-2024-liquid",
+		"nick": "mithR",
+		"realName": "mithR",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "moman-2014-team-ldlc-com",
+		"nick": "MoMaN",
+		"realName": "MoMaN",
+		"nationality": "ZZ",
+		"year": 2014,
+		"orgId": "team-ldlc-com",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "mooze-2015-penta-sports",
+		"nick": "MooZE",
+		"realName": "MooZE",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "penta-sports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "nabowow-2024-saw",
+		"nick": "NABOWOW",
+		"realName": "NABOWOW",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "saw",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "nak-2015-luminosity-gaming",
+		"nick": "nak",
+		"realName": "nak",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "luminosity-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "nak-2024-mibr",
+		"nick": "nak",
+		"realName": "nak",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "mibr",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "natu-2015-nip",
+		"nick": "natu",
+		"realName": "natu",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "nawrot-2023-9ine",
+		"nick": "nawrot",
+		"realName": "nawrot",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "9ine",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "neil_m-2019-grayhound-gaming",
+		"nick": "NeiL_M",
+		"realName": "NeiL_M",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "grayhound-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "neo-2024-faze",
+		"nick": "NEO",
+		"realName": "NEO",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "faze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "neo-2025-faze",
+		"nick": "NEO",
+		"realName": "NEO",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "faze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "next-2015-team-envyus",
+		"nick": "Next",
+		"realName": "Next",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "team-envyus",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "next-2016-team-envyus",
+		"nick": "Next",
+		"realName": "Next",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "team-envyus",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "niak-2015-titan",
+		"nick": "NiaK",
+		"realName": "NiaK",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "titan",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "niak-2016-g2",
+		"nick": "NiaK",
+		"realName": "NiaK",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "niak-2017-g2",
+		"nick": "NiaK",
+		"realName": "NiaK",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "niak-2018-g2",
+		"nick": "NiaK",
+		"realName": "NiaK",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "pashanoj-2024-virtus-pro",
+		"nick": "PASHANOJ",
+		"realName": "PASHANOJ",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "virtus-pro",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "peacemaker-2016-liquid",
+		"nick": "peacemaker",
+		"realName": "peacemaker",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "pita-2014-nip",
+		"nick": "pita",
+		"realName": "pita",
+		"nationality": "ZZ",
+		"year": 2014,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "pita-2016-counter-logic-gaming",
+		"nick": "pita",
+		"realName": "pita",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "counter-logic-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "pita-2018-nip",
+		"nick": "pita",
+		"realName": "pita",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "pita-2019-nip",
+		"nick": "pita",
+		"realName": "pita",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "psycho-2015-mouz",
+		"nick": "PsYcHo",
+		"realName": "PsYcHo",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "railway-2025-betboom-team",
+		"nick": "RAiLWAY",
+		"realName": "RAiLWAY",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "betboom-team",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "rambo-2018-complexity",
+		"nick": "Rambo",
+		"realName": "Rambo",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "complexity",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "rdl-2017-godsent",
+		"nick": "rdl",
+		"realName": "rdl",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "godsent",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "realition-2015-team-solomid",
+		"nick": "realition",
+		"realName": "realition",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "team-solomid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "rejin-2019-mouz",
+		"nick": "Rejin",
+		"realName": "Rejin",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "rikz-2023-pain-gaming",
+		"nick": "rikz",
+		"realName": "rikz",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "pain-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "rikz-2024-pain-gaming",
+		"nick": "rikz",
+		"realName": "rikz",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "pain-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "rikz-2025-pain-gaming",
+		"nick": "rikz",
+		"realName": "rikz",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "pain-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "rikz-2026-pain-gaming",
+		"nick": "rikz",
+		"realName": "rikz",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "pain-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "robban-2016-faze",
+		"nick": "RobbaN",
+		"realName": "RobbaN",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "faze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "robban-2017-faze",
+		"nick": "RobbaN",
+		"realName": "RobbaN",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "faze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "robban-2018-faze",
+		"nick": "RobbaN",
+		"realName": "RobbaN",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "faze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
 	},
 	{
 		"id": "robban-2022",
@@ -51,6 +2814,1414 @@
 		"nationality": "SE",
 		"year": 2022,
 		"orgId": "faze",
-		"modifiers": { "comeback": 2, "economy": 1, "antistrat": 2 }
+		"modifiers": {
+			"comeback": 2,
+			"economy": 1,
+			"antistrat": 2
+		}
+	},
+	{
+		"id": "robban-2023-faze",
+		"nick": "RobbaN",
+		"realName": "RobbaN",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "faze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ruggah-2016-team-dignitas",
+		"nick": "ruggah",
+		"realName": "ruggah",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "team-dignitas",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ruggah-2017-north",
+		"nick": "ruggah",
+		"realName": "ruggah",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "north",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ruggah-2018-north",
+		"nick": "ruggah",
+		"realName": "ruggah",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "north",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ruggah-2018-optic-gaming",
+		"nick": "ruggah",
+		"realName": "ruggah",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "optic-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ruggah-2022-og",
+		"nick": "ruggah",
+		"realName": "ruggah",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "og",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ruggah-2023-og",
+		"nick": "ruggah",
+		"realName": "ruggah",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "og",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ruggah-2025-astralis",
+		"nick": "ruggah",
+		"realName": "ruggah",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "astralis",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ruggah-2026-astralis",
+		"nick": "ruggah",
+		"realName": "ruggah",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "astralis",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ryu-2018-renegades",
+		"nick": "Ryu",
+		"realName": "Ryu",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "renegades",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "saw-2021-ence",
+		"nick": "sAw",
+		"realName": "sAw",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "ence",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "saw-2022-ence",
+		"nick": "sAw",
+		"realName": "sAw",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "ence",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "saw-2023-ence",
+		"nick": "sAw",
+		"realName": "sAw",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "ence",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "saw-2024-heroic",
+		"nick": "sAw",
+		"realName": "sAw",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "heroic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "saw-2025-g2",
+		"nick": "sAw",
+		"realName": "sAw",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "saw-2025-heroic",
+		"nick": "sAw",
+		"realName": "sAw",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "heroic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "saw-2026-g2",
+		"nick": "sAw",
+		"realName": "sAw",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "sidde-2024-furia-esports",
+		"nick": "sidde",
+		"realName": "sidde",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "furia-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "sidde-2025-furia",
+		"nick": "sidde",
+		"realName": "sidde",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "furia",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "sidde-2026-furia",
+		"nick": "sidde",
+		"realName": "sidde",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "furia",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "smithzz-2017-g2",
+		"nick": "SmithZz",
+		"realName": "SmithZz",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "smithzz-2018-g2",
+		"nick": "SmithZz",
+		"realName": "SmithZz",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "solaar-2019-syman-gaming",
+		"nick": "Solaar",
+		"realName": "Solaar",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "syman-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "starix-2015-navi",
+		"nick": "starix",
+		"realName": "starix",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "starix-2016-navi",
+		"nick": "starix",
+		"realName": "starix",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "starix-2017-navi",
+		"nick": "starix",
+		"realName": "starix",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "starix-2018",
+		"nick": "starix",
+		"realName": "Sergey Ischuk",
+		"nationality": "UA",
+		"year": 2018,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 1,
+			"economy": 0,
+			"antistrat": 1
+		}
+	},
+	{
+		"id": "stikle-2022-bad-news-eagles",
+		"nick": "stikle-",
+		"realName": "stikle-",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "bad-news-eagles",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "stunna-2015-cloud9",
+		"nick": "stunna",
+		"realName": "stunna",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "cloud9",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "svyat-2024-amkal-esports",
+		"nick": "svyat",
+		"realName": "svyat",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "amkal-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "swani-2023-g2",
+		"nick": "Swani",
+		"realName": "Swani",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "sycrone-2022-mouz",
+		"nick": "sycrone",
+		"realName": "sycrone",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "sycrone-2023-mouz",
+		"nick": "sycrone",
+		"realName": "sycrone",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "sycrone-2024-mouz",
+		"nick": "sycrone",
+		"realName": "sycrone",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "sycrone-2025-mouz",
+		"nick": "sycrone",
+		"realName": "sycrone",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "sycrone-2026-mouz",
+		"nick": "sycrone",
+		"realName": "sycrone",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "mouz",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "t_c-2022-complexity",
+		"nick": "T.c",
+		"realName": "T.c",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "complexity",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "t_c-2023-complexity",
+		"nick": "T.c",
+		"realName": "T.c",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "complexity",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "t_c-2024-complexity",
+		"nick": "T.c",
+		"realName": "T.c",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "complexity",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "t_c-2025-passion-ua",
+		"nick": "T.c",
+		"realName": "T.c",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "passion-ua",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "tacitus-2021-furia-esports",
+		"nick": "tacitus",
+		"realName": "tacitus",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "furia-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "tacitus-2022-furia-esports",
+		"nick": "tacitus",
+		"realName": "tacitus",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "furia-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "tacitus-2025-fluxo",
+		"nick": "tacitus",
+		"realName": "tacitus",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "fluxo",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "taz-2024-g2",
+		"nick": "TaZ",
+		"realName": "TaZ",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "taz-2025-g2",
+		"nick": "TaZ",
+		"realName": "TaZ",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "tge-2025-red-canids",
+		"nick": "tge",
+		"realName": "tge",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "red-canids",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "threat-2013",
+		"nick": "THREAT",
+		"realName": "Björn Pers",
+		"nationality": "SE",
+		"year": 2013,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 1,
+			"antistrat": 1
+		}
+	},
+	{
+		"id": "threat-2016-nip",
+		"nick": "THREAT",
+		"realName": "THREAT",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "threat-2021-nip",
+		"nick": "THREAT",
+		"realName": "THREAT",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "tobiz-2026-heroic",
+		"nick": "TOBIZ",
+		"realName": "TOBIZ",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "heroic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "tow_b-2018-sprout",
+		"nick": "tow b",
+		"realName": "tow b",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "sprout",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "trace-2022-astralis",
+		"nick": "trace",
+		"realName": "trace",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "astralis",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "twista-2019-ence",
+		"nick": "Twista",
+		"realName": "Twista",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "ence",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ugin-2015-navi",
+		"nick": "Ugin",
+		"realName": "Ugin",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "navi",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "valens-2017-cloud9",
+		"nick": "valens",
+		"realName": "valens",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "cloud9",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "valens-2018-cloud9",
+		"nick": "valens",
+		"realName": "valens",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "cloud9",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "vins-2024-wildcard",
+		"nick": "vinS",
+		"realName": "vinS",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "wildcard",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "vins-2025-wildcard",
+		"nick": "vinS",
+		"realName": "vinS",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "wildcard",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "viridian-2026-thunderdownunder",
+		"nick": "viridian",
+		"realName": "viridian",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "thunderdownunder",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "vorborg-2021-copenhagen-flames",
+		"nick": "vorborg",
+		"realName": "vorborg",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "copenhagen-flames",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "vorborg-2022-copenhagen-flames",
+		"nick": "vorborg",
+		"realName": "vorborg",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "copenhagen-flames",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "vorborg-2022-evil-geniuses",
+		"nick": "vorborg",
+		"realName": "vorborg",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "evil-geniuses",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "vuggo-2015",
+		"nick": "vuggo",
+		"realName": "Viktor Hallgrenstedt",
+		"nationality": "SE",
+		"year": 2015,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 1,
+			"economy": 0,
+			"antistrat": 1
+		}
+	},
+	{
+		"id": "vuggo-2016-fnatic",
+		"nick": "vuggo",
+		"realName": "vuggo",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "fnatic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "warden-2019-complexity",
+		"nick": "Warden",
+		"realName": "Warden",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "complexity",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "wasink-2024-3dmax",
+		"nick": "wasiNk",
+		"realName": "wasiNk",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "3dmax",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "wasink-2025-3dmax",
+		"nick": "wasiNk",
+		"realName": "wasiNk",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "3dmax",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xenn-2026-big",
+		"nick": "xenn",
+		"realName": "xenn",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "big",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xizt-2021-heroic",
+		"nick": "Xizt",
+		"realName": "Xizt",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "heroic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xizt-2022-heroic",
+		"nick": "Xizt",
+		"realName": "Xizt",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "heroic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xizt-2023-heroic",
+		"nick": "Xizt",
+		"realName": "Xizt",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "heroic",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xizt-2025-nip",
+		"nick": "Xizt",
+		"realName": "Xizt",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "nip",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xtqzzz-2019-vitality",
+		"nick": "XTQZZZ",
+		"realName": "XTQZZZ",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "vitality",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xtqzzz-2021-vitality",
+		"nick": "XTQZZZ",
+		"realName": "XTQZZZ",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "vitality",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xtqzzz-2022-g2",
+		"nick": "XTQZZZ",
+		"realName": "XTQZZZ",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xtqzzz-2024-vitality",
+		"nick": "XTQZZZ",
+		"realName": "XTQZZZ",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "vitality",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xtqzzz-2025-vitality",
+		"nick": "XTQZZZ",
+		"realName": "XTQZZZ",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "vitality",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "xtqzzz-2026-vitality",
+		"nick": "XTQZZZ",
+		"realName": "XTQZZZ",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "vitality",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ynk-2018-mibr",
+		"nick": "YNk",
+		"realName": "YNk",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "mibr",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "ynk-2019-faze",
+		"nick": "YNk",
+		"realName": "YNk",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "faze",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "youknow-2025-3dmax",
+		"nick": "YouKnow",
+		"realName": "YouKnow",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "3dmax",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "z8z-2018-flash-gaming",
+		"nick": "z8z",
+		"realName": "z8z",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "flash-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "z8z-2024-rare-atom",
+		"nick": "z8z",
+		"realName": "z8z",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "rare-atom",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "z8z-2025-rare-atom",
+		"nick": "z8z",
+		"realName": "z8z",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "rare-atom",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zakk-2017-immortals",
+		"nick": "zakk",
+		"realName": "zakk",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "immortals",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zakk-2022-9z-team",
+		"nick": "zakk",
+		"realName": "zakk",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "9z-team",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zakk-2024-imperial-esports",
+		"nick": "zakk",
+		"realName": "zakk",
+		"nationality": "ZZ",
+		"year": 2024,
+		"orgId": "imperial-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zakk-2025-imperial-esports",
+		"nick": "zakk",
+		"realName": "zakk",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "imperial-esports",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zbm-2015-g2",
+		"nick": "zbM",
+		"realName": "zbM",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "g2",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zews-2016",
+		"nick": "zews",
+		"realName": "Wilton Prado",
+		"nationality": "BR",
+		"year": 2016,
+		"orgId": "sk",
+		"modifiers": {
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
+		}
+	},
+	{
+		"id": "zews-2016-luminosity-gaming",
+		"nick": "zews",
+		"realName": "zews",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "luminosity-gaming",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zews-2017-liquid",
+		"nick": "zews",
+		"realName": "zews",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zews-2018-liquid",
+		"nick": "zews",
+		"realName": "zews",
+		"nationality": "ZZ",
+		"year": 2018,
+		"orgId": "liquid",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zews-2019-mibr",
+		"nick": "zews",
+		"realName": "zews",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "mibr",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zews-2023-fluxo",
+		"nick": "zews",
+		"realName": "zews",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "fluxo",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zhoking-2025-tyloo",
+		"nick": "zhokiNg",
+		"realName": "zhokiNg",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "tyloo",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zhoking-2026-tyloo",
+		"nick": "zhokiNg",
+		"realName": "zhokiNg",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "tyloo",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zoner-2019-dreameaters",
+		"nick": "zoneR",
+		"realName": "zoneR",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "dreameaters",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zonic-2015-team-dignitas",
+		"nick": "zonic",
+		"realName": "zonic",
+		"nationality": "ZZ",
+		"year": 2015,
+		"orgId": "team-dignitas",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zonic-2016-astralis",
+		"nick": "zonic",
+		"realName": "zonic",
+		"nationality": "ZZ",
+		"year": 2016,
+		"orgId": "astralis",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zonic-2017-astralis",
+		"nick": "zonic",
+		"realName": "zonic",
+		"nationality": "ZZ",
+		"year": 2017,
+		"orgId": "astralis",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zonic-2018",
+		"nick": "zonic",
+		"realName": "Danny Sørensen",
+		"nationality": "DK",
+		"year": 2018,
+		"orgId": "astralis",
+		"modifiers": {
+			"comeback": 2,
+			"economy": 2,
+			"antistrat": 2
+		}
+	},
+	{
+		"id": "zonic-2019-astralis",
+		"nick": "zonic",
+		"realName": "zonic",
+		"nationality": "ZZ",
+		"year": 2019,
+		"orgId": "astralis",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zonic-2021-astralis",
+		"nick": "zonic",
+		"realName": "zonic",
+		"nationality": "ZZ",
+		"year": 2021,
+		"orgId": "astralis",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zonic-2022-vitality",
+		"nick": "zonic",
+		"realName": "zonic",
+		"nationality": "ZZ",
+		"year": 2022,
+		"orgId": "vitality",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zonic-2023-vitality",
+		"nick": "zonic",
+		"realName": "zonic",
+		"nationality": "ZZ",
+		"year": 2023,
+		"orgId": "vitality",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zonic-2025-team-falcons",
+		"nick": "zonic",
+		"realName": "zonic",
+		"nationality": "ZZ",
+		"year": 2025,
+		"orgId": "team-falcons",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
+	},
+	{
+		"id": "zonic-2026-team-falcons",
+		"nick": "zonic",
+		"realName": "zonic",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "team-falcons",
+		"modifiers": {
+			"comeback": 0,
+			"economy": 0,
+			"antistrat": 0
+		}
 	}
 ]

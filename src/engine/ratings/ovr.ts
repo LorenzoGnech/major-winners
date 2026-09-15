@@ -29,10 +29,10 @@ export function ovrFromZ(z: number): number {
 }
 
 export function rateOvr(season: PlayerSeason): { ovr: number; breakdown: OvrBreakdown } {
-	if (season.dataRegime === "none") {
+	if (season.dataRegime === "none" || season.dataRegime === "fallback") {
 		const fromCurated = season.curated?.ovr;
 		if (fromCurated === undefined) {
-			throw new Error(`regime none player ${season.id} is missing curated.ovr`);
+			throw new Error(`curated player ${season.id} is missing curated.ovr`);
 		}
 		return {
 			ovr: roundInt(clamp(fromCurated, FINAL_OVR_MIN, FINAL_OVR_MAX)),

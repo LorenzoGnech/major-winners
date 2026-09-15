@@ -3,27 +3,28 @@ import { loadDataset } from "./index";
 import { playerSeasonSchema } from "./schema";
 import { assertValidDataset, collectDatasetIssues, DatasetValidationError } from "./validate";
 
-describe("seed dataset", () => {
-	it("loads Major and Legacy rosters across all three rating regimes", () => {
+describe("complete Major dataset", () => {
+	it("loads every played Major roster across all four rating regimes", () => {
 		const dataset = loadDataset();
-		expect(dataset.majors).toHaveLength(5);
-		expect(dataset.orgYears).toHaveLength(8);
-		expect(dataset.playerSeasons).toHaveLength(40);
+		expect(dataset.majors).toHaveLength(24);
+		expect(dataset.orgYears.filter((roster) => roster.kind === "major")).toHaveLength(511);
+		expect(dataset.playerSeasons.length).toBeGreaterThan(2_000);
 		expect(dataset.orgYears.filter((roster) => roster.kind === "legacy")).toHaveLength(2);
 		expect(new Set(dataset.playerSeasons.map((season) => season.dataRegime))).toEqual(
-			new Set(["full", "partial", "none"]),
+			new Set(["full", "partial", "none", "fallback"]),
 		);
 	});
 
 	it("resolves every Major and roster relationship", () => {
 		const dataset = loadDataset();
 		expect(collectDatasetIssues(dataset)).toEqual([]);
-		for (const orgYear of dataset.orgYears) {
-			if (orgYear.kind === "major") {
-				expect(dataset.majors.some((major) => major.id === orgYear.majorId)).toBe(true);
-			} else {
-				expect(orgYear.majorId).toBeUndefined();
-			}
+		for (const major of dataset.majors) {
+			const rosters = dataset.orgYears.filter((roster) => roster.majorId === major.id);
+			expect(rosters, major.id).toHaveLength(major.teamCount);
+			expect(major.sources[0]?.revision, major.id).toMatch(/^\d+$/);
+		}
+		for (const legacy of dataset.orgYears.filter((roster) => roster.kind === "legacy")) {
+			expect(legacy.majorId).toBeUndefined();
 		}
 	});
 });

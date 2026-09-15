@@ -1,8 +1,667 @@
 [
-	{ "id": "sk", "name": "SK Gaming", "country": "DE" },
-	{ "id": "fnatic", "name": "fnatic", "country": "GB" },
-	{ "id": "nip", "name": "Ninjas in Pyjamas", "country": "SE" },
-	{ "id": "astralis", "name": "Astralis", "country": "DK" },
-	{ "id": "navi", "name": "Natus Vincere", "country": "UA" },
-	{ "id": "faze", "name": "FaZe Clan", "country": "US" }
+	{
+		"id": "00-nation",
+		"name": "00 Nation",
+		"country": "BR"
+	},
+	{
+		"id": "3dmax",
+		"name": "3DMAX",
+		"country": "DK"
+	},
+	{
+		"id": "9ine",
+		"name": "9INE",
+		"country": "PL"
+	},
+	{
+		"id": "9z-team",
+		"name": "9z Team",
+		"country": "UY"
+	},
+	{
+		"id": "amkal-esports",
+		"name": "AMKAL ESPORTS",
+		"country": "RU"
+	},
+	{
+		"id": "apeks",
+		"name": "Apeks",
+		"country": "SE"
+	},
+	{
+		"id": "astana-dragons",
+		"name": "Astana Dragons",
+		"country": "UA"
+	},
+	{
+		"id": "astralis",
+		"name": "Astralis",
+		"country": "DK"
+	},
+	{
+		"id": "aurora-gaming",
+		"name": "Aurora Gaming",
+		"country": "TR"
+	},
+	{
+		"id": "avangar",
+		"name": "AVANGAR",
+		"country": "KZ"
+	},
+	{
+		"id": "b8",
+		"name": "B8",
+		"country": "UA"
+	},
+	{
+		"id": "bad-news-eagles",
+		"name": "Bad News Eagles",
+		"country": "XK"
+	},
+	{
+		"id": "betboom-team",
+		"name": "BetBoom Team",
+		"country": "RU"
+	},
+	{
+		"id": "big",
+		"name": "BIG",
+		"country": "DE"
+	},
+	{
+		"id": "bravado-gaming",
+		"name": "Bravado Gaming",
+		"country": "ZA"
+	},
+	{
+		"id": "chinggis-warriors",
+		"name": "Chinggis Warriors",
+		"country": "MN"
+	},
+	{
+		"id": "clan-mystik",
+		"name": "Clan-Mystik",
+		"country": "FR"
+	},
+	{
+		"id": "clg",
+		"name": "CLG",
+		"country": "US"
+	},
+	{
+		"id": "cloud9",
+		"name": "Cloud9",
+		"country": "US"
+	},
+	{
+		"id": "complexity",
+		"name": "compLexity Gaming",
+		"country": "US"
+	},
+	{
+		"id": "copenhagen-flames",
+		"name": "Copenhagen Flames",
+		"country": "DK"
+	},
+	{
+		"id": "copenhagen-wolves",
+		"name": "Copenhagen Wolves",
+		"country": "DK"
+	},
+	{
+		"id": "counter-logic-gaming",
+		"name": "Counter Logic Gaming",
+		"country": "US"
+	},
+	{
+		"id": "cr4zy",
+		"name": "CR4ZY",
+		"country": "RS"
+	},
+	{
+		"id": "dat-team",
+		"name": "dAT Team",
+		"country": "RU"
+	},
+	{
+		"id": "dreameaters",
+		"name": "DreamEaters",
+		"country": "RU"
+	},
+	{
+		"id": "ecstatic",
+		"name": "ECSTATIC",
+		"country": "DK"
+	},
+	{
+		"id": "ence",
+		"name": "ENCE",
+		"country": "FI"
+	},
+	{
+		"id": "entropiq",
+		"name": "Entropiq",
+		"country": "RU"
+	},
+	{
+		"id": "epsilon-esports",
+		"name": "Epsilon eSports",
+		"country": "FR"
+	},
+	{
+		"id": "esc-gaming",
+		"name": "ESC Gaming",
+		"country": "PL"
+	},
+	{
+		"id": "eternal-fire",
+		"name": "Eternal Fire",
+		"country": "TR"
+	},
+	{
+		"id": "evil-geniuses",
+		"name": "Evil Geniuses",
+		"country": "US"
+	},
+	{
+		"id": "faze",
+		"name": "FaZe Clan",
+		"country": "US"
+	},
+	{
+		"id": "flash-gaming",
+		"name": "Flash Gaming",
+		"country": "CN"
+	},
+	{
+		"id": "flipsid3-tactics",
+		"name": "FlipSid3 Tactics",
+		"country": "SE"
+	},
+	{
+		"id": "fluxo",
+		"name": "Fluxo",
+		"country": "BR"
+	},
+	{
+		"id": "flyquest",
+		"name": "FlyQuest",
+		"country": "AU"
+	},
+	{
+		"id": "fnatic",
+		"name": "fnatic",
+		"country": "GB"
+	},
+	{
+		"id": "forze",
+		"name": "forZe",
+		"country": "RU"
+	},
+	{
+		"id": "forze-esports",
+		"name": "FORZE Esports",
+		"country": "RU"
+	},
+	{
+		"id": "furia",
+		"name": "FURIA",
+		"country": "BR"
+	},
+	{
+		"id": "furia-esports",
+		"name": "FURIA Esports",
+		"country": "BR"
+	},
+	{
+		"id": "fut-esports",
+		"name": "FUT Esports",
+		"country": "UA"
+	},
+	{
+		"id": "g2",
+		"name": "G2 Esports",
+		"country": "SE"
+	},
+	{
+		"id": "gaimin-gladiators",
+		"name": "Gaimin Gladiators",
+		"country": "BR"
+	},
+	{
+		"id": "gambit-esports",
+		"name": "Gambit Esports",
+		"country": "KZ"
+	},
+	{
+		"id": "gambit-gaming",
+		"name": "Gambit Gaming",
+		"country": "RU"
+	},
+	{
+		"id": "gamerlegion",
+		"name": "GamerLegion",
+		"country": "RO"
+	},
+	{
+		"id": "godsent",
+		"name": "GODSENT",
+		"country": "SE"
+	},
+	{
+		"id": "grayhound-gaming",
+		"name": "Grayhound Gaming",
+		"country": "AU"
+	},
+	{
+		"id": "hellraisers",
+		"name": "HellRaisers",
+		"country": "UA"
+	},
+	{
+		"id": "heroic",
+		"name": "Heroic",
+		"country": "DK"
+	},
+	{
+		"id": "ihc-esports",
+		"name": "IHC Esports",
+		"country": "MN"
+	},
+	{
+		"id": "immortals",
+		"name": "Immortals",
+		"country": "BR"
+	},
+	{
+		"id": "imperial-esports",
+		"name": "Imperial Esports",
+		"country": "BR"
+	},
+	{
+		"id": "into-the-breach",
+		"name": "Into The Breach",
+		"country": "UK"
+	},
+	{
+		"id": "intz-esports",
+		"name": "INTZ eSports",
+		"country": "BR"
+	},
+	{
+		"id": "keyd-stars",
+		"name": "Keyd Stars",
+		"country": "BR"
+	},
+	{
+		"id": "koi",
+		"name": "KOI",
+		"country": "ES"
+	},
+	{
+		"id": "legacy",
+		"name": "Legacy",
+		"country": "BR"
+	},
+	{
+		"id": "lgb-esports",
+		"name": "LGB eSports",
+		"country": "SE"
+	},
+	{
+		"id": "liquid",
+		"name": "Team Liquid",
+		"country": "US"
+	},
+	{
+		"id": "london-conspiracy",
+		"name": "London Conspiracy",
+		"country": "NO"
+	},
+	{
+		"id": "luminosity-gaming",
+		"name": "Luminosity Gaming",
+		"country": "BR"
+	},
+	{
+		"id": "lynn-vision-gaming",
+		"name": "Lynn Vision Gaming",
+		"country": "CN"
+	},
+	{
+		"id": "m80",
+		"name": "M80",
+		"country": "US"
+	},
+	{
+		"id": "metizport",
+		"name": "Metizport",
+		"country": "SE"
+	},
+	{
+		"id": "mibr",
+		"name": "MIBR",
+		"country": "BR"
+	},
+	{
+		"id": "misfits-gaming",
+		"name": "Misfits Gaming",
+		"country": "US"
+	},
+	{
+		"id": "monte",
+		"name": "Monte",
+		"country": "UA"
+	},
+	{
+		"id": "mouz",
+		"name": "mousesports",
+		"country": "DE"
+	},
+	{
+		"id": "movistar-riders",
+		"name": "Movistar Riders",
+		"country": "ES"
+	},
+	{
+		"id": "myxmg",
+		"name": "myXMG",
+		"country": "DK"
+	},
+	{
+		"id": "n-faculty",
+		"name": "n!faculty",
+		"country": "DK"
+	},
+	{
+		"id": "navi",
+		"name": "Natus Vincere",
+		"country": "UA"
+	},
+	{
+		"id": "nemiga-gaming",
+		"name": "Nemiga Gaming",
+		"country": "RU"
+	},
+	{
+		"id": "nip",
+		"name": "Ninjas in Pyjamas",
+		"country": "SE"
+	},
+	{
+		"id": "north",
+		"name": "North",
+		"country": "DK"
+	},
+	{
+		"id": "nrg",
+		"name": "NRG",
+		"country": "US"
+	},
+	{
+		"id": "nrg-esports",
+		"name": "NRG Esports",
+		"country": "US"
+	},
+	{
+		"id": "og",
+		"name": "OG",
+		"country": "IL"
+	},
+	{
+		"id": "optic-gaming",
+		"name": "OpTic Gaming",
+		"country": "CA"
+	},
+	{
+		"id": "outsiders",
+		"name": "Outsiders",
+		"country": "KZ"
+	},
+	{
+		"id": "pain-gaming",
+		"name": "paiN Gaming",
+		"country": "BR"
+	},
+	{
+		"id": "parivision",
+		"name": "PARIVISION",
+		"country": "RU"
+	},
+	{
+		"id": "passion-ua",
+		"name": "Passion UA",
+		"country": "UA"
+	},
+	{
+		"id": "penta-sports",
+		"name": "PENTA Sports",
+		"country": "DE"
+	},
+	{
+		"id": "planetkey-dynamics",
+		"name": "Planetkey Dynamics",
+		"country": "DE"
+	},
+	{
+		"id": "quantum-bellator-fire",
+		"name": "Quantum Bellator Fire",
+		"country": "RU"
+	},
+	{
+		"id": "rare-atom",
+		"name": "Rare Atom",
+		"country": "CN"
+	},
+	{
+		"id": "reason-gaming",
+		"name": "Reason Gaming",
+		"country": "DK"
+	},
+	{
+		"id": "recursive-esports",
+		"name": "Recursive eSports",
+		"country": "FR"
+	},
+	{
+		"id": "red-canids",
+		"name": "RED Canids",
+		"country": "BR"
+	},
+	{
+		"id": "renegades",
+		"name": "Renegades",
+		"country": "AU"
+	},
+	{
+		"id": "rogue",
+		"name": "Rogue",
+		"country": "US"
+	},
+	{
+		"id": "saw",
+		"name": "SAW",
+		"country": "PT"
+	},
+	{
+		"id": "sharks-esports",
+		"name": "Sharks Esports",
+		"country": "BR"
+	},
+	{
+		"id": "sinners-esports",
+		"name": "SINNERS Esports",
+		"country": "CZ"
+	},
+	{
+		"id": "sk",
+		"name": "SK Gaming",
+		"country": "DE"
+	},
+	{
+		"id": "space-soldiers",
+		"name": "Space Soldiers",
+		"country": "TR"
+	},
+	{
+		"id": "splyce",
+		"name": "Splyce",
+		"country": "US"
+	},
+	{
+		"id": "sprout",
+		"name": "Sprout",
+		"country": "DE"
+	},
+	{
+		"id": "syman-gaming",
+		"name": "Syman Gaming",
+		"country": "KZ"
+	},
+	{
+		"id": "team-dignitas",
+		"name": "Team Dignitas",
+		"country": "DK"
+	},
+	{
+		"id": "team-ebettle",
+		"name": "Team eBettle",
+		"country": "PL"
+	},
+	{
+		"id": "team-envy",
+		"name": "Team Envy",
+		"country": "FR"
+	},
+	{
+		"id": "team-envyus",
+		"name": "Team EnVyUs",
+		"country": "FR"
+	},
+	{
+		"id": "team-falcons",
+		"name": "Team Falcons",
+		"country": "DK"
+	},
+	{
+		"id": "team-gamerlegion",
+		"name": "Team GamerLegion",
+		"country": "RO"
+	},
+	{
+		"id": "team-ibuypower",
+		"name": "Team iBUYPOWER",
+		"country": "US"
+	},
+	{
+		"id": "team-immunity",
+		"name": "Team Immunity",
+		"country": "AU"
+	},
+	{
+		"id": "team-kinguin",
+		"name": "Team Kinguin",
+		"country": "SE"
+	},
+	{
+		"id": "team-ldlc-com",
+		"name": "Team LDLC.com",
+		"country": "FR"
+	},
+	{
+		"id": "team-solomid",
+		"name": "Team SoloMid",
+		"country": "DK"
+	},
+	{
+		"id": "team-spirit",
+		"name": "Team Spirit",
+		"country": "RU"
+	},
+	{
+		"id": "team-wolf",
+		"name": "Team Wolf",
+		"country": "IN"
+	},
+	{
+		"id": "the-huns-esports",
+		"name": "The Huns Esports",
+		"country": "MN"
+	},
+	{
+		"id": "the-mongolz",
+		"name": "The MongolZ",
+		"country": "MN"
+	},
+	{
+		"id": "thunderdownunder",
+		"name": "THUNDERdOWNUNDER",
+		"country": "AU"
+	},
+	{
+		"id": "titan",
+		"name": "Titan",
+		"country": "FR"
+	},
+	{
+		"id": "tyloo",
+		"name": "TYLOO",
+		"country": "CN"
+	},
+	{
+		"id": "universal-soldiers",
+		"name": "Universal Soldiers",
+		"country": "PL"
+	},
+	{
+		"id": "vega-squadron",
+		"name": "Vega Squadron",
+		"country": "RU"
+	},
+	{
+		"id": "verygames",
+		"name": "VeryGames",
+		"country": "FR"
+	},
+	{
+		"id": "vexed-gaming",
+		"name": "Vexed Gaming",
+		"country": "PL"
+	},
+	{
+		"id": "vici-gaming",
+		"name": "ViCi Gaming",
+		"country": "CN"
+	},
+	{
+		"id": "virtus-pro",
+		"name": "Virtus.pro",
+		"country": "PL"
+	},
+	{
+		"id": "vitality",
+		"name": "Team Vitality",
+		"country": "FR"
+	},
+	{
+		"id": "vox-eminor",
+		"name": "Vox Eminor",
+		"country": "AU"
+	},
+	{
+		"id": "wildcard",
+		"name": "Wildcard",
+		"country": "SE"
+	},
+	{
+		"id": "winstrike-team",
+		"name": "Winstrike Team",
+		"country": "RU"
+	},
+	{
+		"id": "xapso",
+		"name": "Xapso",
+		"country": "NO"
+	}
 ]

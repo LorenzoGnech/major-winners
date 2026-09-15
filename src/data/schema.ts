@@ -2,10 +2,9 @@ import { z } from "zod";
 
 export const ROLES = ["awp", "igl", "entry", "support", "lurker"] as const;
 export const GAMES = ["cs16", "css", "csgo", "cs2"] as const;
-export const DATA_REGIMES = ["full", "partial", "none"] as const;
+export const DATA_REGIMES = ["full", "partial", "none", "fallback"] as const;
 export const ORG_TIERS = ["legendary", "strong", "cult"] as const;
 export const ROSTER_KINDS = ["major", "legacy"] as const;
-export const ROSTER_STATUSES = ["played", "withdrawn"] as const;
 export const RATING_PROVENANCE_KINDS = [
 	"verified-stats",
 	"curated-legend",
@@ -17,7 +16,6 @@ export const gameSchema = z.enum(GAMES);
 export const dataRegimeSchema = z.enum(DATA_REGIMES);
 export const orgTierSchema = z.enum(ORG_TIERS);
 export const rosterKindSchema = z.enum(ROSTER_KINDS);
-export const rosterStatusSchema = z.enum(ROSTER_STATUSES);
 export const ratingProvenanceKindSchema = z.enum(RATING_PROVENANCE_KINDS);
 
 export const sourceSchema = z.object({
@@ -89,8 +87,7 @@ export const orgYearSchema = z
 		year: z.number().int(),
 		game: gameSchema,
 		tier: orgTierSchema,
-		status: rosterStatusSchema,
-		placement: z.number().int().positive().optional(),
+		placement: z.number().int().positive(),
 		playerSeasonIds: z.array(z.string().min(1)).length(5),
 		substituteSeasonIds: z.array(z.string().min(1)).default([]),
 		coachId: z.string().min(1).optional(),
@@ -110,13 +107,6 @@ export const orgYearSchema = z
 				code: "custom",
 				path: ["majorId"],
 				message: "legacy roster cannot reference a Valve Major",
-			});
-		}
-		if (row.status === "played" && row.placement === undefined) {
-			ctx.addIssue({
-				code: "custom",
-				path: ["placement"],
-				message: "played roster requires placement",
 			});
 		}
 	});
@@ -172,11 +162,11 @@ export const playerSeasonSchema = z
 				message: "primaryRole must be listed in roles",
 			});
 		}
-		if (row.dataRegime === "none" && !row.curated) {
+		if ((row.dataRegime === "none" || row.dataRegime === "fallback") && !row.curated) {
 			ctx.addIssue({
 				code: "custom",
 				path: ["curated"],
-				message: "regime none requires curated OVR and rationale",
+				message: `regime ${row.dataRegime} requires curated OVR and rationale`,
 			});
 		}
 		if (row.dataRegime === "partial" && !row.stats) {
@@ -216,7 +206,6 @@ export type Game = z.infer<typeof gameSchema>;
 export type DataRegime = z.infer<typeof dataRegimeSchema>;
 export type OrgTier = z.infer<typeof orgTierSchema>;
 export type RosterKind = z.infer<typeof rosterKindSchema>;
-export type RosterStatus = z.infer<typeof rosterStatusSchema>;
 export type RatingProvenanceKind = z.infer<typeof ratingProvenanceKindSchema>;
 export type Source = z.infer<typeof sourceSchema>;
 export type Major = z.infer<typeof majorSchema>;

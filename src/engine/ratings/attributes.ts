@@ -99,6 +99,8 @@ function deriveFromCurated(season: PlayerSeason, ovr: number): Attributes {
 
 export function rateAttributes(season: PlayerSeason, ovr: number): Attributes {
 	const derived =
-		season.dataRegime === "none" ? deriveFromCurated(season, ovr) : deriveFromStats(season, ovr);
+		season.dataRegime === "none" || season.dataRegime === "fallback"
+			? deriveFromCurated(season, ovr)
+			: deriveFromStats(season, ovr);
 	return overlay(derived, season.curated?.attributes);
 }

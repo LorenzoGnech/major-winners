@@ -78,6 +78,12 @@ export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 				message: `placement exceeds ${major.id} field size`,
 			});
 		}
+		if (new Set(orgYear.playerSeasonIds).size !== orgYear.playerSeasonIds.length) {
+			issues.push({
+				path: `orgYears.${orgYear.id}.playerSeasonIds`,
+				message: "starter ids must be unique",
+			});
+		}
 		if (!orgIds.has(orgYear.orgId)) {
 			issues.push({
 				path: `orgYears.${orgYear.id}.orgId`,
@@ -113,6 +119,22 @@ export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 					message: `does not match org-year ${orgYear.id} (org/year/game)`,
 				});
 			}
+		}
+	}
+
+	for (const major of data.majors) {
+		const rosterCount = data.orgYears.filter((roster) => roster.majorId === major.id).length;
+		if (rosterCount !== major.teamCount) {
+			issues.push({
+				path: `majors.${major.id}.teamCount`,
+				message: `expected ${major.teamCount} played rosters, found ${rosterCount}`,
+			});
+		}
+		if (major.sources.some((source) => !source.revision)) {
+			issues.push({
+				path: `majors.${major.id}.sources`,
+				message: "Major sources require a pinned revision",
+			});
 		}
 	}
 

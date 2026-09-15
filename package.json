@@ -19,6 +19,7 @@
 		"test:watch": "vitest",
 		"typecheck": "astro check",
 		"validate-data": "tsx scripts/validate-data.ts",
+		"import:majors": "tsx scripts/import-majors.ts",
 		"calibrate": "tsx scripts/calibration-report.ts",
 		"sim:harness": "tsx scripts/sim-harness.ts"
 	},
