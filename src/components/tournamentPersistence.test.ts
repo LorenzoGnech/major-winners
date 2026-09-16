@@ -46,6 +46,36 @@ describe("tournament persistence", () => {
 		expect(parsePersistedTournamentRun(JSON.stringify(stored), dataset)).toEqual(stored);
 	});
 
+	it("restores a custom team name", () => {
+		const tournament = createTournament({ rootSeed: 123, playerTeam, opponents });
+		const stored = {
+			version: TOURNAMENT_STORAGE_VERSION,
+			rootSeed: tournament.rootSeed,
+			draft,
+			tournament,
+			teamName: "Copenhagen Flames",
+		};
+		expect(parsePersistedTournamentRun(JSON.stringify(stored), dataset)?.teamName).toBe(
+			"Copenhagen Flames",
+		);
+	});
+
+	it("rejects an empty team name", () => {
+		const tournament = createTournament({ rootSeed: 123, playerTeam, opponents });
+		expect(
+			parsePersistedTournamentRun(
+				JSON.stringify({
+					version: TOURNAMENT_STORAGE_VERSION,
+					rootSeed: tournament.rootSeed,
+					draft,
+					tournament,
+					teamName: "   ",
+				}),
+				dataset,
+			),
+		).toBeNull();
+	});
+
 	it("ignores corrupt and incompatible values", () => {
 		expect(parsePersistedTournamentRun("{broken", dataset)).toBeNull();
 		expect(

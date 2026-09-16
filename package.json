@@ -20,6 +20,7 @@
 		"typecheck": "astro check",
 		"validate-data": "tsx scripts/validate-data.ts",
 		"import:majors": "tsx scripts/import-majors.ts",
+		"import:logos": "tsx scripts/import-logos.ts",
 		"calibrate": "tsx scripts/calibration-report.ts",
 		"sim:harness": "tsx scripts/sim-harness.ts"
 	},

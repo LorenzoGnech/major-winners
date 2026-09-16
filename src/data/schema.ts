@@ -76,6 +76,10 @@ export const orgSchema = z.object({
 	id: z.string().min(1),
 	name: z.string().min(1),
 	country: z.string().length(2),
+	logo: z
+		.string()
+		.regex(/^\/logos\/[a-z0-9._-]+\.(svg|webp|png|jpe?g)$/i, "logo must be a /logos/ asset path")
+		.optional(),
 });
 
 export const orgYearSchema = z

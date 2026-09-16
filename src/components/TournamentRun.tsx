@@ -18,6 +18,7 @@ const ROUND_LABELS = {
 type TournamentRunProps = {
 	state: TournamentState;
 	playerTeam: TeamProfile;
+	playerTeamName: string;
 	opponents: readonly HistoricalOpponent[];
 	onChange: (state: TournamentState) => void;
 	onAbandon: () => void;
@@ -48,6 +49,7 @@ function RecordCard({
 export function TournamentRun({
 	state,
 	playerTeam,
+	playerTeamName,
 	opponents,
 	onChange,
 	onAbandon,
@@ -166,7 +168,7 @@ export function TournamentRun({
 								Next · {state.nextMatch.format}
 							</p>
 							<p className="mt-1 text-lg font-semibold text-white">
-								{state.nextMatch.opponent.label}
+								{playerTeamName} vs {state.nextMatch.opponent.label}
 							</p>
 							<p className="text-xs text-zinc-500">
 								OVR {state.nextMatch.opponent.profile.overall}
@@ -211,7 +213,7 @@ export function TournamentRun({
 					<MatchPlayback
 						key={playbackMatch.matchNumber}
 						result={playbackMatch.result}
-						teamLabels={["Your legends", playbackMatch.opponent.label]}
+						teamLabels={[playerTeamName, playbackMatch.opponent.label]}
 						eyebrow={`${STAGE_LABELS[playbackMatch.stage]} · ${playbackMatch.format}`}
 						onComplete={() => setPlaybackComplete(true)}
 					/>

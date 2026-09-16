@@ -8,6 +8,7 @@ import {
 	startDraft,
 	type TournamentState,
 } from "../engine";
+import { parseTeamName } from "./teamName";
 import { parsePersistedTournamentRun, TOURNAMENT_STORAGE_VERSION } from "./tournamentPersistence";
 export const DAILY_ATTEMPT_STORAGE_KEY = "major-winners:daily-attempt:v2";
 export const DAILY_ATTEMPT_STORAGE_VERSION = 2;
@@ -18,6 +19,7 @@ export type PersistedDailyAttempt = {
 	seed: number;
 	draft: DraftState;
 	tournament: TournamentState | null;
+	teamName?: string;
 };
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -108,7 +110,8 @@ export function parsePersistedDailyAttempt(
 			value.day !== day ||
 			value.seed !== seed ||
 			!validDraft(value.draft, dataset, seed) ||
-			(value.tournament !== null && !isObject(value.tournament))
+			(value.tournament !== null && !isObject(value.tournament)) ||
+			(value.teamName !== undefined && parseTeamName(value.teamName) === null)
 		)
 			return null;
 		if (value.tournament) {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { Coach, Dataset, Game, OrgTier, PlayerSeason, Role } from "../data";
+import type { Coach, Dataset, Game, Org, OrgTier, PlayerSeason, Role } from "../data";
 import { ROLES } from "../data";
 import {
 	applyAction,
@@ -35,7 +35,9 @@ import {
 	saveDailyAttempt,
 	saveDailyStats,
 } from "./dailyPersistence";
+import { OrgCrest } from "./OrgCrest";
 import { TournamentRun } from "./TournamentRun";
+import { DEFAULT_TEAM_NAME, parseTeamName, TEAM_NAME_MAX } from "./teamName";
 import {
 	parsePersistedTournamentRun,
 	TOURNAMENT_STORAGE_KEY,
@@ -97,6 +99,41 @@ function fitInfo(player: Pick<PlayerSeason, "primaryRole" | "roles">, role: Role
 		return { label: "Secondary", multiplier };
 	}
 	return { label: "Off-role", multiplier };
+}
+
+function TeamNameField({
+	id,
+	value,
+	onChange,
+	error,
+}: {
+	id: string;
+	value: string;
+	onChange: (value: string) => void;
+	error?: string | null;
+}) {
+	return (
+		<div>
+			<label htmlFor={id} className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+				Your team name
+			</label>
+			<input
+				id={id}
+				value={value}
+				maxLength={TEAM_NAME_MAX}
+				autoComplete="off"
+				placeholder="e.g. Copenhagen Flames"
+				onChange={(event) => onChange(event.target.value)}
+				className="mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+			/>
+			<p className="mt-1.5 text-[11px] text-zinc-500">Used on the draft board and every match.</p>
+			{error ? (
+				<p role="alert" className="mt-1.5 text-xs text-red-200">
+					{error}
+				</p>
+			) : null}
+		</div>
+	);
 }
 
 function signedModifier(value: number): string {
@@ -217,10 +254,12 @@ function RosterPanel({
 	state,
 	playersById,
 	previewOvr,
+	teamName,
 }: {
 	state: DraftState;
 	playersById: Map<string, PlayerSeason>;
 	previewOvr: number | null;
+	teamName: string;
 }) {
 	return (
 		<section
@@ -233,7 +272,7 @@ function RosterPanel({
 						Live roster
 					</p>
 					<h2 id="roster-title" className="mt-0.5 text-lg font-semibold text-white">
-						Your five
+						{teamName}
 					</h2>
 				</div>
 				<div className="text-right">
@@ -288,10 +327,12 @@ function RosterPanel({
 
 function CoachCard({
 	coach,
+	org,
 	orgName,
 	onPick,
 }: {
 	coach: Coach;
+	org: Org | undefined;
 	orgName: string;
 	onPick: () => void;
 }) {
@@ -302,11 +343,14 @@ function CoachCard({
 			className="rounded-xl border border-white/10 bg-zinc-900/80 p-4 text-left transition hover:border-emerald-300/50 hover:bg-emerald-300/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 		>
 			<div className="flex items-start justify-between gap-4">
-				<div>
-					<p className="text-lg font-semibold text-white">{coach.nick}</p>
-					<p className="mt-1 text-xs text-zinc-500">
-						{orgName} · {coach.year} · {coach.nationality}
-					</p>
+				<div className="flex min-w-0 items-start gap-3">
+					{org ? <OrgCrest org={org} size="sm" /> : null}
+					<div>
+						<p className="text-lg font-semibold text-white">{coach.nick}</p>
+						<p className="mt-1 text-xs text-zinc-500">
+							{orgName} · {coach.year} · {coach.nationality}
+						</p>
+					</div>
 				</div>
 				<span className="rounded-md bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
 					Coach
@@ -526,6 +570,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [mode, setMode] = useState<GameMode | null>(null);
 	const [identity, setIdentity] = useState(() => dailyIdentity());
 	const [dailyStats, setDailyStats] = useState<DailyStats>(EMPTY_DAILY_STATS);
+	const [teamName, setTeamName] = useState(DEFAULT_TEAM_NAME);
+	const [nameDraft, setNameDraft] = useState("");
+	const [nameError, setNameError] = useState<string | null>(null);
+	const [pendingRestart, setPendingRestart] = useState(false);
 
 	const playersById = useMemo(
 		() => new Map(dataset.playerSeasons.map((player) => [player.id, player])),
@@ -559,6 +607,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	function chooseMode(nextMode: GameMode) {
 		setSelectedPlayerId(null);
 		setError(null);
+		setPendingRestart(false);
 		if (nextMode === "daily") {
 			const today = dailyIdentity();
 			let attempt = null;
@@ -570,8 +619,15 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			} catch {
 				stats = markDailyPlayed(fallbackDailyStats(), today.day);
 			}
+			const name = attempt?.teamName ?? parseTeamName(nameDraft);
+			if (!attempt && !name) {
+				setNameError("Name your team to start today’s challenge.");
+				return;
+			}
 			setIdentity(today);
 			setDailyStats(stats);
+			setTeamName(name ?? DEFAULT_TEAM_NAME);
+			setNameError(null);
 			setState(attempt?.draft ?? startDraft(dataset, today.seed));
 			setTournament(attempt?.tournament ?? null);
 			setMode("daily");
@@ -588,6 +644,8 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		}
 		if (persisted) {
 			const draft = persisted.draft;
+			setTeamName(persisted.teamName ?? DEFAULT_TEAM_NAME);
+			setNameError(null);
 			setState({
 				...draft,
 				phase: { type: "complete" },
@@ -597,10 +655,44 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			});
 			setTournament(persisted.tournament);
 		} else {
+			const name = parseTeamName(nameDraft);
+			if (!name) {
+				setNameError("Name your team to start Free Play.");
+				return;
+			}
+			setTeamName(name);
+			setNameError(null);
 			setState(startDraft(dataset, freePlaySeed()));
 			setTournament(null);
 		}
 		setMode("free");
+	}
+
+	function requestNewDraft() {
+		setPendingRestart(true);
+		setNameDraft(teamName === DEFAULT_TEAM_NAME ? "" : teamName);
+		setNameError(null);
+	}
+
+	function confirmNewDraft() {
+		const name = parseTeamName(nameDraft);
+		if (!name) {
+			setNameError("Name your team to start a new draft.");
+			return;
+		}
+		setTeamName(name);
+		setNameError(null);
+		setPendingRestart(false);
+		setState(startDraft(dataset, mode === "daily" ? identity.seed : freePlaySeed()));
+		setSelectedPlayerId(null);
+		setError(null);
+		setTournament(null);
+		try {
+			if (mode === "daily") clearDailyAttempt(window.localStorage);
+			else window.localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
+		} catch {
+			// The in-memory reset is authoritative.
+		}
 	}
 
 	const card = currentCard(state);
@@ -617,19 +709,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					(total, { pick, player }) => total + ratePlayer(player).ovr * pick.fit,
 					0,
 				) / pickedPlayers.length;
-
-	function restart() {
-		setState(startDraft(dataset, mode === "daily" ? identity.seed : freePlaySeed()));
-		setSelectedPlayerId(null);
-		setError(null);
-		setTournament(null);
-		try {
-			if (mode === "daily") clearDailyAttempt(window.localStorage);
-			else window.localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
-		} catch {
-			// The in-memory reset is authoritative.
-		}
-	}
 
 	function assignRole(role: Role) {
 		if (!selectedPlayerId) {
@@ -706,12 +785,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					rootSeed: tournament.rootSeed,
 					draft: completedDraft satisfies CompletedDraft,
 					tournament,
+					teamName,
 				}),
 			);
 		} catch {
 			// The run remains playable if storage is unavailable or full.
 		}
-	}, [completedDraft, mode, tournament]);
+	}, [completedDraft, mode, teamName, tournament]);
 	useEffect(() => {
 		if (mode !== "daily") return;
 		try {
@@ -721,9 +801,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				seed: identity.seed,
 				draft: state,
 				tournament,
+				teamName,
 			});
 		} catch {}
-	}, [identity, mode, state, tournament]);
+	}, [identity, mode, state, teamName, tournament]);
 	useEffect(() => {
 		if (mode !== "daily" || !tournament) return;
 		const result = dailyResultFromTournament(identity.day, tournament);
@@ -747,7 +828,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					</p>
 					<h1 className="mt-2 text-4xl font-semibold text-white sm:text-5xl">Major Winners</h1>
 					<p className="mt-3 text-sm text-zinc-400">
-						Choose today’s shared challenge or a random run.
+						Name your squad, then choose today’s shared challenge or a random run.
 					</p>
 				</header>
 				<main className="mt-8 space-y-6">
@@ -755,6 +836,17 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						<h2 id="mode-heading" className="font-semibold text-white">
 							Choose a mode
 						</h2>
+						<div className="mt-4 max-w-md">
+							<TeamNameField
+								id="home-team-name"
+								value={nameDraft}
+								onChange={(value) => {
+									setNameDraft(value);
+									setNameError(null);
+								}}
+								error={nameError}
+							/>
+						</div>
 						<div className="mt-3 grid gap-3 sm:grid-cols-2">
 							<button
 								type="button"
@@ -763,7 +855,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							>
 								<strong className="text-xl text-white">Today’s Challenge</strong>
 								<span className="mt-2 block text-sm text-zinc-300">
-									Same UTC seed for everyone. Refreshes restore your attempt.
+									Same UTC seed for everyone. Continuing a saved attempt keeps its team name.
 								</span>
 								<span className="mt-4 block text-xs font-semibold tabular-nums text-emerald-200">
 									{identity.day} UTC · {identity.id}
@@ -797,16 +889,16 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							: "Free Play"}
 					</p>
 					<h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-						Major Winners
+						{teamName}
 					</h1>
 					<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
 						Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
 					</p>
 				</div>
-				{!tournament && (
+				{!tournament && !pendingRestart && (
 					<button
 						type="button"
-						onClick={restart}
+						onClick={requestNewDraft}
 						className="shrink-0 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 					>
 						New draft
@@ -817,16 +909,59 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			<div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start">
 				<main className="min-w-0">
 					<div className="mb-5 lg:hidden">
-						<RosterPanel state={state} playersById={playersById} previewOvr={previewOvr} />
+						<RosterPanel
+							state={state}
+							playersById={playersById}
+							previewOvr={previewOvr}
+							teamName={teamName}
+						/>
 					</div>
 
-					{tournament && teamProfile && (
+					{pendingRestart && (
+						<section className="mb-5 rounded-2xl border border-emerald-300/30 bg-emerald-300/8 p-5">
+							<h2 className="text-xl font-semibold text-white">Name the new draft</h2>
+							<p className="mt-1 text-sm text-zinc-400">This replaces the current run.</p>
+							<div className="mt-4 max-w-md">
+								<TeamNameField
+									id="restart-team-name"
+									value={nameDraft}
+									onChange={(value) => {
+										setNameDraft(value);
+										setNameError(null);
+									}}
+									error={nameError}
+								/>
+							</div>
+							<div className="mt-4 flex flex-wrap gap-2">
+								<button
+									type="button"
+									onClick={confirmNewDraft}
+									className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200"
+								>
+									Start new draft
+								</button>
+								<button
+									type="button"
+									onClick={() => {
+										setPendingRestart(false);
+										setNameError(null);
+									}}
+									className="rounded-lg border border-white/15 px-4 py-2.5 text-sm font-semibold text-zinc-200"
+								>
+									Cancel
+								</button>
+							</div>
+						</section>
+					)}
+
+					{!pendingRestart && tournament && teamProfile && (
 						<TournamentRun
 							state={tournament}
 							playerTeam={teamProfile}
+							playerTeamName={teamName}
 							opponents={opponents}
 							onChange={setTournament}
-							onAbandon={restart}
+							onAbandon={requestNewDraft}
 							terminalExtras={
 								dailyResult ? (
 									<DailySharePanel result={dailyResult} stats={dailyStats} />
@@ -835,131 +970,139 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						/>
 					)}
 
-					{!tournament && state.phase.type === "player" && card && orgYear && org && (
-						<section
-							key={`round-${state.phase.round}`}
-							aria-labelledby="round-heading"
-							className="motion-safe:animate-[draft-reveal_360ms_ease-out]"
-						>
-							<div className="rounded-2xl border border-white/10 bg-zinc-900/55 p-4 sm:p-5">
-								<div className="flex flex-wrap items-start justify-between gap-4">
-									<div>
-										<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-											Player round {state.phase.round + 1} of 5 ·{" "}
-											{major ? major.shortName : "Legacy wildcard"}
-										</p>
-										<h2
-											id="round-heading"
-											className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl"
-										>
-											{org.name} <span className="text-zinc-500">{orgYear.year}</span>
-										</h2>
-										<p className="mt-1 text-sm text-zinc-400">
-											{GAME_LABELS[orgYear.game]}
-											{major ? ` · placed #${orgYear.placement}` : " · pre-Major legend"}
-										</p>
-									</div>
-									<span
-										className={`rounded-full border px-3 py-1 text-xs font-semibold ${TIER_STYLES[orgYear.tier]}`}
-									>
-										{TIER_LABELS[orgYear.tier]} tier
-									</span>
-								</div>
-								<div className="mt-4 flex flex-wrap gap-2 border-t border-white/8 pt-4">
-									<button
-										type="button"
-										disabled={!state.rerolls.majorRemaining}
-										onClick={() => reroll("rerollMajor")}
-										className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-sky-300/50 enabled:hover:bg-sky-300/10 disabled:cursor-not-allowed disabled:opacity-40"
-									>
-										{state.rerolls.majorRemaining ? "Reroll Major · 1 left" : "Major reroll used"}
-									</button>
-									<button
-										type="button"
-										disabled={!state.rerolls.teamRemaining}
-										onClick={() => reroll("rerollTeam")}
-										className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-emerald-300/50 enabled:hover:bg-emerald-300/10 disabled:cursor-not-allowed disabled:opacity-40"
-									>
-										{state.rerolls.teamRemaining ? "Reroll team · 1 left" : "Team reroll used"}
-									</button>
-									<p className="self-center text-[10px] text-zinc-500">
-										One of each per draft. Rerolls apply to this card before you pick.
-									</p>
-								</div>
-							</div>
-
-							<div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-								{card.players.map((draftable) => {
-									const player = playersById.get(draftable.id);
-									if (!player) {
-										return null;
-									}
-									return (
-										<PlayerCard
-											key={player.id}
-											player={player}
-											selected={selectedPlayerId === player.id}
-											onSelect={() =>
-												setSelectedPlayerId((selected) =>
-													selected === player.id ? null : player.id,
-												)
-											}
-										/>
-									);
-								})}
-							</div>
-
-							<div
-								aria-live="polite"
-								className={`mt-4 rounded-2xl border p-4 ${
-									selectedPlayer
-										? "border-emerald-300/30 bg-emerald-300/5"
-										: "border-white/10 bg-black/20"
-								}`}
+					{!pendingRestart &&
+						!tournament &&
+						state.phase.type === "player" &&
+						card &&
+						orgYear &&
+						org && (
+							<section
+								key={`round-${state.phase.round}`}
+								aria-labelledby="round-heading"
+								className="motion-safe:animate-[draft-reveal_360ms_ease-out]"
 							>
-								<div className="flex flex-wrap items-center justify-between gap-2">
-									<div>
-										<p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-											Assign role
-										</p>
-										<p className="mt-1 text-sm text-zinc-300">
-											{selectedPlayer
-												? `Choose an empty slot for ${selectedPlayer.nick}.`
-												: "Select one player above to see their role fit."}
+								<div className="rounded-2xl border border-white/10 bg-zinc-900/55 p-4 sm:p-5">
+									<div className="flex flex-wrap items-start justify-between gap-4">
+										<div className="flex min-w-0 items-start gap-4">
+											<OrgCrest org={org} size="lg" />
+											<div>
+												<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+													Player round {state.phase.round + 1} of 5 ·{" "}
+													{major ? major.shortName : "Legacy wildcard"}
+												</p>
+												<h2
+													id="round-heading"
+													className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+												>
+													{org.name} <span className="text-zinc-500">{orgYear.year}</span>
+												</h2>
+												<p className="mt-1 text-sm text-zinc-400">
+													{GAME_LABELS[orgYear.game]}
+													{major ? ` · placed #${orgYear.placement}` : " · pre-Major legend"}
+												</p>
+											</div>
+										</div>
+										<span
+											className={`rounded-full border px-3 py-1 text-xs font-semibold ${TIER_STYLES[orgYear.tier]}`}
+										>
+											{TIER_LABELS[orgYear.tier]} tier
+										</span>
+									</div>
+									<div className="mt-4 flex flex-wrap gap-2 border-t border-white/8 pt-4">
+										<button
+											type="button"
+											disabled={!state.rerolls.majorRemaining}
+											onClick={() => reroll("rerollMajor")}
+											className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-sky-300/50 enabled:hover:bg-sky-300/10 disabled:cursor-not-allowed disabled:opacity-40"
+										>
+											{state.rerolls.majorRemaining ? "Reroll Major · 1 left" : "Major reroll used"}
+										</button>
+										<button
+											type="button"
+											disabled={!state.rerolls.teamRemaining}
+											onClick={() => reroll("rerollTeam")}
+											className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-emerald-300/50 enabled:hover:bg-emerald-300/10 disabled:cursor-not-allowed disabled:opacity-40"
+										>
+											{state.rerolls.teamRemaining ? "Reroll team · 1 left" : "Team reroll used"}
+										</button>
+										<p className="self-center text-[10px] text-zinc-500">
+											One of each per draft. Rerolls apply to this card before you pick.
 										</p>
 									</div>
 								</div>
-								<div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
-									{ROLES.map((role) => {
-										const occupied = state.roster[role] !== undefined;
-										const fit = selectedPlayer ? fitInfo(selectedPlayer, role) : null;
+
+								<div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+									{card.players.map((draftable) => {
+										const player = playersById.get(draftable.id);
+										if (!player) {
+											return null;
+										}
 										return (
-											<button
-												key={role}
-												type="button"
-												disabled={!selectedPlayer || occupied}
-												onClick={() => assignRole(role)}
-												className="rounded-xl border border-white/10 bg-zinc-900 px-3 py-2.5 text-left transition enabled:hover:border-emerald-300/50 enabled:hover:bg-emerald-300/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-40"
-											>
-												<span className="block text-xs font-semibold text-white">
-													{ROLE_LABELS[role]}
-												</span>
-												<span className="mt-1 block text-[10px] text-zinc-400">
-													{occupied
-														? "Filled"
-														: fit
-															? `${fit.label} · ${fit.multiplier.toFixed(2)}×`
-															: "Empty"}
-												</span>
-											</button>
+											<PlayerCard
+												key={player.id}
+												player={player}
+												selected={selectedPlayerId === player.id}
+												onSelect={() =>
+													setSelectedPlayerId((selected) =>
+														selected === player.id ? null : player.id,
+													)
+												}
+											/>
 										);
 									})}
 								</div>
-							</div>
-						</section>
-					)}
 
-					{!tournament && state.phase.type === "coach" && (
+								<div
+									aria-live="polite"
+									className={`mt-4 rounded-2xl border p-4 ${
+										selectedPlayer
+											? "border-emerald-300/30 bg-emerald-300/5"
+											: "border-white/10 bg-black/20"
+									}`}
+								>
+									<div className="flex flex-wrap items-center justify-between gap-2">
+										<div>
+											<p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+												Assign role
+											</p>
+											<p className="mt-1 text-sm text-zinc-300">
+												{selectedPlayer
+													? `Choose an empty slot for ${selectedPlayer.nick}.`
+													: "Select one player above to see their role fit."}
+											</p>
+										</div>
+									</div>
+									<div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
+										{ROLES.map((role) => {
+											const occupied = state.roster[role] !== undefined;
+											const fit = selectedPlayer ? fitInfo(selectedPlayer, role) : null;
+											return (
+												<button
+													key={role}
+													type="button"
+													disabled={!selectedPlayer || occupied}
+													onClick={() => assignRole(role)}
+													className="rounded-xl border border-white/10 bg-zinc-900 px-3 py-2.5 text-left transition enabled:hover:border-emerald-300/50 enabled:hover:bg-emerald-300/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-40"
+												>
+													<span className="block text-xs font-semibold text-white">
+														{ROLE_LABELS[role]}
+													</span>
+													<span className="mt-1 block text-[10px] text-zinc-400">
+														{occupied
+															? "Filled"
+															: fit
+																? `${fit.label} · ${fit.multiplier.toFixed(2)}×`
+																: "Empty"}
+													</span>
+												</button>
+											);
+										})}
+									</div>
+								</div>
+							</section>
+						)}
+
+					{!pendingRestart && !tournament && state.phase.type === "coach" && (
 						<section
 							aria-labelledby="coach-heading"
 							className="motion-safe:animate-[draft-reveal_360ms_ease-out]"
@@ -986,6 +1129,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										<CoachCard
 											key={coach.id}
 											coach={coach}
+											org={orgsById.get(coach.orgId)}
 											orgName={orgsById.get(coach.orgId)?.name ?? coach.orgId}
 											onPick={() => pickCoach(coach.id)}
 										/>
@@ -995,43 +1139,48 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						</section>
 					)}
 
-					{!tournament && state.phase.type === "complete" && chosenCoach && teamProfile && (
-						<section
-							aria-labelledby="complete-heading"
-							className="rounded-2xl border border-emerald-300/30 bg-emerald-300/7 p-5 motion-safe:animate-[draft-reveal_360ms_ease-out] sm:p-7"
-						>
-							<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-								Draft complete
-							</p>
-							<h2
-								id="complete-heading"
-								className="mt-1 text-3xl font-semibold tracking-tight text-white"
+					{!pendingRestart &&
+						!tournament &&
+						state.phase.type === "complete" &&
+						chosenCoach &&
+						teamProfile && (
+							<section
+								aria-labelledby="complete-heading"
+								className="rounded-2xl border border-emerald-300/30 bg-emerald-300/7 p-5 motion-safe:animate-[draft-reveal_360ms_ease-out] sm:p-7"
 							>
-								Your legends are ready
-							</h2>
-							<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-300">
-								Five players and {chosenCoach.nick} are locked in. This profile combines individual
-								quality, role fit, teammate history, communication, structure, and coaching.
-							</p>
-							<TeamProfilePanel profile={teamProfile} />
-							<div className="mt-5 flex flex-wrap gap-2">
-								<button
-									type="button"
-									onClick={startMajor}
-									className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+								<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+									Draft complete
+								</p>
+								<h2
+									id="complete-heading"
+									className="mt-1 text-3xl font-semibold tracking-tight text-white"
 								>
-									Start Major run
-								</button>
-								<button
-									type="button"
-									onClick={restart}
-									className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-								>
-									Start another draft
-								</button>
-							</div>
-						</section>
-					)}
+									{teamName} is locked in
+								</h2>
+								<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-300">
+									Five players and {chosenCoach.nick} are locked in. This profile combines
+									individual quality, role fit, teammate history, communication, structure, and
+									coaching.
+								</p>
+								<TeamProfilePanel profile={teamProfile} />
+								<div className="mt-5 flex flex-wrap gap-2">
+									<button
+										type="button"
+										onClick={startMajor}
+										className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+									>
+										Start Major run
+									</button>
+									<button
+										type="button"
+										onClick={requestNewDraft}
+										className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+									>
+										Start another draft
+									</button>
+								</div>
+							</section>
+						)}
 
 					{error && (
 						<p
@@ -1044,7 +1193,12 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				</main>
 
 				<aside className="sticky top-5 hidden lg:block">
-					<RosterPanel state={state} playersById={playersById} previewOvr={previewOvr} />
+					<RosterPanel
+						state={state}
+						playersById={playersById}
+						previewOvr={previewOvr}
+						teamName={teamName}
+					/>
 					<p className="mt-3 text-center text-[10px] tabular-nums text-zinc-600">
 						{mode === "daily" ? `${identity.id} · UTC seed ${state.seed}` : `Seed ${state.seed}`}
 					</p>

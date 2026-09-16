@@ -18,5 +18,12 @@ Changes made by Major Winners include:
   individual statistics are unavailable; and
 - adding two independently curated pre-Major Legacy cards.
 
-The source-code license does not override this dataset license. Liquipedia logos, player
-photos, and other media are not included.
+The source-code license does not override this dataset license.
+
+## Organization logos
+
+The image files under `public/logos/` are organization logos retrieved through Liquipedia.
+They are trademarks and copyrighted works of the respective organizations, are **not**
+covered by the CC BY-SA 3.0 license above, and are not licensed onward by this project.
+They are included solely to identify each historical roster in a non-commercial fan
+project, and are removed on request by the rights holder. No player photos are included.

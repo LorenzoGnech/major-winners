@@ -22,7 +22,7 @@ The game never talks to HLTV (or any other live stats API). Everything draftable
 
 The complete roster corpus contains every team that actually played at the 24 Valve Majors completed from DreamHack Winter 2013 through IEM Cologne 2026. Replaced source cards are omitted during normalization rather than represented in game logic. Boston 2018 therefore has 23 played teams; 2018–2024 otherwise have 24, and the 2025–2026 fields have 32.
 
-There are no org logos or player photos in the dataset. The UI uses text crests and abstract art.
+Org logos are committed image files under `public/logos/`, referenced by `org.logo`. They are team marks owned by their organizations rather than CC BY-SA dataset text, so they are tracked separately from the roster corpus (see [`DATA-LICENSE.md`](../DATA-LICENSE.md)). An org with no logo file renders a generated initials crest. There are no player photos.
 
 ## Data regimes
 
@@ -47,6 +47,18 @@ There are no org logos or player photos in the dataset. The UI uses text crests 
 6. Run `npm run validate-data`, `npm run calibrate`, and the full test suite.
 
 HLTV remains manual-only for individual stat transcription and dispute resolution; it is never scraped by this script or accessed by the app.
+
+## Logo import workflow
+
+`npm run import:logos -- --write` reuses the rendered pages already cached by the Major import, so it makes no extra wiki API calls.
+
+1. Parse every `team-template-image-icon` span in `.cache/major-import/*.html.json` and key it by the same org id normalization the roster import uses.
+2. Prefer the team's dark-mode variant, since the UI is dark; fall back to light mode.
+3. Request a 128 px thumbnail, then the width the page rendered, then the original file. Only widths Liquipedia has already generated resolve, so the fallback chain matters.
+4. Download at no more than one request per 1.1 s with the project User-Agent, writing `public/logos/{orgId}.{ext}`. Existing files are skipped unless `--force`.
+5. Rewrite `orgs.json` so each downloaded org carries its `logo` path, then run `npm run validate-data`.
+
+Without `--write` the script prints the resolved mapping and downloads nothing.
 
 ## Role taxonomy
 

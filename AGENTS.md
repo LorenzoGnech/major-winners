@@ -76,7 +76,7 @@ Contemporaries means a **documented elite LAN-pool distribution per rating versi
 
 ## Match UI
 
-`src/components/MatchPlayback.tsx` is the reusable React renderer for a completed `SeriesResult`. It owns replay progress, skip controls, and accessibility announcements but performs no simulation; callers supply the result and two display labels. `TournamentRun` orchestrates one completed match at a time and keeps simulation outside playback. The completed-draft exhibition adapter remains a secondary standalone helper.
+`src/components/MatchPlayback.tsx` is the reusable React renderer for a completed `SeriesResult`. It owns replay progress, skip controls, and accessibility announcements but performs no simulation; callers supply the result and two display labels. `TournamentRun` orchestrates one completed match at a time and keeps simulation outside playback. The completed-draft exhibition adapter remains a secondary standalone helper. The player-facing team name is chosen when a new draft starts, stored with Daily and Free Play persistence, and passed into playback as the first team label.
 
 ## Major tournament
 
@@ -86,14 +86,14 @@ Contemporaries means a **documented elite LAN-pool distribution per rating versi
 - Swiss matches are BO1 unless either team-facing record is on two wins or two losses; advancement and elimination matches are BO3. Every playoff match is BO3 and a playoff loss eliminates.
 - `buildHistoricalOpponents` turns every Major/Legacy roster into a natural best-fit role assignment, labels it with its event, and returns a stable strength-sorted index. It uses that roster's coach when available and deterministically selects a compatible fallback otherwise.
 - Opponent choice is deterministic, generally rises with stage and record, excludes an identical player roster when alternatives exist, and avoids immediate repeats whenever the pool permits.
-- Free Play persists completed drafts and tournaments under `major-winners:tournament:v2`.
+- Free Play persists completed drafts, tournaments, and the chosen team name under `major-winners:tournament:v2`.
 
 ## Daily challenge
 
 Today's Challenge uses the UTC day and `seedFromUtcDate`, making the draft, coach order, opponents, and results deterministic for identical choices. Restarting uses the same daily seed; Free Play remains random.
 
 - Pure identity, stats, streak, result, and spoiler-free share calculations live in `src/engine/daily/`.
-- Daily attempts use `major-winners:daily-attempt:v2`; local stats use `major-winners:daily-stats:v1`. Rerolled cards and remaining budgets survive reloads. Both are separate from Free Play.
+- Daily attempts use `major-winners:daily-attempt:v2` (including the chosen team name); local stats use `major-winners:daily-stats:v1`. Rerolled cards and remaining budgets survive reloads. Both are separate from Free Play.
 - One terminal result is counted per UTC day. Streaks use consecutive UTC completion days across calendar boundaries.
 - Storage, clipboard, and native-share side effects stay in components. Defensive parsing and unavailable storage never block play.
 - Static social metadata uses the generic `/social-card.svg`; no dynamic daily Open Graph image is claimed.
@@ -104,9 +104,9 @@ Today's Challenge uses the UTC day and `seedFromUtcDate`, making the draft, coac
 - `majors.json` contains 24 completed Valve Majors through Cologne 2026. `org-years.json` contains 511 teams that actually played plus two Legacy wildcards; replaced source cards are not game entities.
 - Every roster appearance has exactly five starters, optional registered substitutes, placement, Major/Legacy identity, and source metadata. Roles may be provisional; off-role placement is always available.
 - `npm run import:majors -- --write` performs the one-time, rate-limited Liquipedia MediaWiki import and caches source revisions under ignored `.cache/`. The shipped app has no runtime network dependency.
-- No org logos or player photos. Text crests and abstract art only.
+- Org logos are committed files under `public/logos/{orgId}.png`, referenced by the `org.logo` path. `npm run import:logos -- --write` reparses the cached rendered Major pages, prefers each team's dark-mode team-template icon, downloads it rate-limited, and rewrites `orgs.json`. Logos are third-party marks, not part of the CC BY-SA roster data. An org without a logo falls back to a generated initials crest. Player avatars are out of band until supplied.
 - JSON lives in `src/data/json/` under the separate `DATA-LICENSE.md` terms. Contracts live in `src/data/schema.ts`. Provenance and the transcription workflow live in `docs/DATA.md`.
-- `npm run validate-data` must stay green. It enforces regime consistency, 24 revision-pinned Majors, each played field size, five unique starters, and relational integrity.
+- `npm run validate-data` must stay green. It enforces regime consistency, 24 revision-pinned Majors, each played field size, five unique starters, relational integrity, and that every referenced logo file exists.
 
 ## Commands
 
@@ -119,6 +119,7 @@ npm run typecheck
 npm run check
 npm run validate-data
 npm run import:majors -- --offline
+npm run import:logos
 npm run calibrate
 npm run sim:harness
 ```

@@ -2,666 +2,799 @@
 	{
 		"id": "00-nation",
 		"name": "00 Nation",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/00-nation.png"
 	},
 	{
 		"id": "3dmax",
 		"name": "3DMAX",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/3dmax.png"
 	},
 	{
 		"id": "9ine",
 		"name": "9INE",
-		"country": "PL"
+		"country": "PL",
+		"logo": "/logos/9ine.png"
 	},
 	{
 		"id": "9z-team",
 		"name": "9z Team",
-		"country": "UY"
+		"country": "UY",
+		"logo": "/logos/9z-team.png"
 	},
 	{
 		"id": "amkal-esports",
 		"name": "AMKAL ESPORTS",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/amkal-esports.png"
 	},
 	{
 		"id": "apeks",
 		"name": "Apeks",
-		"country": "SE"
+		"country": "SE",
+		"logo": "/logos/apeks.png"
 	},
 	{
 		"id": "astana-dragons",
 		"name": "Astana Dragons",
-		"country": "UA"
+		"country": "UA",
+		"logo": "/logos/astana-dragons.png"
 	},
 	{
 		"id": "astralis",
 		"name": "Astralis",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/astralis.png"
 	},
 	{
 		"id": "aurora-gaming",
 		"name": "Aurora Gaming",
-		"country": "TR"
+		"country": "TR",
+		"logo": "/logos/aurora-gaming.png"
 	},
 	{
 		"id": "avangar",
 		"name": "AVANGAR",
-		"country": "KZ"
+		"country": "KZ",
+		"logo": "/logos/avangar.png"
 	},
 	{
 		"id": "b8",
 		"name": "B8",
-		"country": "UA"
+		"country": "UA",
+		"logo": "/logos/b8.png"
 	},
 	{
 		"id": "bad-news-eagles",
 		"name": "Bad News Eagles",
-		"country": "XK"
+		"country": "XK",
+		"logo": "/logos/bad-news-eagles.png"
 	},
 	{
 		"id": "betboom-team",
 		"name": "BetBoom Team",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/betboom-team.png"
 	},
 	{
 		"id": "big",
 		"name": "BIG",
-		"country": "DE"
+		"country": "DE",
+		"logo": "/logos/big.png"
 	},
 	{
 		"id": "bravado-gaming",
 		"name": "Bravado Gaming",
-		"country": "ZA"
+		"country": "ZA",
+		"logo": "/logos/bravado-gaming.png"
 	},
 	{
 		"id": "chinggis-warriors",
 		"name": "Chinggis Warriors",
-		"country": "MN"
+		"country": "MN",
+		"logo": "/logos/chinggis-warriors.png"
 	},
 	{
 		"id": "clan-mystik",
 		"name": "Clan-Mystik",
-		"country": "FR"
+		"country": "FR",
+		"logo": "/logos/clan-mystik.png"
 	},
 	{
 		"id": "clg",
 		"name": "CLG",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/clg.png"
 	},
 	{
 		"id": "cloud9",
 		"name": "Cloud9",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/cloud9.png"
 	},
 	{
 		"id": "complexity",
 		"name": "compLexity Gaming",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/complexity.png"
 	},
 	{
 		"id": "copenhagen-flames",
 		"name": "Copenhagen Flames",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/copenhagen-flames.png"
 	},
 	{
 		"id": "copenhagen-wolves",
 		"name": "Copenhagen Wolves",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/copenhagen-wolves.png"
 	},
 	{
 		"id": "counter-logic-gaming",
 		"name": "Counter Logic Gaming",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/counter-logic-gaming.png"
 	},
 	{
 		"id": "cr4zy",
 		"name": "CR4ZY",
-		"country": "RS"
+		"country": "RS",
+		"logo": "/logos/cr4zy.png"
 	},
 	{
 		"id": "dat-team",
 		"name": "dAT Team",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/dat-team.png"
 	},
 	{
 		"id": "dreameaters",
 		"name": "DreamEaters",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/dreameaters.png"
 	},
 	{
 		"id": "ecstatic",
 		"name": "ECSTATIC",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/ecstatic.png"
 	},
 	{
 		"id": "ence",
 		"name": "ENCE",
-		"country": "FI"
+		"country": "FI",
+		"logo": "/logos/ence.png"
 	},
 	{
 		"id": "entropiq",
 		"name": "Entropiq",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/entropiq.png"
 	},
 	{
 		"id": "epsilon-esports",
 		"name": "Epsilon eSports",
-		"country": "FR"
+		"country": "FR",
+		"logo": "/logos/epsilon-esports.png"
 	},
 	{
 		"id": "esc-gaming",
 		"name": "ESC Gaming",
-		"country": "PL"
+		"country": "PL",
+		"logo": "/logos/esc-gaming.png"
 	},
 	{
 		"id": "eternal-fire",
 		"name": "Eternal Fire",
-		"country": "TR"
+		"country": "TR",
+		"logo": "/logos/eternal-fire.png"
 	},
 	{
 		"id": "evil-geniuses",
 		"name": "Evil Geniuses",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/evil-geniuses.png"
 	},
 	{
 		"id": "faze",
 		"name": "FaZe Clan",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/faze.png"
 	},
 	{
 		"id": "flash-gaming",
 		"name": "Flash Gaming",
-		"country": "CN"
+		"country": "CN",
+		"logo": "/logos/flash-gaming.png"
 	},
 	{
 		"id": "flipsid3-tactics",
 		"name": "FlipSid3 Tactics",
-		"country": "SE"
+		"country": "SE",
+		"logo": "/logos/flipsid3-tactics.png"
 	},
 	{
 		"id": "fluxo",
 		"name": "Fluxo",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/fluxo.png"
 	},
 	{
 		"id": "flyquest",
 		"name": "FlyQuest",
-		"country": "AU"
+		"country": "AU",
+		"logo": "/logos/flyquest.png"
 	},
 	{
 		"id": "fnatic",
 		"name": "fnatic",
-		"country": "GB"
+		"country": "GB",
+		"logo": "/logos/fnatic.png"
 	},
 	{
 		"id": "forze",
 		"name": "forZe",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/forze.png"
 	},
 	{
 		"id": "forze-esports",
 		"name": "FORZE Esports",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/forze-esports.png"
 	},
 	{
 		"id": "furia",
 		"name": "FURIA",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/furia.png"
 	},
 	{
 		"id": "furia-esports",
 		"name": "FURIA Esports",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/furia-esports.png"
 	},
 	{
 		"id": "fut-esports",
 		"name": "FUT Esports",
-		"country": "UA"
+		"country": "UA",
+		"logo": "/logos/fut-esports.png"
 	},
 	{
 		"id": "g2",
 		"name": "G2 Esports",
-		"country": "SE"
+		"country": "SE",
+		"logo": "/logos/g2.png"
 	},
 	{
 		"id": "gaimin-gladiators",
 		"name": "Gaimin Gladiators",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/gaimin-gladiators.png"
 	},
 	{
 		"id": "gambit-esports",
 		"name": "Gambit Esports",
-		"country": "KZ"
+		"country": "KZ",
+		"logo": "/logos/gambit-esports.png"
 	},
 	{
 		"id": "gambit-gaming",
 		"name": "Gambit Gaming",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/gambit-gaming.png"
 	},
 	{
 		"id": "gamerlegion",
 		"name": "GamerLegion",
-		"country": "RO"
+		"country": "RO",
+		"logo": "/logos/gamerlegion.png"
 	},
 	{
 		"id": "godsent",
 		"name": "GODSENT",
-		"country": "SE"
+		"country": "SE",
+		"logo": "/logos/godsent.png"
 	},
 	{
 		"id": "grayhound-gaming",
 		"name": "Grayhound Gaming",
-		"country": "AU"
+		"country": "AU",
+		"logo": "/logos/grayhound-gaming.png"
 	},
 	{
 		"id": "hellraisers",
 		"name": "HellRaisers",
-		"country": "UA"
+		"country": "UA",
+		"logo": "/logos/hellraisers.png"
 	},
 	{
 		"id": "heroic",
 		"name": "Heroic",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/heroic.png"
 	},
 	{
 		"id": "ihc-esports",
 		"name": "IHC Esports",
-		"country": "MN"
+		"country": "MN",
+		"logo": "/logos/ihc-esports.png"
 	},
 	{
 		"id": "immortals",
 		"name": "Immortals",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/immortals.png"
 	},
 	{
 		"id": "imperial-esports",
 		"name": "Imperial Esports",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/imperial-esports.png"
 	},
 	{
 		"id": "into-the-breach",
 		"name": "Into The Breach",
-		"country": "UK"
+		"country": "UK",
+		"logo": "/logos/into-the-breach.png"
 	},
 	{
 		"id": "intz-esports",
 		"name": "INTZ eSports",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/intz-esports.png"
 	},
 	{
 		"id": "keyd-stars",
 		"name": "Keyd Stars",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/keyd-stars.png"
 	},
 	{
 		"id": "koi",
 		"name": "KOI",
-		"country": "ES"
+		"country": "ES",
+		"logo": "/logos/koi.png"
 	},
 	{
 		"id": "legacy",
 		"name": "Legacy",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/legacy.png"
 	},
 	{
 		"id": "lgb-esports",
 		"name": "LGB eSports",
-		"country": "SE"
+		"country": "SE",
+		"logo": "/logos/lgb-esports.png"
 	},
 	{
 		"id": "liquid",
 		"name": "Team Liquid",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/liquid.png"
 	},
 	{
 		"id": "london-conspiracy",
 		"name": "London Conspiracy",
-		"country": "NO"
+		"country": "NO",
+		"logo": "/logos/london-conspiracy.png"
 	},
 	{
 		"id": "luminosity-gaming",
 		"name": "Luminosity Gaming",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/luminosity-gaming.png"
 	},
 	{
 		"id": "lynn-vision-gaming",
 		"name": "Lynn Vision Gaming",
-		"country": "CN"
+		"country": "CN",
+		"logo": "/logos/lynn-vision-gaming.png"
 	},
 	{
 		"id": "m80",
 		"name": "M80",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/m80.png"
 	},
 	{
 		"id": "metizport",
 		"name": "Metizport",
-		"country": "SE"
+		"country": "SE",
+		"logo": "/logos/metizport.png"
 	},
 	{
 		"id": "mibr",
 		"name": "MIBR",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/mibr.png"
 	},
 	{
 		"id": "misfits-gaming",
 		"name": "Misfits Gaming",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/misfits-gaming.png"
 	},
 	{
 		"id": "monte",
 		"name": "Monte",
-		"country": "UA"
+		"country": "UA",
+		"logo": "/logos/monte.png"
 	},
 	{
 		"id": "mouz",
 		"name": "mousesports",
-		"country": "DE"
+		"country": "DE",
+		"logo": "/logos/mouz.png"
 	},
 	{
 		"id": "movistar-riders",
 		"name": "Movistar Riders",
-		"country": "ES"
+		"country": "ES",
+		"logo": "/logos/movistar-riders.png"
 	},
 	{
 		"id": "myxmg",
 		"name": "myXMG",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/myxmg.png"
 	},
 	{
 		"id": "n-faculty",
 		"name": "n!faculty",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/n-faculty.png"
 	},
 	{
 		"id": "navi",
 		"name": "Natus Vincere",
-		"country": "UA"
+		"country": "UA",
+		"logo": "/logos/navi.png"
 	},
 	{
 		"id": "nemiga-gaming",
 		"name": "Nemiga Gaming",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/nemiga-gaming.png"
 	},
 	{
 		"id": "nip",
 		"name": "Ninjas in Pyjamas",
-		"country": "SE"
+		"country": "SE",
+		"logo": "/logos/nip.png"
 	},
 	{
 		"id": "north",
 		"name": "North",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/north.png"
 	},
 	{
 		"id": "nrg",
 		"name": "NRG",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/nrg.png"
 	},
 	{
 		"id": "nrg-esports",
 		"name": "NRG Esports",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/nrg-esports.png"
 	},
 	{
 		"id": "og",
 		"name": "OG",
-		"country": "IL"
+		"country": "IL",
+		"logo": "/logos/og.png"
 	},
 	{
 		"id": "optic-gaming",
 		"name": "OpTic Gaming",
-		"country": "CA"
+		"country": "CA",
+		"logo": "/logos/optic-gaming.png"
 	},
 	{
 		"id": "outsiders",
 		"name": "Outsiders",
-		"country": "KZ"
+		"country": "KZ",
+		"logo": "/logos/outsiders.png"
 	},
 	{
 		"id": "pain-gaming",
 		"name": "paiN Gaming",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/pain-gaming.png"
 	},
 	{
 		"id": "parivision",
 		"name": "PARIVISION",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/parivision.png"
 	},
 	{
 		"id": "passion-ua",
 		"name": "Passion UA",
-		"country": "UA"
+		"country": "UA",
+		"logo": "/logos/passion-ua.png"
 	},
 	{
 		"id": "penta-sports",
 		"name": "PENTA Sports",
-		"country": "DE"
+		"country": "DE",
+		"logo": "/logos/penta-sports.png"
 	},
 	{
 		"id": "planetkey-dynamics",
 		"name": "Planetkey Dynamics",
-		"country": "DE"
+		"country": "DE",
+		"logo": "/logos/planetkey-dynamics.png"
 	},
 	{
 		"id": "quantum-bellator-fire",
 		"name": "Quantum Bellator Fire",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/quantum-bellator-fire.png"
 	},
 	{
 		"id": "rare-atom",
 		"name": "Rare Atom",
-		"country": "CN"
+		"country": "CN",
+		"logo": "/logos/rare-atom.png"
 	},
 	{
 		"id": "reason-gaming",
 		"name": "Reason Gaming",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/reason-gaming.png"
 	},
 	{
 		"id": "recursive-esports",
 		"name": "Recursive eSports",
-		"country": "FR"
+		"country": "FR",
+		"logo": "/logos/recursive-esports.png"
 	},
 	{
 		"id": "red-canids",
 		"name": "RED Canids",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/red-canids.png"
 	},
 	{
 		"id": "renegades",
 		"name": "Renegades",
-		"country": "AU"
+		"country": "AU",
+		"logo": "/logos/renegades.png"
 	},
 	{
 		"id": "rogue",
 		"name": "Rogue",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/rogue.png"
 	},
 	{
 		"id": "saw",
 		"name": "SAW",
-		"country": "PT"
+		"country": "PT",
+		"logo": "/logos/saw.png"
 	},
 	{
 		"id": "sharks-esports",
 		"name": "Sharks Esports",
-		"country": "BR"
+		"country": "BR",
+		"logo": "/logos/sharks-esports.png"
 	},
 	{
 		"id": "sinners-esports",
 		"name": "SINNERS Esports",
-		"country": "CZ"
+		"country": "CZ",
+		"logo": "/logos/sinners-esports.png"
 	},
 	{
 		"id": "sk",
 		"name": "SK Gaming",
-		"country": "DE"
+		"country": "DE",
+		"logo": "/logos/sk.png"
 	},
 	{
 		"id": "space-soldiers",
 		"name": "Space Soldiers",
-		"country": "TR"
+		"country": "TR",
+		"logo": "/logos/space-soldiers.png"
 	},
 	{
 		"id": "splyce",
 		"name": "Splyce",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/splyce.png"
 	},
 	{
 		"id": "sprout",
 		"name": "Sprout",
-		"country": "DE"
+		"country": "DE",
+		"logo": "/logos/sprout.png"
 	},
 	{
 		"id": "syman-gaming",
 		"name": "Syman Gaming",
-		"country": "KZ"
+		"country": "KZ",
+		"logo": "/logos/syman-gaming.png"
 	},
 	{
 		"id": "team-dignitas",
 		"name": "Team Dignitas",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/team-dignitas.png"
 	},
 	{
 		"id": "team-ebettle",
 		"name": "Team eBettle",
-		"country": "PL"
+		"country": "PL",
+		"logo": "/logos/team-ebettle.png"
 	},
 	{
 		"id": "team-envy",
 		"name": "Team Envy",
-		"country": "FR"
+		"country": "FR",
+		"logo": "/logos/team-envy.png"
 	},
 	{
 		"id": "team-envyus",
 		"name": "Team EnVyUs",
-		"country": "FR"
+		"country": "FR",
+		"logo": "/logos/team-envyus.png"
 	},
 	{
 		"id": "team-falcons",
 		"name": "Team Falcons",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/team-falcons.png"
 	},
 	{
 		"id": "team-gamerlegion",
 		"name": "Team GamerLegion",
-		"country": "RO"
+		"country": "RO",
+		"logo": "/logos/team-gamerlegion.png"
 	},
 	{
 		"id": "team-ibuypower",
 		"name": "Team iBUYPOWER",
-		"country": "US"
+		"country": "US",
+		"logo": "/logos/team-ibuypower.png"
 	},
 	{
 		"id": "team-immunity",
 		"name": "Team Immunity",
-		"country": "AU"
+		"country": "AU",
+		"logo": "/logos/team-immunity.png"
 	},
 	{
 		"id": "team-kinguin",
 		"name": "Team Kinguin",
-		"country": "SE"
+		"country": "SE",
+		"logo": "/logos/team-kinguin.png"
 	},
 	{
 		"id": "team-ldlc-com",
 		"name": "Team LDLC.com",
-		"country": "FR"
+		"country": "FR",
+		"logo": "/logos/team-ldlc-com.png"
 	},
 	{
 		"id": "team-solomid",
 		"name": "Team SoloMid",
-		"country": "DK"
+		"country": "DK",
+		"logo": "/logos/team-solomid.png"
 	},
 	{
 		"id": "team-spirit",
 		"name": "Team Spirit",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/team-spirit.png"
 	},
 	{
 		"id": "team-wolf",
 		"name": "Team Wolf",
-		"country": "IN"
+		"country": "IN",
+		"logo": "/logos/team-wolf.png"
 	},
 	{
 		"id": "the-huns-esports",
 		"name": "The Huns Esports",
-		"country": "MN"
+		"country": "MN",
+		"logo": "/logos/the-huns-esports.png"
 	},
 	{
 		"id": "the-mongolz",
 		"name": "The MongolZ",
-		"country": "MN"
+		"country": "MN",
+		"logo": "/logos/the-mongolz.png"
 	},
 	{
 		"id": "thunderdownunder",
 		"name": "THUNDERdOWNUNDER",
-		"country": "AU"
+		"country": "AU",
+		"logo": "/logos/thunderdownunder.png"
 	},
 	{
 		"id": "titan",
 		"name": "Titan",
-		"country": "FR"
+		"country": "FR",
+		"logo": "/logos/titan.png"
 	},
 	{
 		"id": "tyloo",
 		"name": "TYLOO",
-		"country": "CN"
+		"country": "CN",
+		"logo": "/logos/tyloo.png"
 	},
 	{
 		"id": "universal-soldiers",
 		"name": "Universal Soldiers",
-		"country": "PL"
+		"country": "PL",
+		"logo": "/logos/universal-soldiers.png"
 	},
 	{
 		"id": "vega-squadron",
 		"name": "Vega Squadron",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/vega-squadron.png"
 	},
 	{
 		"id": "verygames",
 		"name": "VeryGames",
-		"country": "FR"
+		"country": "FR",
+		"logo": "/logos/verygames.png"
 	},
 	{
 		"id": "vexed-gaming",
 		"name": "Vexed Gaming",
-		"country": "PL"
+		"country": "PL",
+		"logo": "/logos/vexed-gaming.png"
 	},
 	{
 		"id": "vici-gaming",
 		"name": "ViCi Gaming",
-		"country": "CN"
+		"country": "CN",
+		"logo": "/logos/vici-gaming.png"
 	},
 	{
 		"id": "virtus-pro",
 		"name": "Virtus.pro",
-		"country": "PL"
+		"country": "PL",
+		"logo": "/logos/virtus-pro.png"
 	},
 	{
 		"id": "vitality",
 		"name": "Team Vitality",
-		"country": "FR"
+		"country": "FR",
+		"logo": "/logos/vitality.png"
 	},
 	{
 		"id": "vox-eminor",
 		"name": "Vox Eminor",
-		"country": "AU"
+		"country": "AU",
+		"logo": "/logos/vox-eminor.png"
 	},
 	{
 		"id": "wildcard",
 		"name": "Wildcard",
-		"country": "SE"
+		"country": "SE",
+		"logo": "/logos/wildcard.png"
 	},
 	{
 		"id": "winstrike-team",
 		"name": "Winstrike Team",
-		"country": "RU"
+		"country": "RU",
+		"logo": "/logos/winstrike-team.png"
 	},
 	{
 		"id": "xapso",
 		"name": "Xapso",
-		"country": "NO"
+		"country": "NO",
+		"logo": "/logos/xapso.png"
 	}
 ]

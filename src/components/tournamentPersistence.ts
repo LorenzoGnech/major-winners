@@ -1,5 +1,6 @@
 import { type Dataset, ROLES } from "../data";
 import type { CompletedDraft, TournamentState } from "../engine";
+import { parseTeamName } from "./teamName";
 
 export const TOURNAMENT_STORAGE_KEY = "major-winners:tournament:v2";
 export const TOURNAMENT_STORAGE_VERSION = 2;
@@ -9,6 +10,7 @@ export type PersistedTournamentRun = {
 	rootSeed: number;
 	draft: CompletedDraft;
 	tournament: TournamentState;
+	teamName?: string;
 };
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -116,6 +118,9 @@ export function parsePersistedTournamentRun(
 				tournament.stage === "champions" &&
 				tournament.playoffRound === null)
 		) {
+			return null;
+		}
+		if (value.teamName !== undefined && parseTeamName(value.teamName) === null) {
 			return null;
 		}
 		return value as PersistedTournamentRun;

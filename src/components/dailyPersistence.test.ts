@@ -25,6 +25,19 @@ describe("daily attempt persistence", () => {
 		expect(parsePersistedDailyAttempt(raw, dataset, day, seed)?.draft).toEqual(major.value);
 	});
 
+	it("restores a custom team name", () => {
+		const original = startDraft(dataset, seed);
+		const raw = JSON.stringify({
+			version: DAILY_ATTEMPT_STORAGE_VERSION,
+			day,
+			seed,
+			draft: original,
+			tournament: null,
+			teamName: "Major Winners",
+		});
+		expect(parsePersistedDailyAttempt(raw, dataset, day, seed)?.teamName).toBe("Major Winners");
+	});
+
 	it("rejects a card that does not belong to the historical dataset", () => {
 		const original = startDraft(dataset, seed);
 		const draft = {
