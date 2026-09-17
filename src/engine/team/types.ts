@@ -5,6 +5,7 @@ import type { RatedPlayer } from "../ratings/rate";
 
 export type TeamMemberProfile = {
 	id: string;
+	playerId: string;
 	nick: string;
 	nationality: string;
 	orgId: string;
@@ -21,6 +22,8 @@ export type TeamMemberProfile = {
 export type ChemistryDetail = {
 	score: number;
 	sharedOrgYearPairs: number;
+	sharedTeamPairs: number;
+	sharedNationalityPairs: number;
 	bonus: number;
 };
 
@@ -28,7 +31,9 @@ export type CommunicationDetail = {
 	score: number;
 	playerPairCompatibility: number;
 	coachCompatibility: number;
-	heuristic: "conservative-language-family";
+	languageScore: number;
+	iglAbility: number;
+	heuristic: "language-family-and-igl";
 };
 
 export type StructureDetail = {

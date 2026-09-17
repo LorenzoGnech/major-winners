@@ -123,11 +123,33 @@ export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 	}
 
 	for (const major of data.majors) {
-		const rosterCount = data.orgYears.filter((roster) => roster.majorId === major.id).length;
-		if (rosterCount !== major.teamCount) {
+		const rosters = data.orgYears.filter((roster) => roster.majorId === major.id);
+		if (rosters.length !== major.teamCount) {
 			issues.push({
 				path: `majors.${major.id}.teamCount`,
-				message: `expected ${major.teamCount} played rosters, found ${rosterCount}`,
+				message: `expected ${major.teamCount} played rosters, found ${rosters.length}`,
+			});
+		}
+		const placementCounts = new Map<number, number>();
+		for (const roster of rosters) {
+			placementCounts.set(roster.placement, (placementCounts.get(roster.placement) ?? 0) + 1);
+		}
+		if ((placementCounts.get(1) ?? 0) !== 1 || (placementCounts.get(2) ?? 0) !== 1) {
+			issues.push({
+				path: `majors.${major.id}.placement`,
+				message: "expected exactly one champion and one runner-up",
+			});
+		}
+		if ((placementCounts.get(3) ?? 0) !== 2) {
+			issues.push({
+				path: `majors.${major.id}.placement`,
+				message: "expected exactly two semifinalists (3rd-4th)",
+			});
+		}
+		if (placementCounts.size < 4) {
+			issues.push({
+				path: `majors.${major.id}.placement`,
+				message: "placement table looks collapsed (need more than 1st/2nd/3rd-4th)",
 			});
 		}
 		if (major.sources.some((source) => !source.revision)) {

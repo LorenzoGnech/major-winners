@@ -13,7 +13,7 @@ import type {
 	PlayerPick,
 	RolledOrgYearCard,
 } from "./types";
-import { orgYearWeight, PLAYER_CARD_COUNT } from "./weights";
+import { COACH_CANDIDATE_COUNT, orgYearWeight, PLAYER_CARD_COUNT, REROLL_BUDGET } from "./weights";
 
 function snapshotPlayer(season: Dataset["playerSeasons"][number]): DraftablePlayer {
 	return {
@@ -85,9 +85,39 @@ function initialRosters(dataset: Dataset, rng: ReturnType<typeof createRng>) {
 	return picked;
 }
 
+function shownRosterIds(state: DraftState, round: number): Set<string> {
+	return new Set(state.cards.filter((_, index) => index !== round).map((card) => card.orgYearId));
+}
+
+export function otherMajorAppearances(
+	state: DraftState,
+	dataset: Dataset,
+): Dataset["orgYears"][number][] {
+	if (state.phase.type !== "player") return [];
+	const current = state.cards[state.phase.round];
+	if (!current) return [];
+	const orgId = dataset.orgYears.find((roster) => roster.id === current.orgYearId)?.orgId;
+	if (!orgId) return [];
+	const shown = shownRosterIds(state, state.phase.round);
+	return dataset.orgYears.filter(
+		(roster) =>
+			roster.orgId === orgId &&
+			roster.kind === "major" &&
+			roster.id !== current.orgYearId &&
+			!shown.has(roster.id),
+	);
+}
+
+export function canRerollMajor(state: DraftState, dataset: Dataset): boolean {
+	return state.rerolls.majorRemaining > 0 && otherMajorAppearances(state, dataset).length > 0;
+}
+
 export function startDraft(dataset: Dataset, seed: number | string): DraftState {
-	if (dataset.coaches.length === 0) {
-		throw new DraftError("insufficient_coaches", "need at least one coach for the sixth round");
+	if (dataset.coaches.length < COACH_CANDIDATE_COUNT) {
+		throw new DraftError(
+			"insufficient_coaches",
+			`need at least ${COACH_CANDIDATE_COUNT} coaches for the sixth round, got ${dataset.coaches.length}`,
+		);
 	}
 	const rng = createRng(seed);
 	const seasons = new Map(dataset.playerSeasons.map((season) => [season.id, season]));
@@ -95,13 +125,13 @@ export function startDraft(dataset: Dataset, seed: number | string): DraftState 
 	const coachIds = shuffle(
 		dataset.coaches.map((coach) => coach.id),
 		rng,
-	);
+	).slice(0, COACH_CANDIDATE_COUNT);
 	return {
 		seed: rng.seed,
 		phase: { type: "player", round: 0 },
 		cards,
 		coachIds,
-		rerolls: { majorRemaining: true, teamRemaining: true },
+		rerolls: { majorRemaining: REROLL_BUDGET, teamRemaining: REROLL_BUDGET },
 		roster: {},
 		coachId: null,
 	};
@@ -116,8 +146,9 @@ function rerollCard(
 		return fail("invalid_phase", "rerolls are only legal before a player pick");
 	}
 	const budgetKey = type === "major" ? "majorRemaining" : "teamRemaining";
-	if (!state.rerolls[budgetKey]) {
-		return fail("reroll_exhausted", `${type} reroll has already been used`);
+	const remaining = state.rerolls[budgetKey];
+	if (remaining <= 0) {
+		return fail("reroll_exhausted", `${type} rerolls are exhausted`);
 	}
 	if (!dataset) {
 		return fail("reroll_unavailable", "reroll requires the current historical dataset");
@@ -125,33 +156,25 @@ function rerollCard(
 	const round = state.phase.round;
 	const current = state.cards[round];
 	if (!current) return fail("reroll_unavailable", "current draft card is missing");
-	const otherCards = state.cards.filter((_, index) => index !== round);
-	const shownRosterIds = new Set(otherCards.map((card) => card.orgYearId));
-	const rng = createRng(`${state.seed}:reroll-${type}:${round}`);
-	let candidates: Dataset["orgYears"];
-	if (type === "team") {
-		candidates = dataset.orgYears.filter(
-			(roster) =>
-				(roster.majorId ?? null) === current.majorId &&
-				roster.kind === current.kind &&
-				roster.id !== current.orgYearId &&
-				!shownRosterIds.has(roster.id),
-		);
-	} else {
-		const usedMajorIds = new Set(otherCards.map((card) => card.majorId).filter(Boolean));
-		const majors = dataset.majors.filter(
-			(major) => major.id !== current.majorId && !usedMajorIds.has(major.id),
-		);
-		if (majors.length === 0) {
-			return fail("reroll_unavailable", "no different Major remains");
-		}
-		const major = majors[rng.nextInt(majors.length)];
-		candidates = dataset.orgYears.filter(
-			(roster) => roster.majorId === major.id && !shownRosterIds.has(roster.id),
-		);
-	}
+	const usedRosterIds = shownRosterIds(state, round);
+	const rng = createRng(`${state.seed}:reroll-${type}:${round}:${REROLL_BUDGET - remaining}`);
+	const candidates =
+		type === "team"
+			? dataset.orgYears.filter(
+					(roster) =>
+						(roster.majorId ?? null) === current.majorId &&
+						roster.kind === current.kind &&
+						roster.id !== current.orgYearId &&
+						!usedRosterIds.has(roster.id),
+				)
+			: otherMajorAppearances(state, dataset);
 	if (candidates.length === 0) {
-		return fail("reroll_unavailable", `no alternative ${type} card remains`);
+		return fail(
+			"reroll_unavailable",
+			type === "major"
+				? "this team has no other Major appearance"
+				: "no alternative team card remains",
+		);
 	}
 	const seasons = new Map(dataset.playerSeasons.map((season) => [season.id, season]));
 	const replacement = snapshotCard(pickRoster(candidates, rng), seasons);
@@ -159,7 +182,7 @@ function rerollCard(
 	return ok({
 		...state,
 		cards,
-		rerolls: { ...state.rerolls, [budgetKey]: false },
+		rerolls: { ...state.rerolls, [budgetKey]: remaining - 1 },
 	});
 }
 

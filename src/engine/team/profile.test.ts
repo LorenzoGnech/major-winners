@@ -75,17 +75,60 @@ describe("buildTeamProfile", () => {
 		expect(result.details.structure.naturalRoleCount).toBe(5);
 		expect(result.details.structure.iglFit).toBe("primary");
 		expect(result.details.chemistry.sharedOrgYearPairs).toBe(10);
+		expect(result.details.chemistry.sharedTeamPairs).toBe(10);
+		expect(result.details.chemistry.sharedNationalityPairs).toBeGreaterThan(0);
 		expect(result.strengths).toContain("Natural role coverage");
 		expect(Object.values(result.attributes)).toHaveLength(6);
 		expect(result.overall).toBeGreaterThan(80);
 	});
 
-	it("keeps a mixed all-star lineup powerful without inventing chemistry", () => {
+	it("gives mixed all-stars chemistry from nationality or shared-team history, not a fake intact roster", () => {
 		const result = profile(MIXED_ALL_STARS, coachById("robban-2022"));
 
 		expect(result.components.baseStrength).toBeGreaterThan(80);
-		expect(result.components.chemistry).toBe(TEAM_PROFILE_BASELINES.chemistry);
-		expect(result.weaknesses).toContain("No shared org-year history");
+		expect(result.details.chemistry.sharedOrgYearPairs).toBe(0);
+		expect(result.components.chemistry).toBeGreaterThan(TEAM_PROFILE_BASELINES.chemistry);
+		expect(result.components.chemistry).toBeLessThan(
+			TEAM_PROFILE_BASELINES.chemistry + CHEMISTRY_BONUS_CAP,
+		);
+		expect(result.weaknesses).not.toContain("No shared history or nationality");
+	});
+
+	it("credits pairs that shared a roster even on different drafted org-years", () => {
+		const result = profile(
+			{
+				awp: "s1mple-2018-navi",
+				igl: "electronic-2021-navi",
+				entry: "rain-2022-faze",
+				support: "krimz-2015-fnatic",
+				lurker: "get_right-2013-nip",
+			},
+			coachById("robban-2022"),
+		);
+
+		expect(result.details.chemistry.sharedOrgYearPairs).toBe(0);
+		expect(result.details.chemistry.sharedTeamPairs).toBeGreaterThanOrEqual(1);
+		expect(result.components.chemistry).toBeGreaterThan(TEAM_PROFILE_BASELINES.chemistry);
+	});
+
+	it("lets a proven IGL lift communication on the same language mix", () => {
+		const offRoleRoster = {
+			...ASTRALIS_ROSTER,
+			igl: "magisk-2018-astralis",
+			lurker: "gla1ve-2018-astralis",
+		};
+		const withCaller = profile(ASTRALIS_ROSTER, coachById("zonic-2018"));
+		const withoutCaller = profile(offRoleRoster, coachById("zonic-2018"));
+
+		expect(withCaller.details.communication.iglAbility).toBeGreaterThan(
+			withoutCaller.details.communication.iglAbility,
+		);
+		expect(withCaller.components.communication).toBeGreaterThan(
+			withoutCaller.components.communication,
+		);
+		expect(withCaller.details.communication.languageScore).toBe(
+			withoutCaller.details.communication.languageScore,
+		);
 	});
 
 	it("applies a strong structure penalty for an off-role IGL", () => {

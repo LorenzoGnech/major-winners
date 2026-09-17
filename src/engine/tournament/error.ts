@@ -3,7 +3,8 @@ export type TournamentErrorCode =
 	| "TOURNAMENT_COMPLETE"
 	| "MISSING_NEXT_MATCH"
 	| "INVALID_STATE"
-	| "INVALID_RESULT";
+	| "INVALID_RESULT"
+	| "MATCH_IN_PROGRESS";
 
 export class TournamentError extends Error {
 	readonly code: TournamentErrorCode;

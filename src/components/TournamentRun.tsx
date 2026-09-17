@@ -1,7 +1,27 @@
 import { type ReactNode, useState } from "react";
-import type { HistoricalOpponent, TeamProfile, TournamentState } from "../engine";
-import { runNextMatch } from "../engine";
+import type { Org, PlayerSeason } from "../data";
+import type {
+	GamePlanId,
+	HistoricalOpponent,
+	LiveSeriesState,
+	SimMapId,
+	TeamProfile,
+	TournamentState,
+} from "../engine";
+import {
+	beginNextMatch,
+	commitLiveMatch,
+	getMap,
+	needsGamePlan,
+	nextMapContext,
+	setLiveSeries,
+	startNextMap,
+} from "../engine";
+import { GamePlanPicker } from "./GamePlanPicker";
+import { MapPicker } from "./MapPicker";
 import { MatchPlayback } from "./MatchPlayback";
+import { OrgCrest } from "./OrgCrest";
+import { visibleTournamentBoard } from "./tournamentBoard";
 
 const STAGE_LABELS = {
 	challengers: "Challengers Swiss",
@@ -20,10 +40,21 @@ type TournamentRunProps = {
 	playerTeam: TeamProfile;
 	playerTeamName: string;
 	opponents: readonly HistoricalOpponent[];
+	orgsById: ReadonlyMap<string, Org>;
+	playersById: ReadonlyMap<string, PlayerSeason>;
 	onChange: (state: TournamentState) => void;
 	onAbandon: () => void;
 	terminalExtras?: ReactNode;
 };
+
+function resolveOpponentOrg(
+	opponent: HistoricalOpponent,
+	orgsById: ReadonlyMap<string, Org>,
+): Pick<Org, "id" | "name" | "logo"> | undefined {
+	if (opponent.org) return opponent.org;
+	const orgId = opponent.profile.members[0]?.orgId;
+	return orgId ? orgsById.get(orgId) : undefined;
+}
 
 function RecordCard({
 	label,
@@ -51,34 +82,81 @@ export function TournamentRun({
 	playerTeam,
 	playerTeamName,
 	opponents,
+	orgsById,
+	playersById,
 	onChange,
 	onAbandon,
 	terminalExtras,
 }: TournamentRunProps) {
-	const latestMatch = state.history.at(-1);
-	const [playbackMatchNumber, setPlaybackMatchNumber] = useState<number | null>(
-		latestMatch?.matchNumber ?? null,
-	);
 	const [playbackComplete, setPlaybackComplete] = useState(false);
+	const [pickingMap, setPickingMap] = useState(false);
+	const [pickedMapId, setPickedMapId] = useState<SimMapId | null>(null);
 	const [confirmAbandon, setConfirmAbandon] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const playbackMatch = state.history.find((match) => match.matchNumber === playbackMatchNumber);
+	const liveSeries = state.liveSeries ?? null;
+	const awaitingPlan = Boolean(liveSeries && needsGamePlan(liveSeries));
+	const upcomingMap = liveSeries ? nextMapContext(liveSeries) : undefined;
+	const planMap = pickedMapId
+		? getMap(pickedMapId)
+		: upcomingMap
+			? getMap(upcomingMap.mapId)
+			: undefined;
+	const planMapNumber = pickedMapId ? 1 : (liveSeries?.maps.length ?? 0) + 1;
+	const pickingPlan = Boolean(planMap && (pickedMapId || awaitingPlan));
+	const board = visibleTournamentBoard(state, undefined, true);
+	const nextOpponentOrg = state.nextMatch
+		? resolveOpponentOrg(state.nextMatch.opponent, orgsById)
+		: undefined;
 
 	function playNext() {
-		const result = runNextMatch(state, playerTeam, opponents);
+		setPickingMap(true);
+		setPickedMapId(null);
+		setError(null);
+	}
+
+	function pickMap(mapId: SimMapId) {
+		setPickedMapId(mapId);
+		setPickingMap(false);
+		setError(null);
+	}
+
+	function confirmPlan(plan: GamePlanId) {
+		if (liveSeries && needsGamePlan(liveSeries)) {
+			const started = startNextMap(liveSeries, plan);
+			if (!started.ok) {
+				setError(started.error.message);
+				return;
+			}
+			onChange(setLiveSeries(state, started.value));
+			setPlaybackComplete(false);
+			setError(null);
+			return;
+		}
+		if (!pickedMapId) return;
+		const result = beginNextMatch(state, playerTeam, opponents, pickedMapId, plan);
 		if (!result.ok) {
 			setError(result.error.message);
 			return;
 		}
-		const match = result.value.history.at(-1);
+		setPickedMapId(null);
 		onChange(result.value);
-		setPlaybackMatchNumber(match?.matchNumber ?? null);
 		setPlaybackComplete(false);
 		setError(null);
 	}
 
+	function updateLive(next: LiveSeriesState) {
+		onChange(setLiveSeries(state, next));
+	}
+
 	function continueRun() {
-		setPlaybackMatchNumber(null);
+		if (liveSeries?.complete) {
+			const result = commitLiveMatch(state, playerTeam, opponents);
+			if (!result.ok) {
+				setError(result.error.message);
+				return;
+			}
+			onChange(result.value);
+		}
 		setPlaybackComplete(false);
 	}
 
@@ -91,9 +169,9 @@ export function TournamentRun({
 	}
 
 	const terminalHeading =
-		state.status === "champion"
+		board.status === "champion"
 			? "Major champions"
-			: state.status === "eliminated"
+			: board.status === "eliminated"
 				? "Run over"
 				: null;
 
@@ -109,7 +187,7 @@ export function TournamentRun({
 							id="tournament-heading"
 							className="mt-1 text-3xl font-semibold tracking-tight text-white"
 						>
-							{terminalHeading ?? STAGE_LABELS[state.stage]}
+							{terminalHeading ?? STAGE_LABELS[board.stage]}
 						</h2>
 						<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
 							Two Swiss stages, then three playoff series. A flawless championship is 9–0.
@@ -120,8 +198,8 @@ export function TournamentRun({
 							Run record
 						</span>
 						<strong className="text-2xl tabular-nums text-white">
-							{state.history.filter((match) => match.won).length}–
-							{state.history.filter((match) => !match.won).length}
+							{board.history.filter((match) => match.won).length}–
+							{board.history.filter((match) => !match.won).length}
 						</strong>
 					</div>
 				</div>
@@ -129,20 +207,20 @@ export function TournamentRun({
 				<div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-5">
 					<RecordCard
 						label="Challengers"
-						record={state.challengers}
-						active={state.status === "active" && state.stage === "challengers"}
+						record={board.challengers}
+						active={board.status === "active" && board.stage === "challengers"}
 					/>
 					<RecordCard
 						label="Legends"
-						record={state.legends}
-						active={state.status === "active" && state.stage === "legends"}
+						record={board.legends}
+						active={board.status === "active" && board.stage === "legends"}
 					/>
 					{(["quarterfinal", "semifinal", "final"] as const).map((round) => {
-						const match = state.history.find((item) => item.playoffRound === round);
+						const match = board.history.find((item) => item.playoffRound === round);
 						const active =
-							state.status === "active" &&
-							state.stage === "champions" &&
-							state.playoffRound === round;
+							board.status === "active" &&
+							board.stage === "champions" &&
+							board.playoffRound === round;
 						return (
 							<div
 								key={round}
@@ -161,30 +239,37 @@ export function TournamentRun({
 					})}
 				</div>
 
-				{!playbackMatch && state.status === "active" && state.nextMatch && (
-					<div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/25 p-4">
-						<div>
-							<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-								Next · {state.nextMatch.format}
-							</p>
-							<p className="mt-1 text-lg font-semibold text-white">
-								{playerTeamName} vs {state.nextMatch.opponent.label}
-							</p>
-							<p className="text-xs text-zinc-500">
-								OVR {state.nextMatch.opponent.profile.overall}
-							</p>
+				{!liveSeries &&
+					!pickingMap &&
+					!pickingPlan &&
+					state.status === "active" &&
+					state.nextMatch && (
+						<div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/25 p-4">
+							<div className="flex min-w-0 items-center gap-3">
+								{nextOpponentOrg ? <OrgCrest org={nextOpponentOrg} size="md" /> : null}
+								<div className="min-w-0">
+									<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+										Next · {state.nextMatch.format}
+									</p>
+									<p className="mt-1 truncate text-lg font-semibold text-white">
+										{playerTeamName} vs {state.nextMatch.opponent.label}
+									</p>
+									<p className="text-xs text-zinc-500">
+										OVR {state.nextMatch.opponent.profile.overall}
+									</p>
+								</div>
+							</div>
+							<button
+								type="button"
+								onClick={playNext}
+								className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+							>
+								Play match {state.nextMatch.matchNumber}
+							</button>
 						</div>
-						<button
-							type="button"
-							onClick={playNext}
-							className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-						>
-							Play match {state.nextMatch.matchNumber}
-						</button>
-					</div>
-				)}
+					)}
 
-				{!playbackMatch && state.status !== "active" && (
+				{!liveSeries && state.status !== "active" && (
 					<>
 						<div className="mt-5 rounded-xl border border-white/10 bg-black/25 p-4">
 							<p className="text-lg font-semibold text-white">
@@ -208,16 +293,33 @@ export function TournamentRun({
 				)}
 			</div>
 
-			{playbackMatch && (
+			{pickingMap && state.nextMatch && (
+				<MapPicker format={state.nextMatch.format} onPick={pickMap} />
+			)}
+
+			{pickingPlan && planMap && state.nextMatch && (
+				<GamePlanPicker
+					key={`${planMap.id}-${planMapNumber}`}
+					map={planMap}
+					mapNumber={planMapNumber}
+					format={state.nextMatch.format}
+					onConfirm={confirmPlan}
+				/>
+			)}
+
+			{liveSeries && (
 				<>
 					<MatchPlayback
-						key={playbackMatch.matchNumber}
-						result={playbackMatch.result}
-						teamLabels={[playerTeamName, playbackMatch.opponent.label]}
-						eyebrow={`${STAGE_LABELS[playbackMatch.stage]} · ${playbackMatch.format}`}
+						key={`${state.nextMatch?.matchNumber ?? "live"}-${liveSeries.seed}`}
+						live={liveSeries}
+						onLiveChange={updateLive}
+						teamLabels={[playerTeamName, state.nextMatch?.opponent.label ?? "Opponent"]}
+						opponentOrg={nextOpponentOrg}
+						playersById={playersById}
+						eyebrow={`${STAGE_LABELS[state.nextMatch?.stage ?? state.stage]} · ${state.nextMatch?.format ?? ""}`}
 						onComplete={() => setPlaybackComplete(true)}
 					/>
-					{playbackComplete && (
+					{playbackComplete && liveSeries.complete && (
 						<div className="mt-3 flex justify-end">
 							<button
 								type="button"
@@ -231,7 +333,7 @@ export function TournamentRun({
 				</>
 			)}
 
-			{state.history.length > 0 && (
+			{board.history.length > 0 && (
 				<section
 					aria-labelledby="history-heading"
 					className="mt-5 rounded-2xl border border-white/10 p-4"
@@ -243,15 +345,22 @@ export function TournamentRun({
 						Match history
 					</h3>
 					<ol className="mt-3 grid gap-2 sm:grid-cols-2">
-						{state.history.map((match) => (
-							<li key={match.matchNumber} className="rounded-lg bg-white/4 px-3 py-2 text-sm">
-								<span className={match.won ? "text-emerald-300" : "text-amber-300"}>
-									{match.won ? "W" : "L"}
-								</span>{" "}
-								<span className="text-zinc-200">{match.opponent.label}</span>
-								<span className="text-zinc-600"> · {match.format}</span>
-							</li>
-						))}
+						{board.history.map((match) => {
+							const org = resolveOpponentOrg(match.opponent, orgsById);
+							return (
+								<li
+									key={match.matchNumber}
+									className="flex items-center gap-2 rounded-lg bg-white/4 px-3 py-2 text-sm"
+								>
+									{org ? <OrgCrest org={org} size="sm" /> : null}
+									<span className={match.won ? "text-emerald-300" : "text-amber-300"}>
+										{match.won ? "W" : "L"}
+									</span>
+									<span className="min-w-0 truncate text-zinc-200">{match.opponent.label}</span>
+									<span className="shrink-0 text-zinc-600">· {match.format}</span>
+								</li>
+							);
+						})}
 					</ol>
 				</section>
 			)}

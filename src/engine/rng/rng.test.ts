@@ -45,6 +45,18 @@ describe("createRng", () => {
 		expect(streamA).toEqual(streamB);
 	});
 
+	it("restores a serialized register and continues the stream", () => {
+		const live = createRng(2026);
+		live.next();
+		live.nextUint32();
+		const resumed = createRng(2026, live.state);
+		const fresh = createRng(2026);
+		fresh.next();
+		fresh.nextUint32();
+		expect(resumed.next()).toBe(fresh.next());
+		expect(resumed.nextInt(12)).toBe(fresh.nextInt(12));
+	});
+
 	it("gives a different stream for a different seed", () => {
 		const a = createRng(1);
 		const b = createRng(2);

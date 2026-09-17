@@ -1,5 +1,54 @@
 @import "tailwindcss";
 
+@font-face {
+	font-family: "Stratum 2";
+	src:
+		local("Stratum 2"),
+		local("Stratum2"),
+		url("/fonts/ChakraPetch-Regular.ttf") format("truetype");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Stratum 2";
+	src:
+		local("Stratum 2 Medium"),
+		local("Stratum2 Medium"),
+		url("/fonts/ChakraPetch-Medium.ttf") format("truetype");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Stratum 2";
+	src:
+		local("Stratum 2 SemiBold"),
+		local("Stratum2 SemiBold"),
+		url("/fonts/ChakraPetch-SemiBold.ttf") format("truetype");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Stratum 2";
+	src:
+		local("Stratum 2 Bold"),
+		local("Stratum2 Bold"),
+		local("Stratum2-Bold"),
+		url("/fonts/ChakraPetch-Bold.ttf") format("truetype");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@theme {
+	--font-sans: "Stratum 2", ui-sans-serif, system-ui, sans-serif;
+}
+
 /* Tailwind v4 preflight resets buttons to the default arrow. */
 @layer base {
 	button:not(:disabled),
@@ -18,6 +67,102 @@
 		opacity: 1;
 		transform: translateY(0);
 	}
+}
+
+@keyframes round-score-pulse {
+	0% {
+		transform: scale(1);
+	}
+	28% {
+		transform: scale(1.08);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+@keyframes round-score-ring {
+	0% {
+		opacity: 0.55;
+		transform: translate(-50%, -50%) scale(0.55);
+	}
+	100% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(2.15);
+	}
+}
+
+.round-score-pulse {
+	animation: round-score-pulse 700ms ease-out;
+}
+
+.round-score-pulse strong {
+	text-shadow: 0 0 22px currentColor;
+}
+
+.round-score-pulse-ring {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 2.85em;
+	height: 2.85em;
+	border-radius: 9999px;
+	pointer-events: none;
+	animation: round-score-ring 700ms ease-out both;
+}
+
+.round-score-pulse-ring-player {
+	background: radial-gradient(circle, rgb(52 211 153 / 0.38) 0%, rgb(52 211 153 / 0) 78%);
+	box-shadow: 0 0 28px rgb(110 231 183 / 0.32);
+}
+
+.round-score-pulse-ring-opponent {
+	background: radial-gradient(circle, rgb(251 191 36 / 0.38) 0%, rgb(251 191 36 / 0) 78%);
+	box-shadow: 0 0 28px rgb(252 211 77 / 0.32);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.round-score-pulse {
+		animation: none;
+	}
+
+	.round-score-pulse-ring {
+		animation: none;
+		opacity: 0.4;
+		transform: translate(-50%, -50%) scale(1);
+	}
+}
+
+@keyframes clutch-moment-in {
+	from {
+		opacity: 0;
+		transform: scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes draft-reel-lock {
+	0% {
+		box-shadow: 0 0 0 0 rgb(110 231 183 / 0);
+	}
+	40% {
+		box-shadow: 0 0 0 8px rgb(110 231 183 / 0.2);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgb(110 231 183 / 0);
+	}
+}
+
+.draft-reel-mask {
+	mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+}
+
+.draft-dragging {
+	cursor: grabbing;
+	user-select: none;
 }
 
 ::selection {

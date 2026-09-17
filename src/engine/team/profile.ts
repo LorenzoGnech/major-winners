@@ -3,6 +3,7 @@ import { clamp } from "../math";
 import type { Attributes } from "../ratings/attributes";
 import type { RatedPlayer } from "../ratings/rate";
 import type {
+	ChemistryDetail,
 	CoachingDetail,
 	CommunicationDetail,
 	StructureDetail,
@@ -24,8 +25,12 @@ export const TEAM_PROFILE_BASELINES = {
 } as const;
 
 export const CHEMISTRY_PAIR_BONUS = 4;
+export const CHEMISTRY_SHARED_TEAM_PAIR_BONUS = 2.5;
+export const CHEMISTRY_NATIONALITY_PAIR_BONUS = 2;
 export const CHEMISTRY_BONUS_CAP = 32;
 export const COACH_COMMUNICATION_WEIGHT = 0.1;
+export const COMMUNICATION_LANGUAGE_WEIGHT = 0.72;
+export const COMMUNICATION_IGL_WEIGHT = 0.28;
 export const COACH_OVR_PER_MODIFIER = 0.25;
 
 const ATTRIBUTE_KEYS = [
@@ -86,6 +91,34 @@ function pairValues<T>(rows: readonly T[], value: (left: T, right: T) => number)
 	return values;
 }
 
+function pairKey(left: string, right: string): string {
+	return left < right ? `${left}|${right}` : `${right}|${left}`;
+}
+
+function historicalTeammatePairs(playerSeasons: readonly PlayerSeason[]): ReadonlySet<string> {
+	const byOrgYear = new Map<string, Set<string>>();
+	for (const season of playerSeasons) {
+		const key = `${season.orgId}:${season.year}`;
+		const ids = byOrgYear.get(key) ?? new Set<string>();
+		ids.add(season.playerId);
+		byOrgYear.set(key, ids);
+	}
+	const pairs = new Set<string>();
+	for (const ids of byOrgYear.values()) {
+		const playerIds = [...ids];
+		for (let left = 0; left < playerIds.length; left += 1) {
+			for (let right = left + 1; right < playerIds.length; right += 1) {
+				const leftId = playerIds[left];
+				const rightId = playerIds[right];
+				if (leftId !== undefined && rightId !== undefined) {
+					pairs.add(pairKey(leftId, rightId));
+				}
+			}
+		}
+	}
+	return pairs;
+}
+
 function memberFor(
 	role: Role,
 	season: PlayerSeason,
@@ -94,6 +127,7 @@ function memberFor(
 ): TeamMemberProfile {
 	return {
 		id: season.id,
+		playerId: season.playerId,
 		nick: season.nick,
 		nationality: season.nationality,
 		orgId: season.orgId,
@@ -124,16 +158,61 @@ function communication(members: readonly TeamMemberProfile[], coach: Coach): Com
 	const coachCompatibility = average(
 		members.map((member) => pairCompatibility(member.nationality, coach.nationality)),
 	);
-	const score = round1(
+	const languageScore = round1(
 		(playerPairCompatibility * (1 - COACH_COMMUNICATION_WEIGHT) +
 			coachCompatibility * COACH_COMMUNICATION_WEIGHT) *
 			100,
+	);
+	const igl = members.find((member) => member.slot === "igl");
+	const iglAbility = igl?.attributes.igl ?? TEAM_PROFILE_BASELINES.communication;
+	const score = round1(
+		languageScore * COMMUNICATION_LANGUAGE_WEIGHT + iglAbility * COMMUNICATION_IGL_WEIGHT,
 	);
 	return {
 		score,
 		playerPairCompatibility: round1(playerPairCompatibility * 100),
 		coachCompatibility: round1(coachCompatibility * 100),
-		heuristic: "conservative-language-family",
+		languageScore,
+		iglAbility,
+		heuristic: "language-family-and-igl",
+	};
+}
+
+function chemistry(
+	members: readonly TeamMemberProfile[],
+	teammates: ReadonlySet<string>,
+): ChemistryDetail {
+	const pairBonuses = pairValues(members, (left, right) => {
+		const sameOrgYear = left.orgId === right.orgId && left.year === right.year;
+		const sharedTeam = teammates.has(pairKey(left.playerId, right.playerId));
+		const teammateBonus = sameOrgYear
+			? CHEMISTRY_PAIR_BONUS
+			: sharedTeam
+				? CHEMISTRY_SHARED_TEAM_PAIR_BONUS
+				: 0;
+		const nationalityBonus =
+			left.nationality === right.nationality ? CHEMISTRY_NATIONALITY_PAIR_BONUS : 0;
+		return teammateBonus + nationalityBonus;
+	});
+	const sharedOrgYearPairs = pairValues(members, (left, right) =>
+		left.orgId === right.orgId && left.year === right.year ? 1 : 0,
+	).reduce((total, value) => total + value, 0);
+	const sharedTeamPairs = pairValues(members, (left, right) =>
+		teammates.has(pairKey(left.playerId, right.playerId)) ? 1 : 0,
+	).reduce((total, value) => total + value, 0);
+	const sharedNationalityPairs = pairValues(members, (left, right) =>
+		left.nationality === right.nationality ? 1 : 0,
+	).reduce((total, value) => total + value, 0);
+	const bonus = Math.min(
+		CHEMISTRY_BONUS_CAP,
+		pairBonuses.reduce((total, value) => total + value, 0),
+	);
+	return {
+		score: round1(TEAM_PROFILE_BASELINES.chemistry + bonus),
+		sharedOrgYearPairs,
+		sharedTeamPairs,
+		sharedNationalityPairs,
+		bonus,
 	};
 }
 
@@ -207,7 +286,7 @@ function labels(
 
 	if (chemistryScore >= 75) strengths.push("Proven teammate chemistry");
 	else if (chemistryScore === TEAM_PROFILE_BASELINES.chemistry)
-		weaknesses.push("No shared org-year history");
+		weaknesses.push("No shared history or nationality");
 
 	if (communicationScore >= 88) strengths.push("Clear communication bridge");
 	else if (communicationScore < 75) weaknesses.push("Communication may need adaptation");
@@ -244,11 +323,7 @@ export function buildTeamProfile({
 		return memberFor(role, season, rated, pick.fit);
 	});
 	const baseStrength = round1(average(members.map((member) => member.ovr * member.fit)));
-	const sharedOrgYearPairs = pairValues(members, (left, right) =>
-		left.orgId === right.orgId && left.year === right.year ? 1 : 0,
-	).reduce((total, value) => total + value, 0);
-	const chemistryBonus = Math.min(CHEMISTRY_BONUS_CAP, sharedOrgYearPairs * CHEMISTRY_PAIR_BONUS);
-	const chemistryScore = TEAM_PROFILE_BASELINES.chemistry + chemistryBonus;
+	const chemistryDetail = chemistry(members, historicalTeammatePairs(playerSeasons));
 	const communicationDetail = communication(members, coach);
 	const structureDetail = structure(members);
 	const attributes = aggregateAttributes(members);
@@ -256,7 +331,8 @@ export function buildTeamProfile({
 	const overall = round1(
 		clamp(
 			baseStrength +
-				(chemistryScore - TEAM_PROFILE_BASELINES.chemistry) * TEAM_PROFILE_WEIGHTS.chemistry +
+				(chemistryDetail.score - TEAM_PROFILE_BASELINES.chemistry) *
+					TEAM_PROFILE_WEIGHTS.chemistry +
 				(communicationDetail.score - TEAM_PROFILE_BASELINES.communication) *
 					TEAM_PROFILE_WEIGHTS.communication +
 				(structureDetail.score - TEAM_PROFILE_BASELINES.structure) *
@@ -268,7 +344,7 @@ export function buildTeamProfile({
 	);
 	const profileLabels = labels(
 		baseStrength,
-		chemistryScore,
+		chemistryDetail.score,
 		communicationDetail.score,
 		structureDetail,
 		coachingDetail,
@@ -279,17 +355,13 @@ export function buildTeamProfile({
 		overall,
 		components: {
 			baseStrength,
-			chemistry: chemistryScore,
+			chemistry: chemistryDetail.score,
 			communication: communicationDetail.score,
 			structure: structureDetail.score,
 			coaching: coachingDetail.score,
 		},
 		details: {
-			chemistry: {
-				score: chemistryScore,
-				sharedOrgYearPairs,
-				bonus: chemistryBonus,
-			},
+			chemistry: chemistryDetail,
 			communication: communicationDetail,
 			structure: structureDetail,
 			coaching: coachingDetail,

@@ -33,6 +33,10 @@ describe("Major tournament runner", () => {
 	it("indexes every historical roster by stable ascending strength", () => {
 		expect(opponents).toHaveLength(dataset.orgYears.length);
 		expect(opponents.every((opponent) => opponent.label.includes(" · "))).toBe(true);
+		expect(
+			opponents.every((opponent) => opponent.org.id === opponent.profile.members[0]?.orgId),
+		).toBe(true);
+		expect(opponents.some((opponent) => opponent.org.logo)).toBe(true);
 		for (let index = 1; index < opponents.length; index++) {
 			expect(opponents[index].profile.overall).toBeGreaterThanOrEqual(
 				opponents[index - 1].profile.overall,
@@ -127,5 +131,27 @@ describe("Major tournament runner", () => {
 		expect(runNextMatch(left, playerTeam, opponents)).toEqual(
 			runNextMatch(right, playerTeam, opponents),
 		);
+	});
+
+	it("climbs opponent strength along a 9-0 path", () => {
+		const median = opponents[Math.floor(opponents.length / 2)]?.profile.overall ?? 0;
+		const topDecile = opponents[Math.floor(opponents.length * 0.9)]?.profile.overall ?? 0;
+		for (const rootSeed of [1, 42, "ladder"]) {
+			let state = createTournament({ rootSeed, playerTeam, opponents });
+			expect(state.nextMatch?.opponent.profile.overall).toBeLessThanOrEqual(median);
+			const overalls: number[] = [];
+			for (let index = 0; index < 9; index += 1) {
+				const overall = state.nextMatch?.opponent.profile.overall;
+				if (overall === undefined) throw new Error("expected an opponent");
+				overalls.push(overall);
+				state = play(state, true);
+			}
+			for (let index = 1; index < overalls.length; index += 1) {
+				expect(overalls[index]).toBeGreaterThanOrEqual(overalls[index - 1]);
+			}
+			expect(overalls[3]).toBeGreaterThan(overalls[0]);
+			expect(overalls[6]).toBeGreaterThan(overalls[3]);
+			expect(overalls[8]).toBeGreaterThanOrEqual(topDecile);
+		}
 	});
 });

@@ -25,6 +25,24 @@ describe("daily attempt persistence", () => {
 		expect(parsePersistedDailyAttempt(raw, dataset, day, seed)?.draft).toEqual(major.value);
 	});
 
+	it("upgrades boolean reroll flags from older saves", () => {
+		const original = startDraft(dataset, seed);
+		const raw = JSON.stringify({
+			version: DAILY_ATTEMPT_STORAGE_VERSION,
+			day,
+			seed,
+			draft: {
+				...original,
+				rerolls: { majorRemaining: true, teamRemaining: false },
+			},
+			tournament: null,
+		});
+		expect(parsePersistedDailyAttempt(raw, dataset, day, seed)?.draft.rerolls).toEqual({
+			majorRemaining: 2,
+			teamRemaining: 0,
+		});
+	});
+
 	it("restores a custom team name", () => {
 		const original = startDraft(dataset, seed);
 		const raw = JSON.stringify({

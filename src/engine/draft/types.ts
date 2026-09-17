@@ -33,8 +33,8 @@ export type DraftState = {
 	cards: readonly RolledOrgYearCard[];
 	coachIds: readonly string[];
 	rerolls: {
-		majorRemaining: boolean;
-		teamRemaining: boolean;
+		majorRemaining: number;
+		teamRemaining: number;
 	};
 	roster: Partial<Record<Role, PlayerPick>>;
 	coachId: string | null;

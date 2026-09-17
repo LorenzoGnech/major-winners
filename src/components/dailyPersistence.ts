@@ -4,6 +4,7 @@ import {
 	type DraftState,
 	EMPTY_DAILY_STATS,
 	parseDailyStats,
+	REROLL_BUDGET,
 	roleFit,
 	startDraft,
 	type TournamentState,
@@ -24,6 +25,36 @@ export type PersistedDailyAttempt = {
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 const isObject = (value: unknown): value is Record<string, unknown> =>
 	typeof value === "object" && value !== null && !Array.isArray(value);
+
+function remainingCount(value: unknown): number | null {
+	if (value === true) {
+		return REROLL_BUDGET;
+	}
+	if (value === false) {
+		return 0;
+	}
+	if (
+		typeof value === "number" &&
+		Number.isInteger(value) &&
+		value >= 0 &&
+		value <= REROLL_BUDGET
+	) {
+		return value;
+	}
+	return null;
+}
+
+function coerceDraftRerolls(draft: unknown): void {
+	if (!isObject(draft) || !isObject(draft.rerolls)) {
+		return;
+	}
+	const major = remainingCount(draft.rerolls.majorRemaining);
+	const team = remainingCount(draft.rerolls.teamRemaining);
+	if (major === null || team === null) {
+		return;
+	}
+	draft.rerolls = { majorRemaining: major, teamRemaining: team };
+}
 function validDraft(value: unknown, dataset: Dataset, seed: number): value is DraftState {
 	if (!isObject(value)) return false;
 	const canonical = startDraft(dataset, seed);
@@ -33,8 +64,10 @@ function validDraft(value: unknown, dataset: Dataset, seed: number): value is Dr
 		!Array.isArray(value.cards) ||
 		value.cards.length !== 5 ||
 		!isObject(value.rerolls) ||
-		typeof value.rerolls.majorRemaining !== "boolean" ||
-		typeof value.rerolls.teamRemaining !== "boolean" ||
+		typeof value.rerolls.majorRemaining !== "number" ||
+		typeof value.rerolls.teamRemaining !== "number" ||
+		remainingCount(value.rerolls.majorRemaining) === null ||
+		remainingCount(value.rerolls.teamRemaining) === null ||
 		!isObject(value.roster) ||
 		!isObject(value.phase) ||
 		!["player", "coach", "complete"].includes(String(value.phase.type))
@@ -104,6 +137,9 @@ export function parsePersistedDailyAttempt(
 ): PersistedDailyAttempt | null {
 	try {
 		const value: unknown = JSON.parse(raw);
+		if (isObject(value)) {
+			coerceDraftRerolls(value.draft);
+		}
 		if (
 			!isObject(value) ||
 			value.version !== DAILY_ATTEMPT_STORAGE_VERSION ||

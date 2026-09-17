@@ -14,16 +14,24 @@ Changes made by Major Winners include:
 - selecting only teams and players that participated in each Major;
 - normalizing organization, player, roster, and coach identifiers;
 - combining roster appearances into player-org-season records;
-- deriving provisional roles and conservative placement-based ratings where verified
-  individual statistics are unavailable; and
+- deriving player roles from career AWP/IGL identity and roster uniqueness, with TeamCard
+  listing order only as a weak prior, a committed curated overlay for exceptions, and
+  conservative placement-based ratings where verified individual statistics are unavailable;
+- deriving coach modifiers from Major placement (champion through field-floor) so every
+  coach card grants at least one tactical bonus, while preserving a few hand-tuned rows;
+- transcribing individual season statistics from HLTV year-filtered player pages
+  (those numbers are not Liquipedia material); and
 - adding two independently curated pre-Major Legacy cards.
 
 The source-code license does not override this dataset license.
 
-## Organization logos
+## Organization logos, Major logos, and player photos
 
-The image files under `public/logos/` are organization logos retrieved through Liquipedia.
-They are trademarks and copyrighted works of the respective organizations, are **not**
-covered by the CC BY-SA 3.0 license above, and are not licensed onward by this project.
-They are included solely to identify each historical roster in a non-commercial fan
-project, and are removed on request by the rights holder. No player photos are included.
+The image files under `public/logos/` (including `public/logos/majors/`) and
+`public/photos/players/` are organization marks, tournament marks, and official HLTV
+player portraits retrieved through Liquipedia or year-filtered HLTV stats pages. They are
+trademarks and copyrighted works of the respective organizations and photographers, are
+**not** covered by the CC BY-SA 3.0 license above, and are not licensed onward by this
+project. They are included solely to identify historical rosters, Majors, and
+player-seasons in a non-commercial fan project, and are removed on request by the rights
+holder.

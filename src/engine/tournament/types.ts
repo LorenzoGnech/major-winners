@@ -1,4 +1,4 @@
-import type { SeriesFormat, SeriesResult } from "../sim";
+import type { LiveSeriesState, SeriesFormat, SeriesResult } from "../sim";
 import type { TeamProfile } from "../team";
 
 export type TournamentStage = "challengers" | "legends" | "champions";
@@ -13,6 +13,11 @@ export type SwissRecord = {
 export type HistoricalOpponent = {
 	id: string;
 	label: string;
+	org: {
+		id: string;
+		name: string;
+		logo?: string;
+	};
 	profile: TeamProfile;
 };
 
@@ -41,6 +46,7 @@ export type TournamentState = {
 	playoffRound: PlayoffRound | null;
 	history: readonly TournamentMatch[];
 	nextMatch: TournamentNextMatch | null;
+	liveSeries?: LiveSeriesState | null;
 };
 
 export type SeriesResolver = (input: {

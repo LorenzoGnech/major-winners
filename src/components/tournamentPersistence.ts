@@ -42,6 +42,19 @@ function isCompletedMatch(value: unknown): boolean {
 	);
 }
 
+function isLiveSeries(value: unknown): boolean {
+	return (
+		isObject(value) &&
+		Number.isInteger(value.seed) &&
+		(value.format === "BO1" || value.format === "BO3") &&
+		Array.isArray(value.maps) &&
+		Array.isArray(value.teams) &&
+		value.teams.length === 2 &&
+		typeof value.complete === "boolean" &&
+		Number.isInteger(value.rngState)
+	);
+}
+
 function isSwissRecord(value: unknown): boolean {
 	return (
 		isObject(value) &&
@@ -122,6 +135,9 @@ export function parsePersistedTournamentRun(
 		}
 		if (value.teamName !== undefined && parseTeamName(value.teamName) === null) {
 			return null;
+		}
+		if (tournament.liveSeries != null && !isLiveSeries(tournament.liveSeries)) {
+			tournament.liveSeries = null;
 		}
 		return value as PersistedTournamentRun;
 	} catch {

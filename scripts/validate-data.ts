@@ -1,10 +1,24 @@
-import { access } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { DatasetValidationError, loadDataset } from "../src/data";
+import { parseRoleOverrides } from "../src/data/roles";
 
 const PUBLIC_DIR = new URL("../public/", import.meta.url);
 
 try {
 	const dataset = loadDataset();
+	const overrides = parseRoleOverrides(
+		JSON.parse(
+			await readFile(new URL("../src/data/json/role-overrides.json", import.meta.url), "utf8"),
+		),
+	);
+	const seasonIds = new Set(dataset.playerSeasons.map((season) => season.id));
+	const missingOverrides = Object.keys(overrides).filter((id) => !seasonIds.has(id));
+	if (missingOverrides.length > 0) {
+		for (const id of missingOverrides) {
+			console.error(`role-overrides.${id}: unknown player-season`);
+		}
+		process.exit(1);
+	}
 	const missingLogos: string[] = [];
 	for (const org of dataset.orgs) {
 		if (!org.logo) continue;
@@ -14,8 +28,25 @@ try {
 			missingLogos.push(`orgs.${org.id}.logo: missing file public${org.logo}`);
 		}
 	}
-	if (missingLogos.length > 0) {
-		for (const issue of missingLogos) {
+	for (const major of dataset.majors) {
+		if (!major.logo) continue;
+		try {
+			await access(new URL(`.${major.logo}`, PUBLIC_DIR));
+		} catch {
+			missingLogos.push(`majors.${major.id}.logo: missing file public${major.logo}`);
+		}
+	}
+	const missingPhotos: string[] = [];
+	for (const season of dataset.playerSeasons) {
+		if (!season.photo) continue;
+		try {
+			await access(new URL(`.${season.photo}`, PUBLIC_DIR));
+		} catch {
+			missingPhotos.push(`playerSeasons.${season.id}.photo: missing file public${season.photo}`);
+		}
+	}
+	if (missingLogos.length > 0 || missingPhotos.length > 0) {
+		for (const issue of [...missingLogos, ...missingPhotos]) {
 			console.error(issue);
 		}
 		process.exit(1);
@@ -24,8 +55,11 @@ try {
 		`majors          ${dataset.majors.length}`,
 		`orgs            ${dataset.orgs.length}`,
 		`org logos       ${dataset.orgs.filter((org) => org.logo).length}`,
+		`major logos     ${dataset.majors.filter((major) => major.logo).length}`,
 		`org-years       ${dataset.orgYears.length}`,
 		`player-seasons  ${dataset.playerSeasons.length}`,
+		`player photos   ${dataset.playerSeasons.filter((season) => season.photo).length}`,
+		`role-overrides  ${Object.keys(overrides).length}`,
 		`coaches         ${dataset.coaches.length}`,
 	];
 	for (const line of lines) {

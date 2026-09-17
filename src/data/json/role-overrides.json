@@ -1,0 +1,214 @@
+{
+	"ahl-2003-sk": {
+		"primaryRole": "support",
+		"roles": ["support", "entry"]
+	},
+	"archi-2009-fnatic": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "entry"]
+	},
+	"broky-2022-faze": {
+		"primaryRole": "awp",
+		"roles": ["awp", "lurker"]
+	},
+	"carn-2009-fnatic": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"coldzera-2016-sk": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "entry"]
+	},
+	"device-2018-astralis": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"dsn-2009-fnatic": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
+	},
+	"dupreeh-2018-astralis": {
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
+	},
+	"edward-2018-navi": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "support"]
+	},
+	"electronic-2018-navi": {
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
+	},
+	"element-2003-sk": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "entry"]
+	},
+	"fallen-2016-sk": {
+		"primaryRole": "igl",
+		"roles": ["igl", "awp"]
+	},
+	"fer-2016-sk": {
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
+	},
+	"fifflaren-2013-nip": {
+		"primaryRole": "support",
+		"roles": ["support", "awp"]
+	},
+	"fisker-2003-sk": {
+		"primaryRole": "entry",
+		"roles": ["entry", "support"]
+	},
+	"flamie-2018-navi": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "entry"]
+	},
+	"flusha-2015-fnatic": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "igl"]
+	},
+	"fnx-2016-sk": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "entry"]
+	},
+	"forest-2009-fnatic": {
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
+	},
+	"forest-2013-nip": {
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker", "awp"]
+	},
+	"friberg-2013-nip": {
+		"primaryRole": "entry",
+		"roles": ["entry", "support"]
+	},
+	"get_right-2013-nip": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "entry"]
+	},
+	"gla1ve-2018-astralis": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"gux-2009-fnatic": {
+		"primaryRole": "awp",
+		"roles": ["awp", "lurker"]
+	},
+	"heaton-2003-sk": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"jw-2015-fnatic": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"karrigan-2013-n-faculty": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2014-copenhagen-wolves": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2014-reason-gaming": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2015-team-solomid": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2016-astralis": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2017-faze": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2018-faze": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2019-mouz": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2021-faze": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2022-faze": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2023-faze": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2024-faze": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2025-faze": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"karrigan-2026-team-falcons": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"krimz-2015-fnatic": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
+	},
+	"magisk-2018-astralis": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "entry"]
+	},
+	"olofmeister-2015-fnatic": {
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
+	},
+	"potti-2003-sk": {
+		"primaryRole": "igl",
+		"roles": ["igl", "lurker"]
+	},
+	"pronax-2015-fnatic": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"rain-2022-faze": {
+		"primaryRole": "entry",
+		"roles": ["entry", "support"]
+	},
+	"ropz-2022-faze": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "support"]
+	},
+	"s1mple-2018-navi": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"taco-2016-sk": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
+	},
+	"twistzz-2022-faze": {
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
+	},
+	"xizt-2013-nip": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	},
+	"xyp9x-2018-astralis": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
+	},
+	"zeus-2018-navi": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
+	}
+}

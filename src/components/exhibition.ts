@@ -126,7 +126,7 @@ export function createExhibitionMatch({
 			teams: [draftedTeam, opponent],
 			seed: hashStringToSeed(`${draft.seed}:exhibition-series`),
 			format: "BO1",
-			mapContext: { label: "Exhibition map" },
+			playerMapId: "mirage",
 		}),
 		teamLabels: ["Your legends", opponentLabel],
 	};

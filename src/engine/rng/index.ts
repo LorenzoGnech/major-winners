@@ -33,6 +33,8 @@ export type IntRng = {
 
 export type Rng = IntRng & {
 	readonly seed: number;
+	/** Signed Mulberry32 register. Restore with `createRng(seed, state)`. */
+	readonly state: number;
 	/** Uniform float in `[0, 1)`. */
 	next(): number;
 	nextUint32(): number;
@@ -40,10 +42,11 @@ export type Rng = IntRng & {
 
 /**
  * Mulberry32. Same seed → same stream. Does not use `Math.random`.
+ * Pass `restoredState` to continue a previously serialized stream.
  */
-export function createRng(seed: number | string): Rng {
+export function createRng(seed: number | string, restoredState?: number): Rng {
 	const normalized = normalizeSeed(seed);
-	let state = normalized | 0;
+	let state = restoredState === undefined ? normalized | 0 : restoredState | 0;
 
 	const nextUint32 = (): number => {
 		state = (state + 0x6d2b79f5) | 0;
@@ -54,6 +57,9 @@ export function createRng(seed: number | string): Rng {
 
 	return {
 		seed: normalized,
+		get state() {
+			return state | 0;
+		},
 		nextUint32,
 		next: () => nextUint32() / 4294967296,
 		nextInt(maxExclusive: number): number {

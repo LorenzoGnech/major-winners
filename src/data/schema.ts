@@ -10,6 +10,7 @@ export const RATING_PROVENANCE_KINDS = [
 	"curated-legend",
 	"curated-fallback",
 ] as const;
+export const ROLE_PROVENANCE_KINDS = ["teamcard-slot", "inferred", "curated"] as const;
 
 export const roleSchema = z.enum(ROLES);
 export const gameSchema = z.enum(GAMES);
@@ -17,6 +18,27 @@ export const dataRegimeSchema = z.enum(DATA_REGIMES);
 export const orgTierSchema = z.enum(ORG_TIERS);
 export const rosterKindSchema = z.enum(ROSTER_KINDS);
 export const ratingProvenanceKindSchema = z.enum(RATING_PROVENANCE_KINDS);
+export const roleProvenanceKindSchema = z.enum(ROLE_PROVENANCE_KINDS);
+export const roleProvenanceSchema = z.object({
+	kind: roleProvenanceKindSchema,
+	source: z.string().min(1).optional(),
+	note: z.string().min(1).optional(),
+});
+export const roleOverrideSchema = z
+	.object({
+		primaryRole: roleSchema,
+		roles: z.array(roleSchema).min(1),
+	})
+	.superRefine((row, ctx) => {
+		if (!row.roles.includes(row.primaryRole)) {
+			ctx.addIssue({
+				code: "custom",
+				path: ["primaryRole"],
+				message: "primaryRole must be listed in roles",
+			});
+		}
+	});
+export const roleOverridesFileSchema = z.record(z.string().min(1), roleOverrideSchema);
 
 export const sourceSchema = z.object({
 	label: z.string().min(1),
@@ -35,6 +57,13 @@ export const majorSchema = z.object({
 	endDate: z.iso.date(),
 	location: z.string().min(1),
 	teamCount: z.number().int().min(16).max(32),
+	logo: z
+		.string()
+		.regex(
+			/^\/logos\/majors\/[a-z0-9._-]+\.(svg|webp|png|jpe?g)$/i,
+			"logo must be a /logos/majors/ asset path",
+		)
+		.optional(),
 	sources: z.array(sourceSchema).min(1),
 });
 
@@ -138,9 +167,17 @@ export const playerSeasonSchema = z
 		nationality: z.string().length(2),
 		year: z.number().int(),
 		orgId: z.string().min(1),
+		photo: z
+			.string()
+			.regex(
+				/^\/photos\/players\/[a-z0-9._-]+\/\d{4}\.(webp|png|jpe?g)$/i,
+				"photo must be a /photos/players/{playerId}/{year} asset path",
+			)
+			.optional(),
 		game: gameSchema,
 		roles: z.array(roleSchema).min(1),
 		primaryRole: roleSchema,
+		roleProvenance: roleProvenanceSchema.default({ kind: "teamcard-slot" }),
 		dataRegime: dataRegimeSchema,
 		ratingProvenance: z.object({
 			kind: ratingProvenanceKindSchema,
@@ -211,6 +248,10 @@ export type DataRegime = z.infer<typeof dataRegimeSchema>;
 export type OrgTier = z.infer<typeof orgTierSchema>;
 export type RosterKind = z.infer<typeof rosterKindSchema>;
 export type RatingProvenanceKind = z.infer<typeof ratingProvenanceKindSchema>;
+export type RoleProvenanceKind = z.infer<typeof roleProvenanceKindSchema>;
+export type RoleProvenance = z.infer<typeof roleProvenanceSchema>;
+export type RoleOverride = z.infer<typeof roleOverrideSchema>;
+export type RoleOverridesFile = z.infer<typeof roleOverridesFileSchema>;
 export type Source = z.infer<typeof sourceSchema>;
 export type Major = z.infer<typeof majorSchema>;
 export type Org = z.infer<typeof orgSchema>;

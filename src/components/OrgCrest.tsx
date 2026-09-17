@@ -5,14 +5,16 @@ const SIZE_CLASS = {
 	sm: "size-9 text-[11px]",
 	md: "size-14 text-sm",
 	lg: "size-16 text-base sm:size-20 sm:text-lg",
+	xl: "size-24 text-lg sm:size-28 sm:text-xl",
 } as const;
 
 type OrgCrestProps = {
 	org: Pick<Org, "id" | "name" | "logo">;
 	size?: keyof typeof SIZE_CLASS;
+	loading?: "lazy" | "eager";
 };
 
-export function OrgCrest({ org, size = "md" }: OrgCrestProps) {
+export function OrgCrest({ org, size = "md", loading = "lazy" }: OrgCrestProps) {
 	const src = orgLogoSrc(org);
 	const tone = orgCrestTone(org.id);
 	if (src) {
@@ -20,7 +22,7 @@ export function OrgCrest({ org, size = "md" }: OrgCrestProps) {
 			<img
 				src={src}
 				alt=""
-				loading="lazy"
+				loading={loading}
 				decoding="async"
 				className={`shrink-0 object-contain ${SIZE_CLASS[size]}`}
 			/>

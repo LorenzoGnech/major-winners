@@ -1,16 +1,17 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { Coach, Major, Org, OrgTier, OrgYear, PlayerSeason, Role, Source } from "../src/data";
+import type { Coach, Major, Org, OrgTier, OrgYear, PlayerSeason, Source } from "../src/data";
+import { importRolesFor, parseRoleOverrides } from "../src/data/roles";
+import { fillCoachModifiers } from "../src/engine/team/coachModifiers";
 import { MAJOR_SOURCES, type MajorSource } from "./major-source-manifest";
 
 const JSON_DIR = new URL("../src/data/json/", import.meta.url);
 const CACHE_DIR = new URL("../.cache/major-import/", import.meta.url);
-const USER_AGENT = "MajorWinners/1.0 (https://major-winners.vercel.app)";
+const USER_AGENT = "MajorWinners/1.0 (https://major.lorenzognech.workers.dev)";
 const ACCESSED_AT = new Date().toISOString().slice(0, 10);
 const WRITE = process.argv.includes("--write");
 const OFFLINE = process.argv.includes("--offline");
-const ROLE_BY_SLOT: readonly Role[] = ["igl", "awp", "entry", "support", "lurker"];
 
 type WikiPage = {
 	title: string;
@@ -223,7 +224,7 @@ function placementMap(wikitext: string): Map<string, number> {
 		if (!Number.isFinite(placement)) continue;
 		for (let index = 0; params.has(String(index)); index++) {
 			const candidate = cleanWikiValue(params.get(String(index)));
-			if (candidate && !/^(?:true|false|yes|no|\d)/i.test(candidate)) {
+			if (candidate && !/^(?:true|false|yes|no|\d+)$/i.test(candidate)) {
 				output.set(normalizeTeam(candidate), placement);
 				output.set(orgIdFor(candidate), placement);
 			}
@@ -241,7 +242,16 @@ function decodeHtml(value: string): string {
 		.trim();
 }
 
-function renderedPlacementMap(html: string): Map<string, number> {
+function parsePlaceNumber(value: string): number | undefined {
+	const text = decodeHtml(value);
+	if (/^[WL]$/i.test(text)) return undefined;
+	const match = /(\d+)/.exec(text);
+	if (!match) return undefined;
+	const placement = Number.parseInt(match[1], 10);
+	return Number.isFinite(placement) && placement > 0 ? placement : undefined;
+}
+
+export function renderedPlacementMap(html: string): Map<string, number> {
 	const output = new Map<string, number>();
 	const tableStart = html.indexOf("prizepooltable prizepooltable-placement");
 	if (tableStart < 0) return output;
@@ -250,8 +260,13 @@ function renderedPlacementMap(html: string): Map<string, number> {
 	let currentPlacement: number | undefined;
 	for (const row of table.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)) {
 		const body = row[1];
-		const placeText = /prizepooltable-badge[^>]*>([\s\S]*?)<\/span>/i.exec(body)?.[1];
-		if (placeText) currentPlacement = Number.parseInt(decodeHtml(placeText), 10);
+		const placeCell =
+			/prizepooltable-place[^>]*>([\s\S]*?)<\/td>/i.exec(body)?.[1] ??
+			/prizepooltable-badge[^>]*>([\s\S]*?)<\/span>/i.exec(body)?.[1];
+		if (placeCell) {
+			const parsed = parsePlaceNumber(placeCell);
+			if (parsed !== undefined) currentPlacement = parsed;
+		}
 		const teamName = /<span class="name"[^>]*>[\s\S]*?<a\b[^>]*>([\s\S]*?)<\/a>/i.exec(body)?.[1];
 		if (!currentPlacement || !teamName) continue;
 		const name = decodeHtml(teamName);
@@ -422,7 +437,7 @@ function infobox(page: WikiPage): Map<string, string> {
 	return templateParams(template);
 }
 
-function majorFromPage(source: MajorSource, page: WikiPage): Major {
+function majorFromPage(source: MajorSource, page: WikiPage, logo?: string): Major {
 	const info = infobox(page);
 	const startDate = cleanWikiValue(info.get("sdate"));
 	const endDate = cleanWikiValue(info.get("edate"));
@@ -446,6 +461,7 @@ function majorFromPage(source: MajorSource, page: WikiPage): Major {
 		endDate,
 		location: [city, country].filter(Boolean).join(", ") || "Unknown",
 		teamCount: Number.parseInt(cleanWikiValue(info.get("team_number")), 10),
+		...(logo ? { logo } : {}),
 		sources: [sourceRow],
 	};
 }
@@ -560,6 +576,8 @@ async function main() {
 	const existingPlayers = await readJson<PlayerSeason[]>("player-seasons.json");
 	const existingCoaches = await readJson<Coach[]>("coaches.json");
 	const existingRosters = await readJson<OrgYear[]>("org-years.json");
+	const roleOverrides = parseRoleOverrides(await readJson("role-overrides.json"));
+	const existingPlayerById = new Map(existingPlayers.map((player) => [player.id, player]));
 	const playerById = new Map(
 		existingPlayers
 			.filter((player) => player.ratingProvenance.kind !== "curated-fallback")
@@ -572,6 +590,10 @@ async function main() {
 			coach.id,
 		]),
 	);
+	const existingMajors = await readJson<Major[]>("majors.json");
+	const majorLogoById = new Map(
+		existingMajors.flatMap((major) => (major.logo ? [[major.id, major.logo] as const] : [])),
+	);
 	const orgById = new Map((await readJson<Org[]>("orgs.json")).map((org) => [org.id, org]));
 	const legacyRosters = existingRosters.filter((roster) => roster.kind === "legacy");
 	const majors: Major[] = [];
@@ -580,7 +602,7 @@ async function main() {
 
 	for (const source of MAJOR_SOURCES) {
 		const page = await fetchPage(source);
-		const major = majorFromPage(source, page);
+		const major = majorFromPage(source, page, majorLogoById.get(source.id));
 		const renderedHtml = await fetchRenderedPage(source);
 		const teams = parseTeams(page, major.teamCount, major.id, renderedHtml);
 		if (teams.length !== major.teamCount) {
@@ -594,9 +616,10 @@ async function main() {
 			const orgId = orgIdFor(team.name);
 			const playerSeasonIds = team.players.map((player, slot) => {
 				const id = `${playerSlug(player.canonical)}-${major.year}-${orgId}`;
-				const role = ROLE_BY_SLOT[slot] ?? "support";
 				const ovr = fallbackOvr(team.placement, major.teamCount, slot);
 				if (!playerById.has(id)) {
+					const roles = importRolesFor(slot, existingPlayerById.get(id), roleOverrides[id]);
+					const existing = existingPlayerById.get(id);
 					playerById.set(id, {
 						id,
 						playerId: playerSlug(player.canonical),
@@ -605,9 +628,9 @@ async function main() {
 						nationality: player.nationality,
 						year: major.year,
 						orgId,
+						...(existing?.photo ? { photo: existing.photo } : {}),
 						game: major.game,
-						roles: [role],
-						primaryRole: role,
+						...roles,
 						dataRegime: "fallback",
 						ratingProvenance: {
 							kind: "curated-fallback",
@@ -617,7 +640,7 @@ async function main() {
 						curated: {
 							ovr,
 							attributes: {},
-							rationale: `Placement-based fallback for ${team.name} at ${major.name}; TeamCard slot supplies the provisional role.`,
+							rationale: `Placement-based fallback for ${team.name} at ${major.name}; TeamCard slot is only a weak role prior.`,
 						},
 						accolades: { majorWins: 0, majorMvps: 0, eventMvps: 0 },
 					});
@@ -629,10 +652,14 @@ async function main() {
 						(ovr > existing.curated.ovr ||
 							existing.ratingProvenance.source?.endsWith(" substitute"))
 					) {
+						const roles = importRolesFor(
+							slot,
+							existingPlayerById.get(id) ?? existing,
+							roleOverrides[id],
+						);
 						playerById.set(id, {
 							...existing,
-							roles: [role],
-							primaryRole: role,
+							...roles,
 							ratingProvenance: {
 								...existing.ratingProvenance,
 								source: `${major.name} placement and TeamCard order`,
@@ -640,7 +667,7 @@ async function main() {
 							curated: {
 								...existing.curated,
 								ovr,
-								rationale: `Best placement-based fallback for ${team.name} in ${major.year}, from ${major.name}; TeamCard slot supplies the provisional role.`,
+								rationale: `Best placement-based fallback for ${team.name} in ${major.year}, from ${major.name}; TeamCard slot is only a weak role prior.`,
 							},
 						});
 					}
@@ -650,6 +677,8 @@ async function main() {
 			const substituteSeasonIds = team.substitutes.map((player) => {
 				const id = `${playerSlug(player.canonical)}-${major.year}-${orgId}`;
 				if (!playerById.has(id)) {
+					const roles = importRolesFor(3, existingPlayerById.get(id), roleOverrides[id]);
+					const existing = existingPlayerById.get(id);
 					playerById.set(id, {
 						id,
 						playerId: playerSlug(player.canonical),
@@ -658,9 +687,9 @@ async function main() {
 						nationality: player.nationality,
 						year: major.year,
 						orgId,
+						...(existing?.photo ? { photo: existing.photo } : {}),
 						game: major.game,
-						roles: ["support"],
-						primaryRole: "support",
+						...roles,
 						dataRegime: "fallback",
 						ratingProvenance: { kind: "curated-fallback", source: `${major.name} substitute` },
 						curated: {
@@ -739,12 +768,17 @@ async function main() {
 	if (played !== 511) throw new Error(`expected 511 played rosters, got ${played}`);
 
 	if (WRITE) {
+		const orgYears = [...legacyRosters, ...rosters];
+		const coaches = fillCoachModifiers(
+			[...coachById.values()].sort((a, b) => a.id.localeCompare(b.id)),
+			orgYears,
+		);
 		const outputs: [string, unknown][] = [
 			["majors.json", majors],
 			["orgs.json", [...orgById.values()].sort((a, b) => a.id.localeCompare(b.id))],
-			["org-years.json", [...legacyRosters, ...rosters]],
+			["org-years.json", orgYears],
 			["player-seasons.json", players.sort((a, b) => a.id.localeCompare(b.id))],
-			["coaches.json", [...coachById.values()].sort((a, b) => a.id.localeCompare(b.id))],
+			["coaches.json", coaches],
 		];
 		for (const [name, value] of outputs) {
 			await writeFile(new URL(name, JSON_DIR), `${JSON.stringify(value, null, "\t")}\n`);
@@ -755,4 +789,6 @@ async function main() {
 	}
 }
 
-await main();
+if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1] ?? "")) {
+	await main();
+}

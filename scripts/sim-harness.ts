@@ -17,6 +17,7 @@ function makeTeam(prefix: string, overall: number): TeamProfile {
 	};
 	const members: TeamMemberProfile[] = roles.map((slot, index) => ({
 		id: `${prefix}-${index}`,
+		playerId: `${prefix}-${index}`,
 		nick: `${prefix}${index}`,
 		nationality: "DK",
 		orgId: prefix,
@@ -40,12 +41,20 @@ function makeTeam(prefix: string, overall: number): TeamProfile {
 			coaching: 60,
 		},
 		details: {
-			chemistry: { score: 75, sharedOrgYearPairs: 5, bonus: 25 },
+			chemistry: {
+				score: 75,
+				sharedOrgYearPairs: 5,
+				sharedTeamPairs: 5,
+				sharedNationalityPairs: 10,
+				bonus: 25,
+			},
 			communication: {
 				score: 90,
 				playerPairCompatibility: 90,
 				coachCompatibility: 90,
-				heuristic: "conservative-language-family",
+				languageScore: 90,
+				iglAbility: 80,
+				heuristic: "language-family-and-igl",
 			},
 			structure: {
 				score: 90,

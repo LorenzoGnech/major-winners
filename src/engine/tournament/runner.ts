@@ -1,6 +1,6 @@
 import { hashStringToSeed, normalizeSeed } from "../rng";
-import type { SeriesFormat } from "../sim";
-import { simulateSeries } from "../sim";
+import type { GamePlanId, SeriesFormat } from "../sim";
+import { type LiveSeriesState, seriesFromLive, simulateSeries, startLiveSeries } from "../sim";
 import type { TeamProfile } from "../team";
 import { TournamentError } from "./error";
 import type {
@@ -11,15 +11,20 @@ import type {
 	TournamentMatch,
 	TournamentNextMatch,
 	TournamentResult,
-	TournamentStage,
 	TournamentState,
 } from "./types";
 
-const STAGE_DIFFICULTY: Record<TournamentStage, number> = {
-	challengers: 0.18,
-	legends: 0.5,
-	champions: 0.82,
-};
+/** Percentile of the remaining strength-sorted pool. Later matches sit higher. */
+function desiredPercentile(state: TournamentState): number {
+	if (state.stage === "champions") {
+		if (state.playoffRound === "semifinal") return 0.92;
+		if (state.playoffRound === "final") return 0.98;
+		return 0.84;
+	}
+	const wins = swissRecord(state).wins;
+	if (state.stage === "challengers") return 0.14 + wins * 0.14;
+	return 0.55 + wins * 0.1;
+}
 
 function swissRecord(state: TournamentState): SwissRecord {
 	return state.stage === "challengers" ? state.challengers : state.legends;
@@ -52,18 +57,22 @@ function chooseOpponent(
 	const noImmediateRepeat = available.filter((opponent) => opponent.id !== previousId);
 	const candidates =
 		notUsed.length > 0 ? notUsed : noImmediateRepeat.length > 0 ? noImmediateRepeat : available;
-	const record = state.stage === "champions" ? null : swissRecord(state);
-	const recordAdjustment = record ? (record.wins - record.losses) * 0.08 : 0;
-	const desired = Math.max(0, Math.min(1, STAGE_DIFFICULTY[state.stage] + recordAdjustment));
 	// buildHistoricalOpponents returns a stable strength index; filtering preserves that order.
-	const ranked = candidates;
-	const baseIndex = Math.round(desired * (ranked.length - 1));
+	const previousOverall =
+		state.history.at(-1)?.opponent.profile.overall ?? Number.NEGATIVE_INFINITY;
+	const floorIndex = candidates.findIndex(
+		(opponent) => opponent.profile.overall >= previousOverall,
+	);
+	const minIndex = floorIndex === -1 ? candidates.length - 1 : floorIndex;
+	const target = Math.round(desiredPercentile(state) * (candidates.length - 1));
+	const start = Math.max(minIndex, target);
 	const jitter = hashStringToSeed(
 		`${state.rootSeed}:opponent:${state.stage}:${state.history.length}`,
 	);
-	const offset = ranked.length > 2 ? (jitter % 3) - 1 : jitter % ranked.length;
-	const index = Math.max(0, Math.min(ranked.length - 1, baseIndex + offset));
-	return ranked[index] as HistoricalOpponent;
+	const window = Math.max(1, Math.floor(candidates.length * 0.02));
+	const offset = jitter % (window + 1);
+	const index = Math.min(candidates.length - 1, start + offset);
+	return candidates[index] as HistoricalOpponent;
 }
 
 function prepareNext(
@@ -143,20 +152,16 @@ function progressPlayoffs(state: TournamentState, won: boolean): TournamentState
 		: { ...state, playoffRound: null, status: "champion", nextMatch: null };
 }
 
-const defaultResolver: SeriesResolver = ({ teams, seed, format, nextMatch }) =>
+const defaultResolver: SeriesResolver = ({ teams, seed, format }) =>
 	simulateSeries({
 		teams,
 		seed,
 		format,
-		mapContext: { label: `${nextMatch.opponent.label} · Major map` },
 	});
 
-export function runNextMatch(
+function validatePlayable(
 	state: TournamentState,
-	playerTeam: TeamProfile,
-	opponents: readonly HistoricalOpponent[],
-	resolver: SeriesResolver = defaultResolver,
-): TournamentResult {
+): { ok: true; next: TournamentNextMatch } | { ok: false; error: TournamentError } {
 	if (state.status !== "active") {
 		return {
 			ok: false,
@@ -187,6 +192,66 @@ export function runNextMatch(
 			error: new TournamentError("INVALID_STATE", "tournament state cannot play this match"),
 		};
 	}
+	return { ok: true, next };
+}
+
+export function beginNextMatch(
+	state: TournamentState,
+	playerTeam: TeamProfile,
+	_opponents: readonly HistoricalOpponent[],
+	playerMapId: string,
+	gamePlan?: GamePlanId,
+): TournamentResult {
+	const playable = validatePlayable(state);
+	if (!playable.ok) return playable;
+	if (state.liveSeries && !state.liveSeries.complete) {
+		return {
+			ok: false,
+			error: new TournamentError("MATCH_IN_PROGRESS", "a live series is already in progress"),
+		};
+	}
+	const next = playable.next;
+	const liveSeries = startLiveSeries({
+		teams: [playerTeam, next.opponent.profile],
+		seed: next.seriesSeed,
+		format: next.format,
+		playerMapId,
+		gamePlan,
+	});
+	return { ok: true, value: { ...state, liveSeries } };
+}
+
+export function setLiveSeries(
+	state: TournamentState,
+	liveSeries: LiveSeriesState,
+): TournamentState {
+	return { ...state, liveSeries };
+}
+
+export function commitLiveMatch(
+	state: TournamentState,
+	playerTeam: TeamProfile,
+	opponents: readonly HistoricalOpponent[],
+): TournamentResult {
+	const live = state.liveSeries;
+	if (!live?.complete) {
+		return {
+			ok: false,
+			error: new TournamentError("INVALID_STATE", "live series is not complete"),
+		};
+	}
+	return runNextMatch(state, playerTeam, opponents, () => seriesFromLive(live));
+}
+
+export function runNextMatch(
+	state: TournamentState,
+	playerTeam: TeamProfile,
+	opponents: readonly HistoricalOpponent[],
+	resolver: SeriesResolver = defaultResolver,
+): TournamentResult {
+	const playable = validatePlayable(state);
+	if (!playable.ok) return playable;
+	const next = playable.next;
 	const result = resolver({
 		teams: [playerTeam, next.opponent.profile],
 		seed: next.seriesSeed,
@@ -221,6 +286,7 @@ export function runNextMatch(
 		...state,
 		history: [...state.history, completed],
 		nextMatch: null,
+		liveSeries: null,
 	};
 	const progressed =
 		state.stage === "champions"

@@ -5,10 +5,13 @@ import { createRng } from "../rng";
 import type { DraftState, SampleableOrgYear } from "./index";
 import {
 	applyAction,
+	COACH_CANDIDATE_COUNT,
+	canRerollMajor,
 	currentCard,
 	DraftError,
 	emptyRoles,
 	getCompletedDraft,
+	otherMajorAppearances,
 	PLAYER_CARD_COUNT,
 	ROLE_FIT,
 	roleFit,
@@ -89,8 +92,9 @@ describe("startDraft", () => {
 		expect(a.coachIds).toEqual(b.coachIds);
 		expect(new Set(a.cards.map((card) => card.orgYearId)).size).toBe(PLAYER_CARD_COUNT);
 		expect(a.cards).toHaveLength(PLAYER_CARD_COUNT);
-		expect(a.coachIds).toHaveLength(dataset.coaches.length);
-		expect(new Set(a.coachIds)).toEqual(new Set(dataset.coaches.map((coach) => coach.id)));
+		expect(a.coachIds).toHaveLength(COACH_CANDIDATE_COUNT);
+		expect(new Set(a.coachIds).size).toBe(COACH_CANDIDATE_COUNT);
+		expect(a.coachIds.every((id) => dataset.coaches.some((coach) => coach.id === id))).toBe(true);
 		for (const card of a.cards) {
 			expect(card.players).toHaveLength(5);
 		}
@@ -106,8 +110,9 @@ describe("startDraft", () => {
 });
 
 describe("applyAction", () => {
-	it("offers one deterministic Major reroll and one team reroll", () => {
+	it("offers two deterministic Major rerolls and two team rerolls", () => {
 		const initial = startDraft(dataset, "two-rerolls");
+		expect(initial.rerolls).toEqual({ majorRemaining: 2, teamRemaining: 2 });
 		const original = currentCard(initial);
 		expect(original?.majorId).not.toBeNull();
 
@@ -118,32 +123,130 @@ describe("applyAction", () => {
 		expect(afterTeam?.majorId).toBe(original.majorId);
 		expect(afterTeam?.orgYearId).not.toBe(original.orgYearId);
 		expect(teamResult.value.rerolls).toEqual({
-			majorRemaining: true,
-			teamRemaining: false,
+			majorRemaining: 2,
+			teamRemaining: 1,
 		});
 
-		const repeatTeam = applyAction(teamResult.value, { type: "rerollTeam" }, dataset);
+		const secondTeam = applyAction(teamResult.value, { type: "rerollTeam" }, dataset);
+		expect(secondTeam.ok).toBe(true);
+		if (!secondTeam.ok) return;
+		const afterSecondTeam = currentCard(secondTeam.value);
+		expect(afterSecondTeam?.majorId).toBe(original.majorId);
+		expect(afterSecondTeam?.orgYearId).not.toBe(afterTeam?.orgYearId);
+		expect(secondTeam.value.rerolls).toEqual({
+			majorRemaining: 2,
+			teamRemaining: 0,
+		});
+
+		const repeatTeam = applyAction(secondTeam.value, { type: "rerollTeam" }, dataset);
 		expect(repeatTeam.ok).toBe(false);
 		if (!repeatTeam.ok) expect(repeatTeam.error.code).toBe("reroll_exhausted");
 
-		const majorResult = applyAction(teamResult.value, { type: "rerollMajor" }, dataset);
+		const majorResult = applyAction(secondTeam.value, { type: "rerollMajor" }, dataset);
 		expect(majorResult.ok).toBe(true);
 		if (!majorResult.ok) return;
-		expect(currentCard(majorResult.value)?.majorId).not.toBe(afterTeam?.majorId);
+		const afterMajor = currentCard(majorResult.value);
+		expect(afterMajor?.majorId).not.toBe(afterSecondTeam?.majorId);
+		expect(dataset.orgYears.find((roster) => roster.id === afterMajor?.orgYearId)?.orgId).toBe(
+			dataset.orgYears.find((roster) => roster.id === afterSecondTeam?.orgYearId)?.orgId,
+		);
 		expect(majorResult.value.rerolls).toEqual({
-			majorRemaining: false,
-			teamRemaining: false,
+			majorRemaining: 1,
+			teamRemaining: 0,
 		});
 
-		const replayTeam = applyAction(
-			startDraft(dataset, "two-rerolls"),
-			{ type: "rerollTeam" },
-			dataset,
+		const secondMajor = applyAction(majorResult.value, { type: "rerollMajor" }, dataset);
+		expect(secondMajor.ok).toBe(true);
+		if (!secondMajor.ok) return;
+		expect(currentCard(secondMajor.value)?.majorId).not.toBe(
+			currentCard(majorResult.value)?.majorId,
 		);
-		expect(replayTeam.ok).toBe(true);
-		if (!replayTeam.ok) return;
-		const replay = applyAction(replayTeam.value, { type: "rerollMajor" }, dataset);
-		expect(replay).toEqual(majorResult);
+		expect(secondMajor.value.rerolls).toEqual({
+			majorRemaining: 0,
+			teamRemaining: 0,
+		});
+
+		const exhaustedMajor = applyAction(secondMajor.value, { type: "rerollMajor" }, dataset);
+		expect(exhaustedMajor.ok).toBe(false);
+		if (!exhaustedMajor.ok) expect(exhaustedMajor.error.code).toBe("reroll_exhausted");
+
+		let replay = startDraft(dataset, "two-rerolls");
+		for (const action of [
+			{ type: "rerollTeam" as const },
+			{ type: "rerollTeam" as const },
+			{ type: "rerollMajor" as const },
+			{ type: "rerollMajor" as const },
+		]) {
+			const next = applyAction(replay, action, dataset);
+			expect(next.ok).toBe(true);
+			if (!next.ok) return;
+			replay = next.value;
+		}
+		expect(replay).toEqual(secondMajor.value);
+	});
+
+	it("keeps the org on a Major reroll and refuses a one-Major team", () => {
+		const navi = dataset.orgYears.filter(
+			(roster) => roster.orgId === "navi" && roster.kind === "major",
+		);
+		expect(navi.length).toBeGreaterThan(2);
+		const opened = startDraft(dataset, "same-org-major");
+		const naviCard = {
+			orgYearId: navi[0].id,
+			majorId: navi[0].majorId ?? null,
+			kind: navi[0].kind,
+			tier: navi[0].tier,
+			players: navi[0].playerSeasonIds.map((id) => {
+				const season = dataset.playerSeasons.find((row) => row.id === id);
+				if (!season) throw new Error(id);
+				return { id: season.id, primaryRole: season.primaryRole, roles: [...season.roles] };
+			}),
+		};
+		const withNavi: DraftState = {
+			...opened,
+			cards: opened.cards.map((card, index) =>
+				index === 0 ? naviCard : card.orgYearId === navi[0].id ? opened.cards[0] : card,
+			),
+		};
+		expect(canRerollMajor(withNavi, dataset)).toBe(true);
+		const rerolled = applyAction(withNavi, { type: "rerollMajor" }, dataset);
+		expect(rerolled.ok).toBe(true);
+		if (!rerolled.ok) return;
+		const next = currentCard(rerolled.value);
+		expect(next?.orgYearId).not.toBe(navi[0].id);
+		expect(dataset.orgYears.find((roster) => roster.id === next?.orgYearId)?.orgId).toBe("navi");
+		expect(next?.majorId).not.toBe(navi[0].majorId);
+
+		const singleton = dataset.orgYears.find(
+			(roster) =>
+				roster.kind === "major" &&
+				dataset.orgYears.filter((row) => row.orgId === roster.orgId && row.kind === "major")
+					.length === 1,
+		);
+		if (!singleton) throw new Error("expected a one-Major org");
+		const singletonCard = {
+			orgYearId: singleton.id,
+			majorId: singleton.majorId ?? null,
+			kind: singleton.kind,
+			tier: singleton.tier,
+			players: singleton.playerSeasonIds.map((id) => {
+				const season = dataset.playerSeasons.find((row) => row.id === id);
+				if (!season) throw new Error(id);
+				return { id: season.id, primaryRole: season.primaryRole, roles: [...season.roles] };
+			}),
+		};
+		const withSingleton: DraftState = {
+			...opened,
+			cards: opened.cards.map((card, index) =>
+				index === 0 ? singletonCard : card.orgYearId === singleton.id ? opened.cards[0] : card,
+			),
+		};
+		expect(otherMajorAppearances(withSingleton, dataset)).toEqual([]);
+		expect(canRerollMajor(withSingleton, dataset)).toBe(false);
+		const refused = applyAction(withSingleton, { type: "rerollMajor" }, dataset);
+		expect(refused.ok).toBe(false);
+		if (!refused.ok) expect(refused.error.code).toBe("reroll_unavailable");
+		expect(withSingleton.rerolls.majorRemaining).toBe(2);
 	});
 
 	it("allows off-role picks and yields a valid completed roster", () => {

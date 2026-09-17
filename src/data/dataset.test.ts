@@ -30,6 +30,41 @@ describe("complete Major dataset", () => {
 		for (const legacy of dataset.orgYears.filter((roster) => roster.kind === "legacy")) {
 			expect(legacy.majorId).toBeUndefined();
 		}
+		const zeroCoaches = dataset.coaches.filter(
+			(coach) =>
+				coach.modifiers.comeback + coach.modifiers.economy + coach.modifiers.antistrat === 0,
+		);
+		expect(zeroCoaches.map((coach) => coach.id)).toEqual([]);
+		expect(dataset.coaches.find((coach) => coach.id === "zonic-2018")?.modifiers).toEqual({
+			comeback: 2,
+			economy: 2,
+			antistrat: 2,
+		});
+	});
+
+	it("keeps known AWPers and IGLs after role inference", () => {
+		const dataset = loadDataset();
+		const byId = new Map(dataset.playerSeasons.map((season) => [season.id, season]));
+		expect(byId.get("s1mple-2018-navi")).toMatchObject({
+			primaryRole: "awp",
+			roleProvenance: { kind: "curated" },
+		});
+		expect(byId.get("gla1ve-2018-astralis")?.primaryRole).toBe("igl");
+		expect(byId.get("zywoo-2019-vitality")?.primaryRole).toBe("awp");
+		expect(byId.get("device-2016-astralis")?.primaryRole).toBe("awp");
+		const karrigan = dataset.playerSeasons.filter((season) => season.playerId === "karrigan");
+		expect(karrigan.length).toBeGreaterThan(0);
+		expect(karrigan.every((season) => season.primaryRole === "igl")).toBe(true);
+	});
+
+	it("does not assign three or more primary AWPs on one roster", () => {
+		const dataset = loadDataset();
+		const seasonById = new Map(dataset.playerSeasons.map((season) => [season.id, season]));
+		const crowded = dataset.orgYears.filter((roster) => {
+			const awps = roster.playerSeasonIds.filter((id) => seasonById.get(id)?.primaryRole === "awp");
+			return awps.length >= 3;
+		});
+		expect(crowded.map((roster) => roster.id)).toEqual([]);
 	});
 });
 

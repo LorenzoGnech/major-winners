@@ -130,13 +130,19 @@ export function buildHistoricalOpponents(
 				}),
 			) as CompletedDraft["roster"],
 		};
+		const org = orgsById.get(orgYear.orgId);
 		return {
 			id: orgYear.id,
-			label: `${orgsById.get(orgYear.orgId)?.name ?? orgYear.orgId} · ${
+			label: `${org?.name ?? orgYear.orgId} · ${
 				orgYear.majorId
 					? (majorsById.get(orgYear.majorId)?.shortName ?? orgYear.year)
 					: `Legacy ${orgYear.year}`
 			}`,
+			org: {
+				id: orgYear.orgId,
+				name: org?.name ?? orgYear.orgId,
+				...(org?.logo ? { logo: org.logo } : {}),
+			},
 			profile: buildTeamProfile({
 				draft,
 				playerSeasons: dataset.playerSeasons,

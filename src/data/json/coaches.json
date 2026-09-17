@@ -9,7 +9,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -20,9 +20,9 @@
 		"year": 2014,
 		"orgId": "team-dignitas",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -33,7 +33,7 @@
 		"year": 2025,
 		"orgId": "metizport",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -47,7 +47,7 @@
 		"orgId": "legacy",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -59,7 +59,7 @@
 		"year": 2019,
 		"orgId": "liquid",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -74,7 +74,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -85,7 +85,7 @@
 		"year": 2025,
 		"orgId": "complexity",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -100,7 +100,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -111,7 +111,7 @@
 		"year": 2017,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -125,7 +125,7 @@
 		"orgId": "gambit-esports",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -137,8 +137,8 @@
 		"year": 2022,
 		"orgId": "furia-esports",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
+			"comeback": 1,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -151,7 +151,7 @@
 		"orgId": "intz-esports",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -163,7 +163,7 @@
 		"year": 2022,
 		"orgId": "team-gamerlegion",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -176,9 +176,9 @@
 		"year": 2023,
 		"orgId": "gamerlegion",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -189,7 +189,7 @@
 		"year": 2024,
 		"orgId": "gamerlegion",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -202,7 +202,7 @@
 		"year": 2025,
 		"orgId": "gamerlegion",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -215,7 +215,7 @@
 		"year": 2018,
 		"orgId": "north",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -229,7 +229,7 @@
 		"orgId": "flyquest",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -242,7 +242,7 @@
 		"orgId": "flyquest",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -256,7 +256,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -267,7 +267,7 @@
 		"year": 2018,
 		"orgId": "gambit-esports",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -280,9 +280,9 @@
 		"year": 2021,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 2,
+			"antistrat": 1
 		}
 	},
 	{
@@ -293,9 +293,9 @@
 		"year": 2022,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -308,7 +308,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -319,9 +319,9 @@
 		"year": 2024,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 2,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -333,8 +333,8 @@
 		"orgId": "navi",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -345,7 +345,7 @@
 		"year": 2026,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -358,7 +358,7 @@
 		"year": 2016,
 		"orgId": "gambit-gaming",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -373,7 +373,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -384,7 +384,7 @@
 		"year": 2026,
 		"orgId": "sinners-esports",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -398,7 +398,7 @@
 		"orgId": "eternal-fire",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -410,7 +410,7 @@
 		"year": 2022,
 		"orgId": "mibr",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -425,7 +425,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -436,7 +436,7 @@
 		"year": 2021,
 		"orgId": "movistar-riders",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -451,7 +451,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -464,7 +464,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -475,9 +475,9 @@
 		"year": 2013,
 		"orgId": "fnatic",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 2
 		}
 	},
 	{
@@ -490,7 +490,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -503,7 +503,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -516,7 +516,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -529,7 +529,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -540,7 +540,7 @@
 		"year": 2018,
 		"orgId": "team-spirit",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -553,7 +553,7 @@
 		"year": 2019,
 		"orgId": "team-spirit",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -567,7 +567,7 @@
 		"orgId": "team-spirit",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -581,7 +581,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -592,7 +592,7 @@
 		"year": 2025,
 		"orgId": "legacy",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -606,7 +606,7 @@
 		"orgId": "godsent",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -619,7 +619,7 @@
 		"orgId": "00-nation",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -633,7 +633,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -646,7 +646,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -658,7 +658,7 @@
 		"orgId": "fut-esports",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -672,7 +672,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -683,7 +683,7 @@
 		"year": 2021,
 		"orgId": "evil-geniuses",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -697,7 +697,7 @@
 		"orgId": "liquid",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -711,7 +711,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -723,7 +723,7 @@
 		"orgId": "nrg",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -735,7 +735,7 @@
 		"year": 2026,
 		"orgId": "nrg",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -748,7 +748,7 @@
 		"year": 2018,
 		"orgId": "avangar",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -761,9 +761,9 @@
 		"year": 2019,
 		"orgId": "avangar",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -776,7 +776,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -787,9 +787,9 @@
 		"year": 2022,
 		"orgId": "outsiders",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 2,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -800,7 +800,7 @@
 		"year": 2024,
 		"orgId": "virtus-pro",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -814,7 +814,7 @@
 		"orgId": "parivision",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -827,7 +827,7 @@
 		"orgId": "parivision",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -839,9 +839,9 @@
 		"year": 2017,
 		"orgId": "sk",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -852,9 +852,9 @@
 		"year": 2018,
 		"orgId": "sk",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -867,7 +867,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -879,7 +879,7 @@
 		"orgId": "liquid",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -892,7 +892,7 @@
 		"orgId": "m80",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -906,7 +906,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -917,9 +917,9 @@
 		"year": 2014,
 		"orgId": "fnatic",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -930,9 +930,9 @@
 		"year": 2015,
 		"orgId": "fnatic",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 2,
+			"antistrat": 1
 		}
 	},
 	{
@@ -943,7 +943,7 @@
 		"year": 2023,
 		"orgId": "bad-news-eagles",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -958,7 +958,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -969,7 +969,7 @@
 		"year": 2023,
 		"orgId": "nip",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -982,9 +982,9 @@
 		"year": 2022,
 		"orgId": "faze",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 2,
+			"antistrat": 1
 		}
 	},
 	{
@@ -995,7 +995,7 @@
 		"year": 2019,
 		"orgId": "cr4zy",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1010,7 +1010,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1021,7 +1021,7 @@
 		"year": 2024,
 		"orgId": "flyquest",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1035,7 +1035,7 @@
 		"orgId": "flyquest",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1049,7 +1049,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1062,7 +1062,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1073,7 +1073,7 @@
 		"year": 2025,
 		"orgId": "aurora-gaming",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1087,8 +1087,8 @@
 		"orgId": "aurora-gaming",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -1100,7 +1100,7 @@
 		"orgId": "pain-gaming",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1113,7 +1113,7 @@
 		"orgId": "vega-squadron",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1127,7 +1127,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1140,7 +1140,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1153,7 +1153,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1164,7 +1164,7 @@
 		"year": 2026,
 		"orgId": "betboom-team",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1179,7 +1179,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1191,7 +1191,7 @@
 		"orgId": "liquid",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1203,7 +1203,7 @@
 		"year": 2022,
 		"orgId": "imperial-esports",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1218,7 +1218,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1229,9 +1229,9 @@
 		"year": 2016,
 		"orgId": "liquid",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1242,7 +1242,7 @@
 		"year": 2022,
 		"orgId": "big",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1256,8 +1256,8 @@
 		"orgId": "gambit-esports",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -1269,7 +1269,7 @@
 		"orgId": "cloud9",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1281,7 +1281,7 @@
 		"year": 2024,
 		"orgId": "cloud9",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1294,7 +1294,7 @@
 		"year": 2016,
 		"orgId": "splyce",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1308,7 +1308,7 @@
 		"orgId": "furia-esports",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1320,7 +1320,7 @@
 		"year": 2023,
 		"orgId": "furia-esports",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1335,7 +1335,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1348,7 +1348,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1360,7 +1360,7 @@
 		"orgId": "lynn-vision-gaming",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1374,7 +1374,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1387,7 +1387,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1398,9 +1398,9 @@
 		"year": 2024,
 		"orgId": "team-spirit",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 2
 		}
 	},
 	{
@@ -1412,8 +1412,8 @@
 		"orgId": "team-spirit",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -1426,7 +1426,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1438,7 +1438,7 @@
 		"orgId": "entropiq",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1452,7 +1452,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1464,7 +1464,7 @@
 		"orgId": "quantum-bellator-fire",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1477,7 +1477,7 @@
 		"orgId": "winstrike-team",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1490,7 +1490,7 @@
 		"orgId": "winstrike-team",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1502,9 +1502,9 @@
 		"year": 2019,
 		"orgId": "nrg-esports",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1516,7 +1516,7 @@
 		"orgId": "gamerlegion",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1530,7 +1530,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1543,7 +1543,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1556,7 +1556,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1568,7 +1568,7 @@
 		"orgId": "mibr",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1582,7 +1582,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1594,7 +1594,7 @@
 		"orgId": "hellraisers",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1607,7 +1607,7 @@
 		"orgId": "hellraisers",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1621,7 +1621,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1632,7 +1632,7 @@
 		"year": 2021,
 		"orgId": "liquid",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1645,9 +1645,9 @@
 		"year": 2017,
 		"orgId": "fnatic",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1660,7 +1660,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1672,7 +1672,7 @@
 		"orgId": "fnatic",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1686,7 +1686,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1697,7 +1697,7 @@
 		"year": 2017,
 		"orgId": "big",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1711,7 +1711,7 @@
 		"orgId": "big",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1724,7 +1724,7 @@
 		"orgId": "big",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1737,7 +1737,7 @@
 		"orgId": "monte",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -1749,7 +1749,7 @@
 		"year": 2016,
 		"orgId": "flipsid3-tactics",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1762,9 +1762,9 @@
 		"year": 2017,
 		"orgId": "gambit-esports",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 2,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -1775,9 +1775,9 @@
 		"year": 2018,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -1788,9 +1788,9 @@
 		"year": 2019,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1803,7 +1803,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1814,7 +1814,7 @@
 		"year": 2016,
 		"orgId": "mouz",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1827,7 +1827,7 @@
 		"year": 2021,
 		"orgId": "tyloo",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1842,7 +1842,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1853,7 +1853,7 @@
 		"year": 2016,
 		"orgId": "mouz",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1866,7 +1866,7 @@
 		"year": 2018,
 		"orgId": "renegades",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1879,9 +1879,9 @@
 		"year": 2019,
 		"orgId": "renegades",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1892,7 +1892,7 @@
 		"year": 2019,
 		"orgId": "complexity",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1905,7 +1905,7 @@
 		"year": 2022,
 		"orgId": "fnatic",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1918,7 +1918,7 @@
 		"year": 2023,
 		"orgId": "fnatic",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1933,7 +1933,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1946,7 +1946,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1957,7 +1957,7 @@
 		"year": 2022,
 		"orgId": "grayhound-gaming",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -1972,7 +1972,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -1984,8 +1984,8 @@
 		"orgId": "virtus-pro",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -1996,8 +1996,8 @@
 		"year": 2016,
 		"orgId": "virtus-pro",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
+			"comeback": 1,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2009,9 +2009,9 @@
 		"year": 2017,
 		"orgId": "virtus-pro",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -2022,7 +2022,7 @@
 		"year": 2018,
 		"orgId": "virtus-pro",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2036,8 +2036,8 @@
 		"orgId": "apeks",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -2050,7 +2050,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2062,7 +2062,7 @@
 		"orgId": "og",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2075,7 +2075,7 @@
 		"orgId": "team-kinguin",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2088,7 +2088,7 @@
 		"orgId": "big",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2100,7 +2100,7 @@
 		"year": 2021,
 		"orgId": "big",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2113,7 +2113,7 @@
 		"year": 2026,
 		"orgId": "mibr",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2127,7 +2127,7 @@
 		"orgId": "vega-squadron",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2140,7 +2140,7 @@
 		"orgId": "mouz",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2154,7 +2154,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2165,7 +2165,7 @@
 		"year": 2022,
 		"orgId": "ihc-esports",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2178,7 +2178,7 @@
 		"year": 2023,
 		"orgId": "the-mongolz",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2192,7 +2192,7 @@
 		"orgId": "the-mongolz",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2204,9 +2204,9 @@
 		"year": 2025,
 		"orgId": "the-mongolz",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -2217,7 +2217,7 @@
 		"year": 2026,
 		"orgId": "the-mongolz",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2230,7 +2230,7 @@
 		"year": 2025,
 		"orgId": "b8",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2245,7 +2245,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2257,7 +2257,7 @@
 		"orgId": "g2",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2269,9 +2269,9 @@
 		"year": 2021,
 		"orgId": "g2",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -2284,7 +2284,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2295,7 +2295,7 @@
 		"year": 2018,
 		"orgId": "rogue",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2310,7 +2310,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2322,7 +2322,7 @@
 		"orgId": "mouz",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2335,7 +2335,7 @@
 		"orgId": "apeks",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2347,7 +2347,7 @@
 		"year": 2024,
 		"orgId": "liquid",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2360,9 +2360,9 @@
 		"year": 2014,
 		"orgId": "team-ldlc-com",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 2
 		}
 	},
 	{
@@ -2373,7 +2373,7 @@
 		"year": 2015,
 		"orgId": "penta-sports",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2386,7 +2386,7 @@
 		"year": 2024,
 		"orgId": "saw",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2400,7 +2400,7 @@
 		"orgId": "luminosity-gaming",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2412,7 +2412,7 @@
 		"year": 2024,
 		"orgId": "mibr",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2427,7 +2427,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2440,7 +2440,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2453,7 +2453,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2464,9 +2464,9 @@
 		"year": 2024,
 		"orgId": "faze",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -2477,9 +2477,9 @@
 		"year": 2025,
 		"orgId": "faze",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -2490,9 +2490,9 @@
 		"year": 2015,
 		"orgId": "team-envyus",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 2
 		}
 	},
 	{
@@ -2503,7 +2503,7 @@
 		"year": 2016,
 		"orgId": "team-envyus",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2517,7 +2517,7 @@
 		"orgId": "titan",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2530,7 +2530,7 @@
 		"orgId": "g2",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2544,7 +2544,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2555,7 +2555,7 @@
 		"year": 2018,
 		"orgId": "g2",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2569,7 +2569,7 @@
 		"orgId": "virtus-pro",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2581,9 +2581,9 @@
 		"year": 2016,
 		"orgId": "liquid",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -2594,9 +2594,9 @@
 		"year": 2014,
 		"orgId": "nip",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 2
 		}
 	},
 	{
@@ -2608,7 +2608,7 @@
 		"orgId": "counter-logic-gaming",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2622,7 +2622,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2634,7 +2634,7 @@
 		"orgId": "nip",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2648,7 +2648,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2661,7 +2661,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2673,7 +2673,7 @@
 		"orgId": "complexity",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2687,7 +2687,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2699,8 +2699,8 @@
 		"orgId": "team-solomid",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -2713,7 +2713,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2726,7 +2726,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2737,7 +2737,7 @@
 		"year": 2024,
 		"orgId": "pain-gaming",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2750,9 +2750,9 @@
 		"year": 2025,
 		"orgId": "pain-gaming",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2764,7 +2764,7 @@
 		"orgId": "pain-gaming",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2776,7 +2776,7 @@
 		"year": 2016,
 		"orgId": "faze",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -2790,7 +2790,7 @@
 		"orgId": "faze",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2802,9 +2802,9 @@
 		"year": 2018,
 		"orgId": "faze",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -2830,7 +2830,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2843,7 +2843,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2856,7 +2856,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2868,7 +2868,7 @@
 		"orgId": "north",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2882,7 +2882,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2895,7 +2895,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2908,7 +2908,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2920,7 +2920,7 @@
 		"orgId": "astralis",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2933,7 +2933,7 @@
 		"orgId": "astralis",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2947,7 +2947,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2960,7 +2960,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2971,9 +2971,9 @@
 		"year": 2022,
 		"orgId": "ence",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -2985,7 +2985,7 @@
 		"orgId": "ence",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -2998,7 +2998,7 @@
 		"orgId": "heroic",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3010,7 +3010,7 @@
 		"year": 2025,
 		"orgId": "g2",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3024,7 +3024,7 @@
 		"orgId": "heroic",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3036,7 +3036,7 @@
 		"year": 2026,
 		"orgId": "g2",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3050,7 +3050,7 @@
 		"orgId": "furia-esports",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3064,7 +3064,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3075,9 +3075,9 @@
 		"year": 2026,
 		"orgId": "furia",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3090,7 +3090,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3101,7 +3101,7 @@
 		"year": 2018,
 		"orgId": "g2",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3116,7 +3116,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3127,9 +3127,9 @@
 		"year": 2015,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3140,9 +3140,9 @@
 		"year": 2016,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3153,7 +3153,7 @@
 		"year": 2017,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3168,7 +3168,7 @@
 		"modifiers": {
 			"comeback": 1,
 			"economy": 0,
-			"antistrat": 1
+			"antistrat": 0
 		}
 	},
 	{
@@ -3181,7 +3181,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3192,7 +3192,7 @@
 		"year": 2015,
 		"orgId": "cloud9",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3205,7 +3205,7 @@
 		"year": 2024,
 		"orgId": "amkal-esports",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3219,7 +3219,7 @@
 		"orgId": "g2",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3231,8 +3231,8 @@
 		"year": 2022,
 		"orgId": "mouz",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
+			"comeback": 1,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3244,7 +3244,7 @@
 		"year": 2023,
 		"orgId": "mouz",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3257,9 +3257,9 @@
 		"year": 2024,
 		"orgId": "mouz",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3271,8 +3271,8 @@
 		"orgId": "mouz",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3285,7 +3285,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3298,7 +3298,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3309,7 +3309,7 @@
 		"year": 2023,
 		"orgId": "complexity",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3323,7 +3323,7 @@
 		"orgId": "complexity",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3335,7 +3335,7 @@
 		"year": 2025,
 		"orgId": "passion-ua",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3349,7 +3349,7 @@
 		"orgId": "furia-esports",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3361,7 +3361,7 @@
 		"year": 2022,
 		"orgId": "furia-esports",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3374,7 +3374,7 @@
 		"year": 2025,
 		"orgId": "fluxo",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3388,8 +3388,8 @@
 		"orgId": "g2",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3400,7 +3400,7 @@
 		"year": 2025,
 		"orgId": "g2",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3414,7 +3414,7 @@
 		"orgId": "red-canids",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3440,7 +3440,7 @@
 		"orgId": "nip",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3454,7 +3454,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3466,7 +3466,7 @@
 		"orgId": "heroic",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3479,7 +3479,7 @@
 		"orgId": "sprout",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3492,7 +3492,7 @@
 		"orgId": "astralis",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3504,9 +3504,9 @@
 		"year": 2019,
 		"orgId": "ence",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3517,7 +3517,7 @@
 		"year": 2015,
 		"orgId": "navi",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3532,7 +3532,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3543,9 +3543,9 @@
 		"year": 2018,
 		"orgId": "cloud9",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 2
 		}
 	},
 	{
@@ -3558,7 +3558,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3569,7 +3569,7 @@
 		"year": 2025,
 		"orgId": "wildcard",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3583,7 +3583,7 @@
 		"orgId": "thunderdownunder",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3597,7 +3597,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3609,7 +3609,7 @@
 		"orgId": "copenhagen-flames",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3622,7 +3622,7 @@
 		"orgId": "evil-geniuses",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3634,8 +3634,8 @@
 		"year": 2015,
 		"orgId": "fnatic",
 		"modifiers": {
-			"comeback": 1,
-			"economy": 0,
+			"comeback": 2,
+			"economy": 1,
 			"antistrat": 1
 		}
 	},
@@ -3647,8 +3647,8 @@
 		"year": 2016,
 		"orgId": "fnatic",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
+			"comeback": 1,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3660,7 +3660,7 @@
 		"year": 2019,
 		"orgId": "complexity",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3674,7 +3674,7 @@
 		"orgId": "3dmax",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3687,7 +3687,7 @@
 		"orgId": "3dmax",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3701,7 +3701,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3712,8 +3712,8 @@
 		"year": 2021,
 		"orgId": "heroic",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
+			"comeback": 1,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3725,9 +3725,9 @@
 		"year": 2022,
 		"orgId": "heroic",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3739,8 +3739,8 @@
 		"orgId": "heroic",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3751,7 +3751,7 @@
 		"year": 2025,
 		"orgId": "nip",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3764,7 +3764,7 @@
 		"year": 2019,
 		"orgId": "vitality",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3778,7 +3778,7 @@
 		"orgId": "vitality",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3790,7 +3790,7 @@
 		"year": 2022,
 		"orgId": "g2",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3803,9 +3803,9 @@
 		"year": 2024,
 		"orgId": "vitality",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3816,9 +3816,9 @@
 		"year": 2025,
 		"orgId": "vitality",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 2,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3831,7 +3831,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3842,9 +3842,9 @@
 		"year": 2018,
 		"orgId": "mibr",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3857,7 +3857,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3869,7 +3869,7 @@
 		"orgId": "3dmax",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3883,7 +3883,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3896,7 +3896,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3907,7 +3907,7 @@
 		"year": 2025,
 		"orgId": "rare-atom",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -3920,9 +3920,9 @@
 		"year": 2017,
 		"orgId": "immortals",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3935,7 +3935,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3948,7 +3948,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -3960,7 +3960,7 @@
 		"orgId": "imperial-esports",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -3973,8 +3973,8 @@
 		"orgId": "g2",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -3987,7 +3987,7 @@
 		"modifiers": {
 			"comeback": 1,
 			"economy": 1,
-			"antistrat": 1
+			"antistrat": 2
 		}
 	},
 	{
@@ -3998,9 +3998,9 @@
 		"year": 2016,
 		"orgId": "luminosity-gaming",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 2
 		}
 	},
 	{
@@ -4012,7 +4012,7 @@
 		"orgId": "liquid",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -4025,8 +4025,8 @@
 		"orgId": "liquid",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"economy": 1,
+			"antistrat": 1
 		}
 	},
 	{
@@ -4037,9 +4037,9 @@
 		"year": 2019,
 		"orgId": "mibr",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -4050,7 +4050,7 @@
 		"year": 2023,
 		"orgId": "fluxo",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -4063,7 +4063,7 @@
 		"year": 2025,
 		"orgId": "tyloo",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -4078,7 +4078,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -4090,7 +4090,7 @@
 		"orgId": "dreameaters",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -4104,7 +4104,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -4115,8 +4115,8 @@
 		"year": 2016,
 		"orgId": "astralis",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
+			"comeback": 1,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -4128,9 +4128,9 @@
 		"year": 2017,
 		"orgId": "astralis",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 2,
+			"antistrat": 1
 		}
 	},
 	{
@@ -4154,9 +4154,9 @@
 		"year": 2019,
 		"orgId": "astralis",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 2
 		}
 	},
 	{
@@ -4168,7 +4168,7 @@
 		"orgId": "astralis",
 		"modifiers": {
 			"comeback": 0,
-			"economy": 0,
+			"economy": 1,
 			"antistrat": 0
 		}
 	},
@@ -4182,7 +4182,7 @@
 		"modifiers": {
 			"comeback": 0,
 			"economy": 0,
-			"antistrat": 0
+			"antistrat": 1
 		}
 	},
 	{
@@ -4193,9 +4193,9 @@
 		"year": 2023,
 		"orgId": "vitality",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 2,
+			"antistrat": 1
 		}
 	},
 	{
@@ -4206,7 +4206,7 @@
 		"year": 2025,
 		"orgId": "team-falcons",
 		"modifiers": {
-			"comeback": 0,
+			"comeback": 1,
 			"economy": 0,
 			"antistrat": 0
 		}
@@ -4219,9 +4219,9 @@
 		"year": 2026,
 		"orgId": "team-falcons",
 		"modifiers": {
-			"comeback": 0,
-			"economy": 0,
-			"antistrat": 0
+			"comeback": 1,
+			"economy": 1,
+			"antistrat": 2
 		}
 	}
 ]

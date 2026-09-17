@@ -1,6 +1,12 @@
 export { TournamentError, type TournamentErrorCode } from "./error";
 export { buildHistoricalOpponents } from "./opponents";
-export { createTournament, runNextMatch } from "./runner";
+export {
+	beginNextMatch,
+	commitLiveMatch,
+	createTournament,
+	runNextMatch,
+	setLiveSeries,
+} from "./runner";
 export type {
 	HistoricalOpponent,
 	PlayoffRound,

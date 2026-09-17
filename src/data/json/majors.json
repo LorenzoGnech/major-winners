@@ -9,12 +9,13 @@
 		"endDate": "2013-11-30",
 		"location": "Jönköping, Sweden",
 		"teamCount": 16,
+		"logo": "/logos/majors/dreamhack-winter-2013.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/DreamHack/2013/Winter",
 				"revision": "3422235",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -28,12 +29,13 @@
 		"endDate": "2014-03-16",
 		"location": "Katowice, Poland",
 		"teamCount": 16,
+		"logo": "/logos/majors/ems-one-katowice-2014.jpg",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/ESL/Major_Series_One/2014/Katowice",
 				"revision": "3390850",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -47,12 +49,13 @@
 		"endDate": "2014-08-17",
 		"location": "Cologne, Germany",
 		"teamCount": 16,
+		"logo": "/logos/majors/esl-one-cologne-2014.jpg",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/ESL/One/2014/Cologne",
 				"revision": "3390742",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -66,12 +69,13 @@
 		"endDate": "2014-11-29",
 		"location": "Jönköping, Sweden",
 		"teamCount": 16,
+		"logo": "/logos/majors/dreamhack-winter-2014.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/DreamHack/2014/Winter",
 				"revision": "3418408",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -85,12 +89,13 @@
 		"endDate": "2015-03-15",
 		"location": "Katowice, Poland",
 		"teamCount": 16,
+		"logo": "/logos/majors/esl-one-katowice-2015.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/ESL/One/2015/Katowice",
 				"revision": "3406720",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -104,12 +109,13 @@
 		"endDate": "2015-08-23",
 		"location": "Cologne, Germany",
 		"teamCount": 16,
+		"logo": "/logos/majors/esl-one-cologne-2015.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/ESL/One/2015/Cologne",
 				"revision": "3406744",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -123,12 +129,13 @@
 		"endDate": "2015-11-01",
 		"location": "Cluj-Napoca, Romania",
 		"teamCount": 16,
+		"logo": "/logos/majors/dreamhack-cluj-napoca-2015.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/DreamHack/2015/Cluj-Napoca",
 				"revision": "3406638",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -142,12 +149,13 @@
 		"endDate": "2016-04-03",
 		"location": "Columbus, United States",
 		"teamCount": 16,
+		"logo": "/logos/majors/mlg-columbus-2016.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/MLG/2016/Columbus",
 				"revision": "3405906",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -161,12 +169,13 @@
 		"endDate": "2016-07-10",
 		"location": "Cologne, Germany",
 		"teamCount": 16,
+		"logo": "/logos/majors/esl-one-cologne-2016.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/ESL/One/2016/Cologne",
 				"revision": "3391866",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -180,12 +189,13 @@
 		"endDate": "2017-01-29",
 		"location": "Atlanta, United States",
 		"teamCount": 16,
+		"logo": "/logos/majors/eleague-atlanta-2017.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/ELEAGUE/2017/Major",
 				"revision": "3405422",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -199,12 +209,13 @@
 		"endDate": "2017-07-23",
 		"location": "Kraków, Poland",
 		"teamCount": 16,
+		"logo": "/logos/majors/pgl-krakow-2017.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/PGL/2017/Krakow",
 				"revision": "3405423",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -218,12 +229,13 @@
 		"endDate": "2018-01-28",
 		"location": "Atlanta, United States",
 		"teamCount": 23,
+		"logo": "/logos/majors/eleague-boston-2018.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/ELEAGUE/2018/Major",
 				"revision": "3427886",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -237,12 +249,13 @@
 		"endDate": "2018-09-23",
 		"location": "London, United Kingdom",
 		"teamCount": 24,
+		"logo": "/logos/majors/faceit-london-2018.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/FACEIT/2018/Major",
 				"revision": "3394956",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -256,12 +269,13 @@
 		"endDate": "2019-03-03",
 		"location": "Katowice, Poland",
 		"teamCount": 24,
+		"logo": "/logos/majors/iem-katowice-2019.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/Intel_Extreme_Masters/Season_XIII/World_Championship",
 				"revision": "3405426",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -275,12 +289,13 @@
 		"endDate": "2019-09-08",
 		"location": "Berlin, Germany",
 		"teamCount": 24,
+		"logo": "/logos/majors/starladder-berlin-2019.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/StarLadder/2019/Major",
 				"revision": "3428320",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -294,12 +309,13 @@
 		"endDate": "2021-11-07",
 		"location": "Stockholm, Sweden",
 		"teamCount": 24,
+		"logo": "/logos/majors/pgl-stockholm-2021.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/PGL/2021/Stockholm",
 				"revision": "3423059",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -313,12 +329,13 @@
 		"endDate": "2022-05-22",
 		"location": "Antwerp, Belgium",
 		"teamCount": 24,
+		"logo": "/logos/majors/pgl-antwerp-2022.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/PGL/2022/Antwerp",
 				"revision": "3423058",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -332,12 +349,13 @@
 		"endDate": "2022-11-13",
 		"location": "Rio de Janeiro, Brazil",
 		"teamCount": 24,
+		"logo": "/logos/majors/iem-rio-2022.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/Intel_Extreme_Masters/2022/Rio",
 				"revision": "3422465",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -351,12 +369,13 @@
 		"endDate": "2023-05-21",
 		"location": "Paris, France",
 		"teamCount": 24,
+		"logo": "/logos/majors/blast-paris-2023.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/BLAST/Major/2023/Paris",
 				"revision": "3348914",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -370,12 +389,13 @@
 		"endDate": "2024-03-31",
 		"location": "Copenhagen, Denmark",
 		"teamCount": 24,
+		"logo": "/logos/majors/pgl-copenhagen-2024.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/PGL/2024/Copenhagen",
 				"revision": "3417622",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -389,12 +409,13 @@
 		"endDate": "2024-12-15",
 		"location": "Shanghai, China",
 		"teamCount": 24,
+		"logo": "/logos/majors/perfect-world-shanghai-2024.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/Perfect_World/Major/2024/Shanghai",
 				"revision": "3389933",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -408,12 +429,13 @@
 		"endDate": "2025-06-22",
 		"location": "Austin, United States",
 		"teamCount": 32,
+		"logo": "/logos/majors/blast-austin-2025.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/BLAST/Major/2025/Austin",
 				"revision": "3417010",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -427,12 +449,13 @@
 		"endDate": "2025-12-14",
 		"location": "Budapest, Hungary",
 		"teamCount": 32,
+		"logo": "/logos/majors/starladder-budapest-2025.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/StarLadder/2025/Major",
 				"revision": "3420743",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	},
@@ -446,12 +469,13 @@
 		"endDate": "2026-06-21",
 		"location": "Cologne, Germany",
 		"teamCount": 32,
+		"logo": "/logos/majors/iem-cologne-2026.png",
 		"sources": [
 			{
 				"label": "Liquipedia",
 				"url": "https://liquipedia.net/counterstrike/Intel_Extreme_Masters/2026/Cologne",
 				"revision": "3443244",
-				"accessedAt": "2026-09-15"
+				"accessedAt": "2026-09-16"
 			}
 		]
 	}

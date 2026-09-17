@@ -1,15 +1,302 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { HighlightEvent, MapResult, RoundResult, SeriesResult } from "../engine";
+import type { Org, PlayerSeason, Role } from "../data";
+import {
+	canQueueTimeout,
+	equipmentValue,
+	formatRoundSummary,
+	gamePlanById,
+	getMap,
+	type HighlightEvent,
+	type KillEvent,
+	type LiveSeriesState,
+	type MapResult,
+	type PlayerMapStats,
+	playbackBanks,
+	playRound,
+	queueTimeout,
+	type RoundResult,
+	type RoundSummary,
+	resolveRoundSummary,
+	type SeriesResult,
+	type Side,
+	scoreboardRating,
+	seriesFromLive,
+	shouldShowFeaturedClutch,
+	skipRemaining,
+	type TeamMemberProfile,
+} from "../engine";
+import { ClutchMoment } from "./ClutchMoment";
+import {
+	activeClutchSequence,
+	clutchBeatLine,
+	clutchMomentLines,
+	clutchMomentStartIndex,
+	clutchOpponents,
+} from "./clutchNarrative";
+import { OrgCrest } from "./OrgCrest";
+import { PlayerCrest } from "./PlayerCrest";
+import { lineupDeadIds, liveCastLines } from "./roundCast";
+import { WeaponIcon } from "./WeaponIcon";
 
 type MatchPlaybackProps = {
-	result: SeriesResult;
+	result?: SeriesResult;
+	live?: LiveSeriesState;
+	onLiveChange?: (live: LiveSeriesState) => void;
 	teamLabels: readonly [string, string];
+	opponentOrg?: Pick<Org, "id" | "name" | "logo">;
+	playersById?: ReadonlyMap<string, PlayerSeason>;
 	eyebrow?: string;
 	onComplete?: () => void;
 };
 
+type LiveLine = {
+	kills: number;
+	deaths: number;
+	assists: number;
+};
+
 const CONTROL_CLASS =
 	"rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-white/30 enabled:hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-40";
+
+const TEAM_TEXT = ["text-emerald-300", "text-amber-300"] as const;
+
+const ROLE_LABELS: Record<Role, string> = {
+	awp: "AWP",
+	igl: "IGL",
+	entry: "Entry",
+	support: "Support",
+	lurker: "Lurker",
+};
+
+export function aggregateSeriesScoreboard(
+	maps: readonly MapResult[],
+): readonly [readonly PlayerMapStats[], readonly PlayerMapStats[]] {
+	return ([0, 1] as const).map((teamIndex) => {
+		const byPlayer = new Map<
+			string,
+			{
+				nick: string;
+				kills: number;
+				deaths: number;
+				assists: number;
+				adrWeight: number;
+				kastWeight: number;
+				rounds: number;
+			}
+		>();
+		for (const map of maps) {
+			const rounds = map.rounds.length;
+			for (const player of map.scoreboard[teamIndex] ?? []) {
+				const row = byPlayer.get(player.playerId) ?? {
+					nick: player.nick,
+					kills: 0,
+					deaths: 0,
+					assists: 0,
+					adrWeight: 0,
+					kastWeight: 0,
+					rounds: 0,
+				};
+				row.kills += player.kills;
+				row.deaths += player.deaths;
+				row.assists += player.assists;
+				row.adrWeight += player.adr * rounds;
+				row.kastWeight += player.kast * rounds;
+				row.rounds += rounds;
+				byPlayer.set(player.playerId, row);
+			}
+		}
+		return [...byPlayer.entries()].map(([playerId, row]) => {
+			const adr = row.rounds === 0 ? 0 : Math.round(row.adrWeight / row.rounds);
+			const kast = row.rounds === 0 ? 0 : Math.round(row.kastWeight / row.rounds);
+			return {
+				playerId,
+				nick: row.nick,
+				kills: row.kills,
+				deaths: row.deaths,
+				assists: row.assists,
+				adr,
+				kast,
+				rating: scoreboardRating({
+					kills: row.kills,
+					deaths: row.deaths,
+					assists: row.assists,
+					adr,
+					kast,
+					rounds: row.rounds,
+				}),
+			};
+		});
+	}) as [PlayerMapStats[], PlayerMapStats[]];
+}
+
+export function seriesRoundsWon(maps: readonly MapResult[]): readonly [number, number] {
+	return maps.reduce(
+		(score, map) => [score[0] + map.score[0], score[1] + map.score[1]] as [number, number],
+		[0, 0],
+	);
+}
+
+export function liveLines(
+	rounds: readonly RoundResult[],
+	settledCount: number,
+	extraKills: readonly KillEvent[] = [],
+): Map<string, LiveLine> {
+	const stats = new Map<string, LiveLine>();
+	const bump = (id: string, key: keyof LiveLine) => {
+		const row = stats.get(id) ?? { kills: 0, deaths: 0, assists: 0 };
+		row[key] += 1;
+		stats.set(id, row);
+	};
+	for (const round of rounds.slice(0, settledCount)) {
+		for (const kill of round.kills) {
+			bump(kill.killerId, "kills");
+			bump(kill.victimId, "deaths");
+			if (kill.assisterId) bump(kill.assisterId, "assists");
+		}
+	}
+	for (const kill of extraKills) {
+		bump(kill.killerId, "kills");
+		bump(kill.victimId, "deaths");
+		if (kill.assisterId) bump(kill.assisterId, "assists");
+	}
+	return stats;
+}
+
+export type PlaybackTick =
+	| { kind: "kill"; mapIndex: number; roundIndex: number; killIndex: number }
+	| { kind: "settle"; mapIndex: number; roundIndex: number };
+
+export type PlaybackCursor = {
+	mapIndex: number;
+	settledRoundCount: number;
+	inProgressRound: RoundResult | undefined;
+	inProgressKills: readonly KillEvent[];
+	deadIds: ReadonlySet<string>;
+	score: readonly [number, number];
+	seriesScore: readonly [number, number];
+	complete: boolean;
+};
+
+export function buildPlaybackTicks(maps: readonly MapResult[]): PlaybackTick[] {
+	const ticks: PlaybackTick[] = [];
+	for (const [mapIndex, map] of maps.entries()) {
+		for (const [roundIndex, round] of map.rounds.entries()) {
+			for (const killIndex of round.kills.keys()) {
+				ticks.push({ kind: "kill", mapIndex, roundIndex, killIndex });
+			}
+			ticks.push({ kind: "settle", mapIndex, roundIndex });
+		}
+	}
+	return ticks;
+}
+
+export const PLAYBACK_SPEEDS = [1, 2, 4] as const;
+export type PlaybackSpeed = (typeof PLAYBACK_SPEEDS)[number];
+export const PLAYBACK_TICK_MS = 750;
+
+export function playbackTickMs(speed: PlaybackSpeed): number {
+	return PLAYBACK_TICK_MS / speed;
+}
+
+export function latestRoundFeed(
+	cursor: PlaybackCursor,
+	map: MapResult,
+): {
+	round: RoundResult;
+	kills: readonly KillEvent[];
+	settled: boolean;
+	highlights: readonly HighlightEvent[];
+} | null {
+	if (cursor.inProgressRound) {
+		return {
+			round: cursor.inProgressRound,
+			kills: cursor.inProgressKills,
+			settled: false,
+			highlights: [],
+		};
+	}
+	const settled = map.rounds[cursor.settledRoundCount - 1];
+	if (!settled) return null;
+	return {
+		round: settled,
+		kills: settled.kills,
+		settled: true,
+		highlights: map.highlights.filter((highlight) => highlight.round === settled.round),
+	};
+}
+
+export function resolvePlayback(
+	maps: readonly MapResult[],
+	ticks: readonly PlaybackTick[],
+	revealedCount: number,
+): PlaybackCursor {
+	const empty: PlaybackCursor = {
+		mapIndex: 0,
+		settledRoundCount: 0,
+		inProgressRound: undefined,
+		inProgressKills: [],
+		deadIds: new Set(),
+		score: [0, 0],
+		seriesScore: [0, 0],
+		complete: false,
+	};
+	if (maps.length === 0 || ticks.length === 0) return empty;
+	const clamped = Math.min(Math.max(revealedCount, 0), ticks.length);
+	const complete = clamped >= ticks.length;
+	const last = ticks[clamped - 1];
+	if (!last) return empty;
+
+	const seriesScore: [number, number] = [0, 0];
+	for (let mapIndex = 0; mapIndex < last.mapIndex; mapIndex += 1) {
+		const prior = maps[mapIndex];
+		if (prior) seriesScore[prior.winner] += 1;
+	}
+
+	const map = maps[last.mapIndex];
+	if (last.kind === "settle") {
+		const round = map?.rounds[last.roundIndex];
+		const lastRoundOfMap = last.roundIndex === (map?.rounds.length ?? 0) - 1;
+		if (lastRoundOfMap && map) seriesScore[map.winner] += 1;
+		return {
+			mapIndex: last.mapIndex,
+			settledRoundCount: last.roundIndex + 1,
+			inProgressRound: undefined,
+			inProgressKills: [],
+			deadIds: new Set(),
+			score: round?.scoreAfter ?? [0, 0],
+			seriesScore,
+			complete,
+		};
+	}
+
+	const round = map?.rounds[last.roundIndex];
+	const kills = round?.kills.slice(0, last.killIndex + 1) ?? [];
+	const previous =
+		last.roundIndex === 0
+			? ([0, 0] as const)
+			: (map?.rounds[last.roundIndex - 1]?.scoreAfter ?? ([0, 0] as const));
+	return {
+		mapIndex: last.mapIndex,
+		settledRoundCount: last.roundIndex,
+		inProgressRound: round,
+		inProgressKills: kills,
+		deadIds: new Set(kills.map((kill) => kill.victimId)),
+		score: previous,
+		seriesScore,
+		complete,
+	};
+}
+
+/** Winner of the round that just settled, while that settle beat is on screen. */
+export function settleWinner(
+	maps: readonly MapResult[],
+	ticks: readonly PlaybackTick[],
+	revealedCount: number,
+): 0 | 1 | undefined {
+	const tick = ticks[revealedCount - 1];
+	if (tick?.kind !== "settle") return undefined;
+	return maps[tick.mapIndex]?.rounds[tick.roundIndex]?.winner;
+}
 
 function playerName(result: SeriesResult, playerId: string): string {
 	for (const team of result.teams) {
@@ -19,25 +306,20 @@ function playerName(result: SeriesResult, playerId: string): string {
 	return playerId;
 }
 
-function highlightText(
-	highlight: HighlightEvent,
-	result: SeriesResult,
-	teamLabels: readonly [string, string],
-): string {
-	switch (highlight.type) {
-		case "opening-duel":
-			return `${playerName(result, highlight.playerId)} won the opening duel against ${playerName(result, highlight.victimId)}.`;
-		case "clutch":
-			return `${playerName(result, highlight.playerId)} converted a 1v${highlight.against} clutch.`;
-		case "multikill":
-			return `${playerName(result, highlight.playerId)} landed a ${highlight.kills}K.`;
-		case "ace":
-			return `${playerName(result, highlight.playerId)} wiped the server with an ace.`;
-		case "coach-timeout":
-			return `${teamLabels[highlight.team]} called a timeout through ${result.teams[highlight.team].coach.nick}.`;
-		case "comeback":
-			return `${teamLabels[highlight.team]} erased a ${highlight.fromDeficit}-round deficit.`;
-	}
+function KillFeedLine({ kill, result }: { kill: KillEvent; result: SeriesResult }) {
+	const killer = playerName(result, kill.killerId);
+	const victim = playerName(result, kill.victimId);
+	const assist = kill.assisterId ? playerName(result, kill.assisterId) : null;
+	return (
+		<span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-zinc-300">
+			<span className={`font-medium ${TEAM_TEXT[kill.killerTeam]}`}>{killer}</span>
+			{assist ? (
+				<span className={`text-[0.95em] ${TEAM_TEXT[kill.killerTeam]} opacity-70`}>+ {assist}</span>
+			) : null}
+			<WeaponIcon weapon={kill.weapon} className={TEAM_TEXT[kill.killerTeam]} />
+			<span className={TEAM_TEXT[kill.victimTeam]}>{victim}</span>
+		</span>
+	);
 }
 
 function roundGroupKey(round: RoundResult): string {
@@ -58,6 +340,30 @@ function groupedRounds(rounds: readonly RoundResult[]): [string, RoundResult[]][
 	return groups;
 }
 
+function crestFor(
+	member: TeamMemberProfile,
+	playersById: ReadonlyMap<string, PlayerSeason> | undefined,
+): Pick<PlayerSeason, "playerId" | "nick" | "photo"> {
+	const season = playersById?.get(member.id);
+	return {
+		playerId: season?.playerId ?? member.id,
+		nick: member.nick,
+		photo: season?.photo,
+	};
+}
+
+function SideMark({ side }: { side: Side }) {
+	return (
+		<span
+			className={`rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wide ${
+				side === "CT" ? "bg-sky-300/15 text-sky-200" : "bg-orange-300/15 text-orange-200"
+			}`}
+		>
+			{side}
+		</span>
+	);
+}
+
 function RoundTimeline({
 	map,
 	revealed,
@@ -69,15 +375,15 @@ function RoundTimeline({
 }) {
 	return (
 		<section
-			className="mt-4 flex flex-wrap gap-x-4 gap-y-3"
+			className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-3"
 			aria-label={`${map.label} round timeline`}
 		>
 			{groupedRounds(map.rounds).map(([label, rounds]) => (
 				<div key={label}>
-					<p className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-zinc-600">
+					<p className="mb-1 text-center text-[9px] font-semibold uppercase tracking-wider text-zinc-600">
 						{label}
 					</p>
-					<div className="flex flex-wrap gap-1">
+					<div className="flex flex-wrap justify-center gap-1">
 						{rounds.map((round) => {
 							const isRevealed = round.round <= revealed;
 							return (
@@ -112,20 +418,22 @@ function RoundTimeline({
 }
 
 function Scoreboard({
-	map,
+	teams,
 	teamLabels,
+	roundsWon,
 }: {
-	map: MapResult;
+	teams: readonly [readonly PlayerMapStats[], readonly PlayerMapStats[]];
 	teamLabels: readonly [string, string];
+	roundsWon: readonly [number, number];
 }) {
 	return (
 		<div className="mt-5 space-y-4">
-			{map.scoreboard.map((teamRows, teamIndex) => (
+			{teams.map((teamRows, teamIndex) => (
 				<div key={teamLabels[teamIndex]}>
 					<div className="mb-2 flex items-baseline justify-between gap-3">
 						<h4 className="text-sm font-semibold text-zinc-100">{teamLabels[teamIndex]}</h4>
 						<span className="text-xs tabular-nums text-zinc-500">
-							{map.score[teamIndex]} rounds
+							{roundsWon[teamIndex]} rounds
 						</span>
 					</div>
 					<div className="overflow-x-auto rounded-xl border border-white/10">
@@ -153,7 +461,7 @@ function Scoreboard({
 											<td className="px-2 py-2 text-right tabular-nums">{player.adr}</td>
 											<td className="px-2 py-2 text-right tabular-nums">{player.kast}%</td>
 											<td className="px-3 py-2 text-right font-bold tabular-nums text-white">
-												{player.rating.toFixed(1)}
+												{player.rating.toFixed(2)}
 											</td>
 										</tr>
 									))}
@@ -166,41 +474,341 @@ function Scoreboard({
 	);
 }
 
-export function MatchPlayback({
+function TeamLineup({
+	align,
+	label,
+	members,
+	coachNick,
+	overall,
+	org,
+	side,
+	stats,
+	involvedIds,
+	deadIds,
+	playersById,
+}: {
+	align: "left" | "right";
+	label: string;
+	members: readonly TeamMemberProfile[];
+	coachNick: string;
+	overall: number;
+	org?: Pick<Org, "id" | "name" | "logo">;
+	side?: Side;
+	stats: ReadonlyMap<string, LiveLine>;
+	involvedIds: ReadonlySet<string>;
+	deadIds: ReadonlySet<string>;
+	playersById?: ReadonlyMap<string, PlayerSeason>;
+}) {
+	const isRight = align === "right";
+	const tone =
+		align === "left"
+			? "border-emerald-300/25 bg-emerald-300/6"
+			: "border-amber-300/25 bg-amber-300/6";
+	return (
+		<section aria-label={`${label} lineup`} className={`rounded-2xl border p-3 sm:p-4 ${tone}`}>
+			<header className={`flex items-center gap-3 ${isRight ? "flex-row-reverse text-right" : ""}`}>
+				{org ? <OrgCrest org={org} size="md" /> : null}
+				<div className="min-w-0">
+					<p className="truncate text-sm font-semibold text-white">{org?.name ?? label}</p>
+					<p
+						className={`mt-0.5 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-zinc-500 ${isRight ? "justify-end" : ""}`}
+					>
+						{isRight ? (
+							<>
+								{side ? <SideMark side={side} /> : null}
+								<span className="tabular-nums">OVR {overall}</span>
+							</>
+						) : (
+							<>
+								<span className="tabular-nums">OVR {overall}</span>
+								{side ? <SideMark side={side} /> : null}
+							</>
+						)}
+					</p>
+					{org ? (
+						<p className="mt-0.5 truncate text-[11px] text-zinc-500">
+							{label.startsWith(`${org.name} · `) ? label.slice(org.name.length + 3) : label}
+						</p>
+					) : null}
+				</div>
+			</header>
+			<ul className="mt-3 space-y-1.5">
+				{members.map((member) => {
+					const line = stats.get(member.id) ?? { kills: 0, deaths: 0, assists: 0 };
+					const dead = deadIds.has(member.id);
+					const hot = !dead && involvedIds.has(member.id);
+					return (
+						<li
+							key={member.id}
+							title={dead ? `${member.nick}, eliminated this round` : undefined}
+							aria-label={dead ? `${member.nick}, eliminated this round` : undefined}
+							className={`flex items-center gap-2 rounded-xl px-1.5 py-1.5 motion-safe:transition-[opacity,filter,background-color] ${
+								isRight ? "flex-row-reverse" : ""
+							} ${dead ? "opacity-40 grayscale" : hot ? "bg-white/8 ring-1 ring-white/15" : ""}`}
+						>
+							<PlayerCrest player={crestFor(member, playersById)} size="md" />
+							<div className={`min-w-0 flex-1 ${isRight ? "text-right" : ""}`}>
+								<p className="truncate text-sm font-semibold text-zinc-100">{member.nick}</p>
+								<p className="text-[10px] uppercase tracking-wider text-zinc-500">
+									{ROLE_LABELS[member.slot]}
+								</p>
+							</div>
+							<span className="shrink-0 text-xs font-semibold tabular-nums text-zinc-300">
+								{line.kills}-{line.deaths}
+							</span>
+						</li>
+					);
+				})}
+			</ul>
+			<p className={`mt-3 truncate text-[11px] text-zinc-500 ${isRight ? "text-right" : ""}`}>
+				Coach · {coachNick}
+			</p>
+		</section>
+	);
+}
+
+function resolvedSummary(round: RoundResult): RoundSummary {
+	return resolveRoundSummary(round);
+}
+
+function RoundFeedItem({
+	round,
+	kills,
+	settled,
 	result,
+	shortLabels,
+}: {
+	round: RoundResult;
+	kills: readonly KillEvent[];
+	settled: boolean;
+	result: SeriesResult;
+	shortLabels: readonly [string, string];
+}) {
+	return (
+		<li className="rounded-xl border border-white/12 bg-zinc-950/70 px-3 py-2.5 text-xs">
+			<span className="font-semibold text-zinc-100">
+				{settled ? (
+					<>
+						R{round.round} · {shortLabels[round.winner]}{" "}
+						<span className="text-zinc-400">
+							{round.scoreAfter[0]}–{round.scoreAfter[1]}
+						</span>
+					</>
+				) : (
+					<>R{round.round}</>
+				)}
+			</span>
+			<ul className="mt-1.5 space-y-0.5">
+				{kills.map((kill) => (
+					<li
+						key={`${round.round}-${kill.killerId}-${kill.victimId}-${kill.assisterId ?? "none"}`}
+						aria-label={`${playerName(result, kill.killerId)} killed ${playerName(result, kill.victimId)}`}
+						className="motion-safe:animate-[draft-reveal_240ms_ease-out]"
+					>
+						<KillFeedLine kill={kill} result={result} />
+					</li>
+				))}
+			</ul>
+		</li>
+	);
+}
+
+function keyedCastLines(
+	lines: readonly string[],
+): { key: string; line: string; latest: boolean }[] {
+	const seen = new Map<string, number>();
+	return lines.map((line, index) => {
+		const count = (seen.get(line) ?? 0) + 1;
+		seen.set(line, count);
+		return {
+			key: count === 1 ? line : `${line} #${count}`,
+			line,
+			latest: index === lines.length - 1,
+		};
+	});
+}
+
+function RoundCast({ lines }: { lines: readonly string[] }) {
+	return (
+		<section
+			aria-label="Round cast"
+			className="rounded-xl border border-white/15 bg-zinc-950/88 px-3 py-2.5 text-sm leading-snug text-zinc-100 shadow-lg"
+		>
+			<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Cast</p>
+			<ol className="mt-2 space-y-1.5">
+				{keyedCastLines(lines).map(({ key, line, latest }) => (
+					<li key={key} className={latest ? "font-medium text-white" : "text-zinc-400"}>
+						{line}
+					</li>
+				))}
+			</ol>
+		</section>
+	);
+}
+
+function buyLabel(buy: string): string {
+	if (buy === "full-buy") return "full buy";
+	if (buy === "force") return "force";
+	if (buy === "eco") return "eco";
+	if (buy === "pistol") return "pistol";
+	return buy;
+}
+
+function CompareBar({
+	left,
+	right,
+	leftCaption,
+	rightCaption,
+	label,
+}: {
+	left: number;
+	right: number;
+	leftCaption: string;
+	rightCaption: string;
+	label: string;
+}) {
+	const total = left + right;
+	const leftPct = total === 0 ? 50 : (left / total) * 100;
+	return (
+		<div>
+			<p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+				{label}
+			</p>
+			<div className="mb-1 flex justify-between gap-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+				<span className="text-emerald-200/90">{leftCaption}</span>
+				<span className="text-right text-amber-200/90">{rightCaption}</span>
+			</div>
+			<div className="h-2 overflow-hidden rounded-full bg-amber-300/80">
+				<div
+					className="h-full bg-emerald-300 motion-safe:transition-[width]"
+					style={{ width: `${leftPct}%` }}
+				/>
+			</div>
+		</div>
+	);
+}
+
+function EconomyBars({
+	roundValues,
+	totals,
+	buys,
+	labels,
+}: {
+	roundValues: readonly [number, number];
+	totals: readonly [number, number];
+	buys: readonly [string, string];
+	labels: readonly [string, string];
+}) {
+	return (
+		<section className="mt-4 space-y-3" aria-label="Team economy">
+			<CompareBar
+				label="This round"
+				left={roundValues[0]}
+				right={roundValues[1]}
+				leftCaption={`${labels[0]} · ${buyLabel(buys[0])} · $${roundValues[0].toLocaleString()}`}
+				rightCaption={`$${roundValues[1].toLocaleString()} · ${buyLabel(buys[1])} · ${labels[1]}`}
+			/>
+			<CompareBar
+				label="Bank"
+				left={totals[0]}
+				right={totals[1]}
+				leftCaption={`${labels[0]} · $${totals[0].toLocaleString()}`}
+				rightCaption={`$${totals[1].toLocaleString()} · ${labels[1]}`}
+			/>
+		</section>
+	);
+}
+
+export function MatchPlayback({
+	result: completedResult,
+	live,
+	onLiveChange,
 	teamLabels,
-	eyebrow = `${result.format} exhibition`,
+	opponentOrg,
+	playersById,
+	eyebrow,
 	onComplete,
 }: MatchPlaybackProps) {
-	const playbackRounds = useMemo(
-		() =>
-			result.maps.flatMap((map, mapIndex) =>
-				map.rounds.map((round, roundIndex) => ({ mapIndex, roundIndex, round })),
-			),
-		[result],
-	);
+	const result = live ? seriesFromLive(live) : completedResult;
+	const shortLabels = [teamLabels[0], opponentOrg?.name ?? teamLabels[1]] as const;
+	const maps = result?.maps ?? [];
+	const playbackTicks = useMemo(() => buildPlaybackTicks(maps), [maps]);
 	const [revealedCount, setRevealedCount] = useState(0);
 	const [playing, setPlaying] = useState(false);
+	const [speed, setSpeed] = useState<PlaybackSpeed>(1);
+	const [settingsOpen, setSettingsOpen] = useState(false);
 	const [announcement, setAnnouncement] = useState("Replay ready.");
+	const [reducedMotion, setReducedMotion] = useState(false);
 	const completionReported = useRef(false);
-	const complete = revealedCount >= playbackRounds.length;
 
 	useEffect(() => {
-		if (!playing || complete) return;
-		const timer = window.setInterval(() => {
-			setRevealedCount((count) => Math.min(playbackRounds.length, count + 1));
-		}, 700);
+		const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+		const sync = () => setReducedMotion(media.matches);
+		sync();
+		media.addEventListener("change", sync);
+		return () => media.removeEventListener("change", sync);
+	}, []);
+
+	const seriesDone = live ? live.complete : Boolean(result);
+	const cursor = resolvePlayback(maps, playbackTicks, revealedCount);
+	const caughtUp = revealedCount >= playbackTicks.length;
+	const complete = cursor.complete && seriesDone && (maps.length > 0 || seriesDone);
+	const waitingForPlan = Boolean(live && !live.complete && !live.current);
+	const waitingForRound = Boolean(live && !live.complete && live.current && caughtUp);
+
+	useEffect(() => {
+		if (!playing || !live || live.complete || !live.current || !onLiveChange || !caughtUp) return;
+		const played = playRound(live);
+		if (played.ok) onLiveChange(played.value);
+	}, [playing, live, onLiveChange, caughtUp]);
+
+	const featuredPlayerClutch = cursor.inProgressRound
+		? (maps[cursor.mapIndex] ?? maps[0])?.highlights.find(
+				(highlight) =>
+					highlight.type === "clutch-sequence" &&
+					highlight.team === 0 &&
+					highlight.round === cursor.inProgressRound?.round,
+			)
+		: undefined;
+	const clutchMomentActive = Boolean(
+		featuredPlayerClutch &&
+			featuredPlayerClutch.type === "clutch-sequence" &&
+			shouldShowFeaturedClutch(maps, cursor.mapIndex, featuredPlayerClutch.round) &&
+			cursor.inProgressKills.length - 1 >=
+				clutchMomentStartIndex(featuredPlayerClutch.startKillIndex),
+	);
+	const clutchSlow = Boolean(!reducedMotion && clutchMomentActive);
+
+	useEffect(() => {
+		if (!playing || complete || waitingForRound || waitingForPlan) return;
+		const timer = window.setInterval(
+			() => {
+				setRevealedCount((count) => Math.min(playbackTicks.length, count + 1));
+			},
+			clutchSlow ? 1_400 : playbackTickMs(speed),
+		);
 		return () => window.clearInterval(timer);
-	}, [complete, playbackRounds.length, playing]);
+	}, [complete, playbackTicks.length, playing, speed, waitingForPlan, waitingForRound, clutchSlow]);
+
+	useEffect(() => {
+		if (waitingForPlan && playing) {
+			setPlaying(false);
+			setAnnouncement("Pick a game plan for the next map.");
+		}
+	}, [playing, waitingForPlan]);
+
+	useEffect(() => {
+		if (clutchMomentActive) setSettingsOpen(false);
+	}, [clutchMomentActive]);
 
 	useEffect(() => {
 		if (complete && playing) {
 			setPlaying(false);
 			setAnnouncement(
-				`Final: ${teamLabels[0]} ${result.maps.at(-1)?.score[0] ?? 0}, ${teamLabels[1]} ${result.maps.at(-1)?.score[1] ?? 0}.`,
+				`Final: ${shortLabels[0]} ${result?.score[0] ?? 0}, ${shortLabels[1]} ${result?.score[1] ?? 0}.`,
 			);
 		}
-	}, [complete, playing, result.maps, teamLabels]);
+	}, [complete, playing, result?.score, shortLabels]);
 
 	useEffect(() => {
 		if (complete && !completionReported.current) {
@@ -209,32 +817,144 @@ export function MatchPlayback({
 		}
 	}, [complete, onComplete]);
 
-	const lastRevealed = playbackRounds[revealedCount - 1];
-	const activeMapIndex = complete
-		? result.maps.length - 1
-		: (lastRevealed?.mapIndex ?? playbackRounds[revealedCount]?.mapIndex ?? 0);
-	const activeMap = result.maps[activeMapIndex] as MapResult;
-	const revealedOnActiveMap = playbackRounds
-		.slice(0, revealedCount)
-		.filter((entry) => entry.mapIndex === activeMapIndex).length;
-	const activeScore =
-		revealedOnActiveMap === 0
-			? ([0, 0] as const)
-			: (activeMap.rounds[revealedOnActiveMap - 1]?.scoreAfter ?? ([0, 0] as const));
-	const completedMaps = result.maps.filter((_, mapIndex) => {
-		const mapLastRound = playbackRounds.findLast((entry) => entry.mapIndex === mapIndex);
-		return mapLastRound ? revealedCount > playbackRounds.indexOf(mapLastRound) : false;
-	});
-	const seriesScore = completedMaps.reduce<[number, number]>(
-		(score, map) => {
-			score[map.winner] += 1;
-			return score;
-		},
-		[0, 0],
+	if (!result) return null;
+
+	const activeMap = (maps[cursor.mapIndex] ?? maps[0]) as MapResult | undefined;
+	if (!activeMap) {
+		return (
+			<section className="mt-5 rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6">
+				<p className="text-center text-sm text-zinc-400">Press play to start the match.</p>
+				<div className="mt-4 flex justify-center">
+					<button type="button" onClick={() => setPlaying(true)} className={CONTROL_CLASS}>
+						Play
+					</button>
+				</div>
+			</section>
+		);
+	}
+
+	const feed = latestRoundFeed(cursor, activeMap);
+	const stats = liveLines(activeMap.rounds, cursor.settledRoundCount, cursor.inProgressKills);
+	const latestKill = cursor.inProgressKills.at(-1);
+	const involvedIds = new Set(
+		latestKill
+			? latestKill.assisterId
+				? [latestKill.killerId, latestKill.victimId, latestKill.assisterId]
+				: [latestKill.killerId, latestKill.victimId]
+			: [],
 	);
-	const visibleRounds = playbackRounds.slice(0, revealedCount).filter((entry) => {
-		return entry.mapIndex === activeMapIndex;
-	});
+	const currentSides =
+		cursor.inProgressRound?.sides ??
+		activeMap.rounds[cursor.settledRoundCount - 1]?.sides ??
+		activeMap.rounds[0]?.sides;
+	const buys: [string, string] = feed?.round.economy
+		? [feed.round.economy[0]?.buy ?? "—", feed.round.economy[1]?.buy ?? "—"]
+		: ["pistol", "pistol"];
+	const roundValues: [number, number] = [
+		equipmentValue(feed?.round.economy[0]?.buy),
+		equipmentValue(feed?.round.economy[1]?.buy),
+	];
+	const totals = playbackBanks(feed?.round.economy, Boolean(feed?.settled));
+	const killIndex = cursor.inProgressKills.length - 1;
+	const clutch =
+		cursor.inProgressRound && killIndex >= 0
+			? activeClutchSequence(activeMap.highlights, cursor.inProgressRound.round, killIndex)
+			: undefined;
+	const featuredClutch = cursor.inProgressRound
+		? activeMap.highlights.find(
+				(highlight) =>
+					highlight.type === "clutch-sequence" && highlight.round === cursor.inProgressRound?.round,
+			)
+		: undefined;
+	const remainingAfter = clutch
+		? (cursor.inProgressRound?.kills
+				.slice(killIndex + 1)
+				.filter((kill) => kill.victimTeam !== clutch.team).length ?? 0)
+		: 0;
+	const clutchLine =
+		clutch && latestKill && cursor.inProgressRound
+			? clutchBeatLine({
+					player: playerName(result, clutch.playerId),
+					against: clutch.against,
+					won: clutch.won,
+					killIndex,
+					startKillIndex: clutch.startKillIndex,
+					remainingAfter,
+					weapon: latestKill.weapon,
+				})
+			: "";
+	const castLines = feed
+		? liveCastLines({
+				round: feed.round,
+				kills: feed.kills,
+				teamLabels: shortLabels,
+				playerName: (id) => playerName(result, id),
+				clutchLine: clutchLine || undefined,
+			})
+		: [];
+	const boardDeadIds = lineupDeadIds(
+		cursor.inProgressKills,
+		featuredClutch && featuredClutch.type === "clutch-sequence"
+			? featuredClutch.startKillIndex
+			: undefined,
+	);
+	const momentClutch =
+		featuredClutch && featuredClutch.type === "clutch-sequence" && featuredClutch.team === 0
+			? featuredClutch
+			: undefined;
+	const clutcher = momentClutch
+		? result.teams[0].members.find((member) => member.id === momentClutch.playerId)
+		: undefined;
+	const momentOpponents = momentClutch
+		? clutchOpponents(
+				result.teams[1].members,
+				cursor.inProgressRound?.kills ?? [],
+				momentClutch.startKillIndex,
+				cursor.inProgressKills.length,
+			)
+		: [];
+	const momentLines =
+		momentClutch && clutcher
+			? clutchMomentLines({
+					player: clutcher.nick,
+					playerId: clutcher.id,
+					clutchTeam: 0,
+					against: momentClutch.against,
+					won: momentClutch.won,
+					startKillIndex: momentClutch.startKillIndex,
+					kills: cursor.inProgressRound?.kills ?? [],
+					revealedCount: cursor.inProgressKills.length,
+					nameOf: (id) => playerName(result, id),
+				})
+			: [];
+	const showClutchMoment = Boolean(clutchMomentActive && clutcher && momentClutch);
+
+	function announceTick(tick: PlaybackTick | undefined) {
+		if (!tick) {
+			setAnnouncement("Final result revealed.");
+			return;
+		}
+		if (tick.kind === "kill") {
+			const kill = maps[tick.mapIndex]?.rounds[tick.roundIndex]?.kills[tick.killIndex];
+			if (kill) {
+				setAnnouncement(
+					`${playerName(result as SeriesResult, kill.killerId)} killed ${playerName(result as SeriesResult, kill.victimId)}.`,
+				);
+				return;
+			}
+		}
+		const round = maps[tick.mapIndex]?.rounds[tick.roundIndex];
+		if (round) {
+			const summary = formatRoundSummary(resolvedSummary(round), shortLabels, (id) =>
+				playerName(result as SeriesResult, id),
+			);
+			setAnnouncement(
+				`Round ${round.round}: ${summary} ${round.scoreAfter[0]}–${round.scoreAfter[1]}.`,
+			);
+			return;
+		}
+		setAnnouncement("Replay advanced.");
+	}
 
 	function playPause() {
 		if (complete) return;
@@ -244,14 +964,29 @@ export function MatchPlayback({
 
 	function step() {
 		setPlaying(false);
-		setRevealedCount((count) => Math.min(playbackRounds.length, count + 1));
-		const next = playbackRounds[revealedCount];
-		setAnnouncement(next ? `Round ${next.round.round} revealed.` : "Final result revealed.");
+		if (live && onLiveChange && !live.complete && live.current && caughtUp) {
+			const played = playRound(live);
+			if (played.ok) {
+				onLiveChange(played.value);
+				setRevealedCount((count) => count + 1);
+			}
+			return;
+		}
+		const next = playbackTicks[revealedCount];
+		setRevealedCount((count) => Math.min(playbackTicks.length, count + 1));
+		announceTick(next);
 	}
 
 	function skip() {
 		setPlaying(false);
-		setRevealedCount(playbackRounds.length);
+		if (live && onLiveChange && !live.complete) {
+			const done = skipRemaining(live);
+			onLiveChange(done);
+			setRevealedCount(buildPlaybackTicks(done.maps).length);
+			setAnnouncement("Skipped to the final result.");
+			return;
+		}
+		setRevealedCount(playbackTicks.length);
 		setAnnouncement("Skipped to the final result.");
 	}
 
@@ -261,102 +996,283 @@ export function MatchPlayback({
 		setAnnouncement("Replay restarted.");
 	}
 
+	function timeout() {
+		if (!live || !onLiveChange) return;
+		const queued = queueTimeout(live);
+		if (queued.ok) {
+			onLiveChange(queued.value);
+			setAnnouncement("Timeout queued for the next round.");
+			return;
+		}
+		setAnnouncement(queued.error.message);
+	}
+
+	const headingEyebrow = eyebrow ?? `${result.format} match`;
+	const background =
+		getMap(activeMap.mapContext?.mapId ?? "")?.background ?? activeMap.mapContext?.background;
+	const roundWinner = settleWinner(maps, playbackTicks, revealedCount);
+	const settleSide = roundWinner === 0 ? "player" : roundWinner === 1 ? "opponent" : undefined;
+
 	return (
 		<section
 			aria-labelledby="match-heading"
-			className="mt-5 rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6"
+			className="relative mt-5 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6"
+			style={
+				background
+					? {
+							backgroundImage: `linear-gradient(to bottom, rgb(9 9 11 / 0.58), rgb(9 9 11 / 0.84)), url(${background})`,
+							backgroundSize: "cover",
+							backgroundPosition: "center",
+						}
+					: undefined
+			}
 		>
-			<div className="flex flex-wrap items-start justify-between gap-4">
-				<div>
-					<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-						{eyebrow}
-					</p>
-					<h3 id="match-heading" className="mt-1 text-xl font-semibold tracking-tight text-white">
-						{teamLabels[0]} <span className="text-zinc-600">vs</span> {teamLabels[1]}
-					</h3>
-					<p className="mt-1 text-xs text-zinc-500">
-						Series {seriesScore[0]}–{seriesScore[1]} · {activeMap.label}
-						{activeMap.overtimeBlocks > 0 ? ` · ${activeMap.overtimeBlocks}× OT` : ""}
-					</p>
-				</div>
-				<section className="flex items-center gap-3" aria-label="Current map score">
-					<div className="text-right">
-						<span className="block max-w-28 truncate text-xs text-zinc-400">{teamLabels[0]}</span>
-						<strong className="text-3xl tabular-nums text-emerald-300">{activeScore[0]}</strong>
-					</div>
-					<span className="text-zinc-700">:</span>
-					<div>
-						<span className="block max-w-28 truncate text-xs text-zinc-400">{teamLabels[1]}</span>
-						<strong className="text-3xl tabular-nums text-amber-300">{activeScore[1]}</strong>
-					</div>
-				</section>
+			{showClutchMoment && clutcher && momentClutch ? (
+				<ClutchMoment
+					player={clutcher.nick}
+					playerCrest={crestFor(clutcher, playersById)}
+					opponents={momentOpponents.map((row) => ({
+						...row,
+						crest: crestFor(row.member, playersById),
+					}))}
+					against={momentClutch.against}
+					lines={momentLines}
+					footer={
+						<fieldset className="flex flex-wrap justify-center gap-2">
+							<legend className="sr-only">Clutch replay controls</legend>
+							<button
+								type="button"
+								onClick={playPause}
+								disabled={complete || waitingForPlan}
+								className={CONTROL_CLASS}
+							>
+								{playing ? "Pause" : "Play"}
+							</button>
+							<button
+								type="button"
+								onClick={step}
+								disabled={complete || waitingForPlan}
+								className={CONTROL_CLASS}
+							>
+								Next
+							</button>
+						</fieldset>
+					}
+				/>
+			) : null}
+
+			<div className="relative z-20 text-center">
+				<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+					{headingEyebrow}
+				</p>
+				<h3 id="match-heading" className="mt-1 text-xl font-semibold tracking-tight text-white">
+					{shortLabels[0]} <span className="text-zinc-600">vs</span> {shortLabels[1]}
+				</h3>
+				<p className="mt-1 text-xs text-zinc-500">
+					Series {cursor.seriesScore[0]}–{cursor.seriesScore[1]} · {activeMap.label}
+					{activeMap.mapContext?.homePick ? " · home pick" : ""}
+					{activeMap.gamePlan ? ` · ${gamePlanById(activeMap.gamePlan).label}` : ""}
+					{activeMap.overtimeBlocks > 0 ? ` · ${activeMap.overtimeBlocks}× OT` : ""}
+				</p>
 			</div>
 
-			<RoundTimeline map={activeMap} revealed={revealedOnActiveMap} teamLabels={teamLabels} />
+			<div className="mt-5 grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)_minmax(15rem,18rem)]">
+				<div className="max-lg:order-2">
+					<TeamLineup
+						align="left"
+						label={teamLabels[0]}
+						members={result.teams[0].members}
+						coachNick={result.teams[0].coach.nick}
+						overall={result.teams[0].overall}
+						side={currentSides?.[0]}
+						stats={stats}
+						involvedIds={involvedIds}
+						deadIds={boardDeadIds}
+						playersById={playersById}
+					/>
+				</div>
 
-			<fieldset className="mt-5 flex flex-wrap gap-2">
-				<legend className="sr-only">Replay controls</legend>
-				<button type="button" onClick={playPause} disabled={complete} className={CONTROL_CLASS}>
-					{playing ? "Pause" : "Play"}
-				</button>
-				<button type="button" onClick={step} disabled={complete} className={CONTROL_CLASS}>
-					Next round
-				</button>
-				<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
-					Skip to result
-				</button>
-				<button
-					type="button"
-					onClick={restart}
-					disabled={revealedCount === 0}
-					className={CONTROL_CLASS}
-				>
-					Restart replay
-				</button>
-			</fieldset>
-			<p className="sr-only" aria-live="polite" aria-atomic="true">
-				{announcement}
-			</p>
+				<div className="relative min-w-0 max-lg:order-1 max-lg:col-span-full">
+					<section
+						className="flex items-center justify-center gap-4"
+						aria-label="Current map score"
+						data-round-winner={settleSide}
+					>
+						<span
+							key={settleSide === "player" ? `player-${revealedCount}` : "player"}
+							className={`relative inline-flex items-center justify-center ${
+								settleSide === "player" ? "round-score-pulse" : ""
+							}`}
+						>
+							{settleSide === "player" ? (
+								<span
+									aria-hidden
+									className="round-score-pulse-ring round-score-pulse-ring-player"
+								/>
+							) : null}
+							<strong className="relative text-5xl tabular-nums text-emerald-300 sm:text-6xl">
+								{cursor.score[0]}
+							</strong>
+						</span>
+						<span className="text-2xl text-zinc-700">:</span>
+						<span
+							key={settleSide === "opponent" ? `opponent-${revealedCount}` : "opponent"}
+							className={`relative inline-flex items-center justify-center ${
+								settleSide === "opponent" ? "round-score-pulse" : ""
+							}`}
+						>
+							{settleSide === "opponent" ? (
+								<span
+									aria-hidden
+									className="round-score-pulse-ring round-score-pulse-ring-opponent"
+								/>
+							) : null}
+							<strong className="relative text-5xl tabular-nums text-amber-300 sm:text-6xl">
+								{cursor.score[1]}
+							</strong>
+						</span>
+					</section>
 
-			<div className="mt-5 border-t border-white/10 pt-4">
-				<h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-					Play-by-play
-				</h4>
-				{visibleRounds.length === 0 ? (
-					<p className="mt-2 text-sm text-zinc-600">
-						Press play, step forward, or skip to the result.
-					</p>
-				) : (
-					<ol className="mt-2 max-h-64 space-y-2 overflow-y-auto pr-1">
-						{visibleRounds
-							.toReversed()
-							.slice(0, 10)
-							.map(({ round }) => {
-								const highlights = activeMap.highlights.filter(
-									(highlight) => highlight.round === round.round,
-								);
-								return (
-									<li
-										key={round.round}
-										className="rounded-lg border border-white/8 bg-white/3 px-3 py-2 text-xs text-zinc-400 motion-safe:animate-[draft-reveal_240ms_ease-out]"
+					<RoundTimeline
+						map={activeMap}
+						revealed={cursor.settledRoundCount}
+						teamLabels={shortLabels}
+					/>
+
+					<EconomyBars roundValues={roundValues} totals={totals} buys={buys} labels={shortLabels} />
+
+					<fieldset className="mt-5 flex flex-wrap items-start justify-center gap-2">
+						<legend className="sr-only">Replay controls</legend>
+						<button
+							type="button"
+							onClick={playPause}
+							disabled={complete || waitingForPlan}
+							className={CONTROL_CLASS}
+						>
+							{playing ? "Pause" : "Play"}
+						</button>
+						<button
+							type="button"
+							onClick={step}
+							disabled={complete || waitingForPlan}
+							className={CONTROL_CLASS}
+						>
+							Next
+						</button>
+						{live ? (
+							<button
+								type="button"
+								onClick={timeout}
+								disabled={!canQueueTimeout(live)}
+								className={CONTROL_CLASS}
+							>
+								Timeout ({live.current?.timeoutsRemaining ?? 0})
+							</button>
+						) : null}
+						<div className="relative">
+							<button
+								type="button"
+								aria-expanded={settingsOpen}
+								aria-controls="playback-settings"
+								onClick={() => setSettingsOpen((open) => !open)}
+								className={CONTROL_CLASS}
+							>
+								Settings
+							</button>
+							{settingsOpen ? (
+								<div
+									id="playback-settings"
+									className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-white/15 bg-zinc-950/95 p-2 shadow-xl"
+								>
+									<button
+										type="button"
+										onClick={skip}
+										disabled={complete}
+										className={`${CONTROL_CLASS} w-full`}
 									>
-										<span className="font-semibold text-zinc-200">
-											R{round.round} · {teamLabels[round.winner]} made it {round.scoreAfter[0]}–
-											{round.scoreAfter[1]}
-										</span>
-										{highlights.map((highlight) => (
-											<span
-												key={`${round.round}-${highlight.type}-${highlightText(highlight, result, teamLabels)}`}
-												className="mt-1 block text-emerald-200"
-											>
-												{highlightText(highlight, result, teamLabels)}
-											</span>
-										))}
-									</li>
-								);
-							})}
-					</ol>
-				)}
+										Skip to result
+									</button>
+									<button
+										type="button"
+										onClick={restart}
+										disabled={revealedCount === 0}
+										className={`${CONTROL_CLASS} mt-1.5 w-full`}
+									>
+										Restart replay
+									</button>
+									<fieldset className="mt-2 flex gap-1.5">
+										<legend className="sr-only">Replay speed</legend>
+										{PLAYBACK_SPEEDS.map((option) => {
+											const selected = option === speed;
+											return (
+												<button
+													key={option}
+													type="button"
+													aria-pressed={selected}
+													onClick={() => {
+														setSpeed(option);
+														setAnnouncement(`Replay speed ${option}×.`);
+													}}
+													className={`${CONTROL_CLASS} min-w-11 flex-1 ${
+														selected
+															? "border-emerald-300/50 bg-emerald-300/15 text-emerald-100"
+															: ""
+													}`}
+												>
+													{option}×
+												</button>
+											);
+										})}
+									</fieldset>
+								</div>
+							) : null}
+						</div>
+					</fieldset>
+					<p className="sr-only" aria-live="polite" aria-atomic="true">
+						{announcement}
+					</p>
+
+					<div className="mt-5">
+						<h4 className="text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
+							Play-by-play
+						</h4>
+						{!feed ? (
+							<p className="mt-3 text-center text-sm text-zinc-600">
+								Press play, step forward, or skip to the result.
+							</p>
+						) : (
+							<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
+								<ol>
+									<RoundFeedItem
+										key={feed.round.round}
+										round={feed.round}
+										kills={feed.kills}
+										settled={feed.settled}
+										result={result}
+										shortLabels={shortLabels}
+									/>
+								</ol>
+								<RoundCast lines={castLines} />
+							</div>
+						)}
+					</div>
+				</div>
+
+				<div className="max-lg:order-3">
+					<TeamLineup
+						align="right"
+						label={teamLabels[1]}
+						members={result.teams[1].members}
+						coachNick={result.teams[1].coach.nick}
+						overall={result.teams[1].overall}
+						org={opponentOrg}
+						side={currentSides?.[1]}
+						stats={stats}
+						involvedIds={involvedIds}
+						deadIds={boardDeadIds}
+						playersById={playersById}
+					/>
+				</div>
 			</div>
 
 			{complete && (
@@ -365,16 +1281,20 @@ export function MatchPlayback({
 						Final result
 					</p>
 					<h4 className="mt-1 text-2xl font-semibold text-white">
-						{teamLabels[result.winner]} win {result.score[0]}–{result.score[1]}
+						{shortLabels[result.winner]} win {result.score[0]}–{result.score[1]}
 					</h4>
-					{result.maps.map((map) => (
-						<section key={map.label} aria-label={`${map.label} final scoreboard`}>
-							<h5 className="mt-5 text-base font-semibold text-zinc-200">
-								{map.label} · {teamLabels[0]} {map.score[0]}–{map.score[1]} {teamLabels[1]}
-							</h5>
-							<Scoreboard map={map} teamLabels={teamLabels} />
-						</section>
-					))}
+					{result.maps.length > 1 ? (
+						<p className="mt-1 text-sm text-zinc-500">
+							{result.maps.map((map) => `${map.label} ${map.score[0]}–${map.score[1]}`).join(" · ")}
+						</p>
+					) : null}
+					<section aria-label="Series scoreboard">
+						<Scoreboard
+							teams={aggregateSeriesScoreboard(result.maps)}
+							teamLabels={shortLabels}
+							roundsWon={seriesRoundsWon(result.maps)}
+						/>
+					</section>
 				</div>
 			)}
 		</section>
