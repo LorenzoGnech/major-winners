@@ -31,7 +31,7 @@ import type {
 } from "./types";
 import { assignWeapon } from "./weapons";
 
-export const TIMEOUTS_PER_MAP = 4;
+export const TIMEOUTS_PER_MAP = 1;
 export { MAX_FEATURED_CLUTCHES } from "./clutch";
 
 const MAX_OVERTIME_BLOCKS = 12;

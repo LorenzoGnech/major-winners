@@ -425,6 +425,27 @@ describe("live series", () => {
 		expect(continued.value.current?.rounds[1]?.timeout).toBe(false);
 	});
 
+	it("allows only one timeout per map", () => {
+		const started = startLiveSeries({
+			teams: equalTeams,
+			seed: 21,
+			format: "BO1",
+			playerMapId: "mirage",
+		});
+		expect(started.current?.timeoutsRemaining).toBe(1);
+		const queued = queueTimeout(started);
+		expect(queued.ok).toBe(true);
+		if (!queued.ok) return;
+		expect(queued.value.current?.timeoutsRemaining).toBe(0);
+		const played = playRound(queued.value);
+		expect(played.ok).toBe(true);
+		if (!played.ok) return;
+		const second = queueTimeout(played.value);
+		expect(second.ok).toBe(false);
+		if (second.ok) return;
+		expect(second.error.code).toBe("NO_TIMEOUTS");
+	});
+
 	it("batch skip matches simulateSeries and restores from rng state", () => {
 		const input = {
 			teams: equalTeams,
