@@ -144,6 +144,38 @@
 	}
 }
 
+@keyframes feed-stack-in {
+	from {
+		grid-template-rows: 0fr;
+		opacity: 0;
+	}
+	to {
+		grid-template-rows: 1fr;
+		opacity: 1;
+	}
+}
+
+.feed-stack-in {
+	display: grid;
+	grid-template-rows: 1fr;
+	animation: feed-stack-in 280ms ease-out;
+}
+
+.feed-stack-in-inner {
+	min-height: 0;
+	overflow: hidden;
+}
+
+.feed-stack-fade {
+	mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 1.25rem), transparent 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.feed-stack-in {
+		animation: none;
+	}
+}
+
 @keyframes draft-reel-lock {
 	0% {
 		box-shadow: 0 0 0 0 rgb(110 231 183 / 0);

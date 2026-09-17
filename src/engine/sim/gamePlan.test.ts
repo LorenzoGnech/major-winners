@@ -110,6 +110,12 @@ describe("game plans", () => {
 		);
 		expect(anti.details.coaching.antiStrat).toBeGreaterThan(teams[0].details.coaching.antiStrat);
 		expect(anti.attributes.aim).toBeLessThan(teams[0].attributes.aim);
+		const risky = applyGamePlan(teams[0], "risky");
+		expect(risky.attributes.entry).toBeGreaterThan(teams[0].attributes.entry);
+		expect(risky.attributes.consistency).toBeLessThan(teams[0].attributes.consistency);
+		expect(risky.details.coaching.economyDiscipline).toBeLessThan(
+			teams[0].details.coaching.economyDiscipline,
+		);
 	});
 
 	it("keeps simulateSeries on the standard plan identical to an omitted plan", () => {

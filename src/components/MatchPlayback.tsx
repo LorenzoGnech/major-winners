@@ -60,6 +60,7 @@ const CONTROL_CLASS =
 	"rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-white/30 enabled:hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-40";
 
 const TEAM_TEXT = ["text-emerald-300", "text-amber-300"] as const;
+const FEED_BOX_CLASS = "flex h-44 flex-col overflow-hidden";
 
 const ROLE_LABELS: Record<Role, string> = {
 	awp: "AWP",
@@ -586,8 +587,10 @@ function RoundFeedItem({
 	shortLabels: readonly [string, string];
 }) {
 	return (
-		<li className="rounded-xl border border-white/12 bg-zinc-950/70 px-3 py-2.5 text-xs">
-			<span className="font-semibold text-zinc-100">
+		<li
+			className={`${FEED_BOX_CLASS} rounded-xl border border-white/12 bg-zinc-950/70 px-3 py-2.5 text-xs`}
+		>
+			<span className="shrink-0 font-semibold text-zinc-100">
 				{settled ? (
 					<>
 						R{round.round} · {shortLabels[round.winner]}{" "}
@@ -599,14 +602,16 @@ function RoundFeedItem({
 					<>R{round.round}</>
 				)}
 			</span>
-			<ul className="mt-1.5 space-y-0.5">
-				{kills.map((kill) => (
+			<ul className="feed-stack-fade mt-1.5 min-h-0 flex-1 space-y-0.5 overflow-hidden">
+				{[...kills].toReversed().map((kill) => (
 					<li
 						key={`${round.round}-${kill.killerId}-${kill.victimId}-${kill.assisterId ?? "none"}`}
 						aria-label={`${playerName(result, kill.killerId)} killed ${playerName(result, kill.victimId)}`}
-						className="motion-safe:animate-[draft-reveal_240ms_ease-out]"
+						className="feed-stack-in"
 					>
-						<KillFeedLine kill={kill} result={result} />
+						<div className="feed-stack-in-inner">
+							<KillFeedLine kill={kill} result={result} />
+						</div>
 					</li>
 				))}
 			</ul>
@@ -618,28 +623,36 @@ function keyedCastLines(
 	lines: readonly string[],
 ): { key: string; line: string; latest: boolean }[] {
 	const seen = new Map<string, number>();
-	return lines.map((line, index) => {
-		const count = (seen.get(line) ?? 0) + 1;
-		seen.set(line, count);
-		return {
-			key: count === 1 ? line : `${line} #${count}`,
-			line,
-			latest: index === lines.length - 1,
-		};
-	});
+	return lines
+		.map((line) => {
+			const count = (seen.get(line) ?? 0) + 1;
+			seen.set(line, count);
+			return {
+				key: count === 1 ? line : `${line} #${count}`,
+				line,
+			};
+		})
+		.toReversed()
+		.map((item, index) => ({ ...item, latest: index === 0 }));
 }
 
 function RoundCast({ lines }: { lines: readonly string[] }) {
 	return (
 		<section
 			aria-label="Round cast"
-			className="rounded-xl border border-white/15 bg-zinc-950/88 px-3 py-2.5 text-sm leading-snug text-zinc-100 shadow-lg"
+			className={`${FEED_BOX_CLASS} rounded-xl border border-white/15 bg-zinc-950/88 px-3 py-2.5 text-sm leading-snug text-zinc-100 shadow-lg`}
 		>
-			<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Cast</p>
-			<ol className="mt-2 space-y-1.5">
+			<p className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+				Cast
+			</p>
+			<ol className="feed-stack-fade mt-2 min-h-0 flex-1 space-y-1.5 overflow-hidden">
 				{keyedCastLines(lines).map(({ key, line, latest }) => (
-					<li key={key} className={latest ? "font-medium text-white" : "text-zinc-400"}>
-						{line}
+					<li key={key} className="feed-stack-in">
+						<div
+							className={`feed-stack-in-inner ${latest ? "font-medium text-white" : "text-zinc-400"}`}
+						>
+							{line}
+						</div>
 					</li>
 				))}
 			</ol>
@@ -1241,12 +1254,8 @@ export function MatchPlayback({
 						<h4 className="text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
 							Play-by-play
 						</h4>
-						{!feed ? (
-							<p className="mt-3 text-center text-sm text-zinc-600">
-								Press play, step forward, or skip to the result.
-							</p>
-						) : (
-							<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
+						<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
+							{feed ? (
 								<ol>
 									<RoundFeedItem
 										key={feed.round.round}
@@ -1257,9 +1266,17 @@ export function MatchPlayback({
 										shortLabels={shortLabels}
 									/>
 								</ol>
-								<RoundCast lines={castLines} />
-							</div>
-						)}
+							) : (
+								<div
+									className={`${FEED_BOX_CLASS} items-center justify-center rounded-xl border border-white/12 bg-zinc-950/70 px-3 py-2.5`}
+								>
+									<p className="text-center text-sm text-zinc-600">
+										Press play, step forward, or skip to the result.
+									</p>
+								</div>
+							)}
+							<RoundCast lines={castLines} />
+						</div>
 					</div>
 				</div>
 
