@@ -7,6 +7,7 @@ const SIZE_CLASS = {
 	lg: "size-16 text-sm",
 	xl: "size-24 text-lg",
 	hero: "h-44 w-32 text-2xl sm:h-56 sm:w-40",
+	card: "aspect-[3/4] w-full text-2xl",
 } as const;
 
 type PlayerCrestProps = {

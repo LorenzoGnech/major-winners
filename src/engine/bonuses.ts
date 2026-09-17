@@ -54,7 +54,7 @@ export type BonusDefinition = {
 };
 
 export const TRAIT_REVEAL_CHANCE = 0.5;
-export const TRAIT_PROC_CHANCE = 0.03;
+export const TRAIT_PROC_CHANCE = 0.02;
 
 function def(
 	id: BonusId,

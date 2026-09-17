@@ -6,6 +6,7 @@ import {
 	pickTraitHits,
 	resolveTraitRound,
 	revealTraits,
+	TRAIT_PROC_CHANCE,
 	TRAIT_REVEAL_CHANCE,
 	tickLingering,
 } from "./bonuses";
@@ -192,7 +193,7 @@ describe("in-match procs", () => {
 		expect(rounds.filter((round) => round.bonus).length).toBeGreaterThanOrEqual(0);
 	});
 
-	it("rolls near 3% over many maps for a single holder", () => {
+	it("rolls near 2% over many maps for a single holder", () => {
 		let procs = 0;
 		let rounds = 0;
 		for (let seed = 0; seed < 40; seed += 1) {
@@ -208,8 +209,9 @@ describe("in-match procs", () => {
 			}
 		}
 		expect(rounds).toBeGreaterThan(400);
-		expect(procs / rounds).toBeGreaterThan(0.01);
-		expect(procs / rounds).toBeLessThan(0.08);
+		expect(TRAIT_PROC_CHANCE).toBe(0.02);
+		expect(procs / rounds).toBeGreaterThan(0.005);
+		expect(procs / rounds).toBeLessThan(0.06);
 	});
 });
 

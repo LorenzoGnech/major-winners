@@ -10,6 +10,7 @@ import {
 	liveBoardMorale,
 	liveLines,
 	mapWinAt,
+	mapWinContinueKind,
 	playbackMorale,
 	playbackTickMs,
 	resolvePlayback,
@@ -352,6 +353,30 @@ describe("isWaitingForNextMap", () => {
 				true,
 			),
 		).toBe(false);
+	});
+});
+
+describe("mapWinContinueKind", () => {
+	it("advances to the next map or match instead of only dismissing", () => {
+		expect(mapWinContinueKind(undefined)).toBe("dismiss");
+		expect(
+			mapWinContinueKind({
+				complete: false,
+				current: { complete: false } as LiveSeriesState["current"],
+			} as LiveSeriesState),
+		).toBe("dismiss");
+		expect(
+			mapWinContinueKind({
+				complete: false,
+				current: null,
+			} as LiveSeriesState),
+		).toBe("next-map");
+		expect(
+			mapWinContinueKind({
+				complete: true,
+				current: null,
+			} as LiveSeriesState),
+		).toBe("next-match");
 	});
 });
 

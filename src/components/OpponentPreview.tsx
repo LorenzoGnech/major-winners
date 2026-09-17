@@ -72,24 +72,23 @@ export function OpponentPreview({
 				</div>
 			</div>
 
-			<ul className="mt-4 space-y-1.5" aria-label="Opponent roster">
+			<ul className="mt-4 grid grid-cols-5 gap-2 sm:gap-3" aria-label="Opponent roster">
 				{roster.map((member) => (
-					<li
-						key={member.id}
-						className="flex items-center gap-2.5 rounded-xl bg-black/25 px-2 py-1.5"
-					>
-						<PlayerCrest player={crestFor(member, playersById)} size="sm" />
-						<div className="min-w-0 flex-1">
-							<p className="truncate text-sm font-semibold text-zinc-100">{member.nick}</p>
-							<p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-zinc-500">
-								<span>{ROLE_LABELS[member.slot]}</span>
-								<span aria-hidden>{flagEmoji(member.nationality)}</span>
-								<span className="normal-case tracking-normal">{member.year}</span>
-							</p>
-						</div>
-						<span className="shrink-0 text-sm font-semibold tabular-nums text-amber-100">
+					<li key={member.id} className="min-w-0">
+						<PlayerCrest player={crestFor(member, playersById)} size="card" />
+						<p className="mt-2 truncate text-center text-sm font-semibold text-zinc-100">
+							{member.nick}
+						</p>
+						<p className="mt-0.5 truncate text-center text-[10px] uppercase tracking-wider text-zinc-500">
+							{ROLE_LABELS[member.slot]}
+						</p>
+						<p className="mt-0.5 flex items-center justify-center gap-1 text-[10px] text-zinc-500">
+							<span aria-hidden>{flagEmoji(member.nationality)}</span>
+							<span>{member.year}</span>
+						</p>
+						<p className="mt-1 text-center text-sm font-semibold tabular-nums text-amber-100">
 							{Math.round(member.ovr)}
-						</span>
+						</p>
 					</li>
 				))}
 			</ul>

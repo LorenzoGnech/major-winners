@@ -56,6 +56,7 @@ type MatchPlaybackProps = {
 	eyebrow?: string;
 	onComplete?: () => void;
 	onAwaitingNextMap?: () => void;
+	onContinueMatch?: () => void;
 };
 
 type LiveLine = {
@@ -411,6 +412,15 @@ export function mapWinAt(
 
 export function isWaitingForNextMap(live: LiveSeriesState | undefined, caughtUp: boolean): boolean {
 	return Boolean(live && !live.complete && !live.current && caughtUp);
+}
+
+export function mapWinContinueKind(
+	live: LiveSeriesState | undefined,
+): "next-map" | "next-match" | "dismiss" {
+	if (!live) return "dismiss";
+	if (live.complete) return "next-match";
+	if (!live.current) return "next-map";
+	return "dismiss";
 }
 
 export const MAP_WIN_MOMENT_MS = 2_600;
@@ -915,6 +925,7 @@ export function MatchPlayback({
 	eyebrow,
 	onComplete,
 	onAwaitingNextMap,
+	onContinueMatch,
 }: MatchPlaybackProps) {
 	const result = live ? seriesFromLive(live) : completedResult;
 	const shortLabels = [teamLabels[0], opponentOrg?.name ?? teamLabels[1]] as const;
@@ -1085,7 +1096,7 @@ export function MatchPlayback({
 		const hold = window.setTimeout(
 			() => {
 				setMapWinMoment(null);
-				if (live && !live.complete && !live.current && !awaitingNextReported.current) {
+				if (mapWinContinueKind(live) === "next-map" && !awaitingNextReported.current) {
 					awaitingNextReported.current = true;
 					onAwaitingNextMap?.();
 					setAnnouncement("Starting the next map.");
@@ -1299,12 +1310,17 @@ export function MatchPlayback({
 
 	function dismissMapWinMoment() {
 		setMapWinMoment(null);
-		if (live && !live.complete && !live.current && !awaitingNextReported.current) {
+		const kind = mapWinContinueKind(live);
+		if (kind === "next-map" && !awaitingNextReported.current) {
 			awaitingNextReported.current = true;
 			onAwaitingNextMap?.();
 			setAnnouncement("Starting the next map.");
+			setPlaying(true);
+			return;
 		}
-		if (live && !live.complete) setPlaying(true);
+		if (kind === "next-match") {
+			onContinueMatch?.();
+		}
 	}
 
 	function playPause() {

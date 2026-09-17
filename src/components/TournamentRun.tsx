@@ -269,6 +269,7 @@ export function TournamentRun({
 						eyebrow={`${STAGE_LABELS[state.nextMatch?.stage ?? state.stage]} · ${state.nextMatch?.format ?? ""}`}
 						onComplete={() => setPlaybackComplete(true)}
 						onAwaitingNextMap={continueToNextMap}
+						onContinueMatch={continueRun}
 					/>
 					{playbackComplete && liveSeries.complete && (
 						<div className="mt-3 flex justify-end">
