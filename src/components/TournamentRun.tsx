@@ -10,6 +10,7 @@ import {
 	startNextMap,
 } from "../engine";
 import { MatchPlayback } from "./MatchPlayback";
+import { OpponentPreview } from "./OpponentPreview";
 import { OrgCrest } from "./OrgCrest";
 import { visibleTournamentBoard } from "./tournamentBoard";
 
@@ -206,28 +207,29 @@ export function TournamentRun({
 				</div>
 
 				{!liveSeries && state.status === "active" && state.nextMatch && (
-					<div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/25 p-4">
-						<div className="flex min-w-0 items-center gap-3">
-							{nextOpponentOrg ? <OrgCrest org={nextOpponentOrg} size="md" /> : null}
-							<div className="min-w-0">
-								<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-									Next · {state.nextMatch.format}
-								</p>
-								<p className="mt-1 truncate text-lg font-semibold text-white">
-									{playerTeamName} vs {state.nextMatch.opponent.label}
-								</p>
-								<p className="text-xs text-zinc-500">
-									OVR {state.nextMatch.opponent.profile.overall}
-								</p>
-							</div>
+					<div className="mt-5 rounded-xl border border-white/10 bg-black/25 p-4">
+						<div className="flex flex-wrap items-start justify-between gap-3">
+							<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+								Next · {state.nextMatch.format}
+							</p>
+							<button
+								type="button"
+								onClick={playNext}
+								className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+							>
+								Play match {state.nextMatch.matchNumber}
+							</button>
 						</div>
-						<button
-							type="button"
-							onClick={playNext}
-							className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-						>
-							Play match {state.nextMatch.matchNumber}
-						</button>
+						<div className="mt-4">
+							<OpponentPreview
+								opponent={state.nextMatch.opponent}
+								org={nextOpponentOrg}
+								playerTeamName={playerTeamName}
+								playerOverall={playerTeam.overall}
+								format={state.nextMatch.format}
+								playersById={playersById}
+							/>
+						</div>
 					</div>
 				)}
 

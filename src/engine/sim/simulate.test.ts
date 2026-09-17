@@ -14,6 +14,7 @@ import {
 	playRound,
 	queueTimeout,
 	simulateSeries,
+	skipCurrentMap,
 	skipRemaining,
 	startLiveSeries,
 } from "./live";
@@ -358,6 +359,27 @@ describe("simulateSeries", () => {
 		expect(won / featured).toBeGreaterThan(0.45);
 		expect(won / featured).toBeLessThan(0.9);
 	});
+
+	it("spreads early-window clutches instead of stacking them on round 1", () => {
+		let early = 0;
+		let opening = 0;
+		for (let seed = 0; seed < 160; seed += 1) {
+			const map = simulateSeries({
+				teams: equalTeams,
+				seed,
+				format: "BO1",
+				playerMapId: "mirage",
+			}).maps[0];
+			for (const highlight of map?.highlights ?? []) {
+				if (highlight.type !== "clutch-sequence") continue;
+				if (featuredClutchWindow(highlight.round) !== 0) continue;
+				early += 1;
+				if (highlight.round === 1) opening += 1;
+			}
+		}
+		expect(early).toBeGreaterThan(60);
+		expect(opening / early).toBeLessThan(0.28);
+	});
 });
 
 describe("roundWinProbability", () => {
@@ -461,6 +483,22 @@ describe("live series", () => {
 		expect(second.ok).toBe(false);
 		if (second.ok) return;
 		expect(second.error.code).toBe("NO_TIMEOUTS");
+	});
+
+	it("skipCurrentMap finishes only the open map", () => {
+		const live = startLiveSeries({
+			teams: equalTeams,
+			seed: 88,
+			format: "BO3",
+		});
+		const skipped = skipCurrentMap(live);
+		expect(skipped.complete).toBe(false);
+		expect(skipped.maps).toHaveLength(1);
+		expect(skipped.current).toBeNull();
+		expect(skipped.seriesScore[0] + skipped.seriesScore[1]).toBe(1);
+		const first = skipRemaining(startLiveSeries({ teams: equalTeams, seed: 88, format: "BO3" }));
+		expect(skipped.maps[0]).toEqual(first.maps[0]);
+		expect(first.maps.length).toBeGreaterThan(1);
 	});
 
 	it("batch skip matches simulateSeries and restores from rng state", () => {

@@ -1,4 +1,5 @@
 import type { KillEvent, RoundResult } from "../engine";
+import { bonusById } from "../engine/bonuses";
 
 const MULTI_KILL_LABEL: Record<number, string> = {
 	2: "double",
@@ -35,6 +36,11 @@ export function openingCastLine(
 		return "A double eco.";
 	}
 	return undefined;
+}
+
+function bonusCastLine(round: RoundResult, playerName: (id: string) => string): string | undefined {
+	if (!round.bonus) return undefined;
+	return `${playerName(round.bonus.seasonId)} activates ${bonusById(round.bonus.bonusId).name}.`;
 }
 
 function multiKillLines(kills: readonly KillEvent[], playerName: (id: string) => string): string[] {
@@ -80,6 +86,8 @@ export function liveCastLines({
 	const lines: string[] = [];
 	const economy = openingCastLine(round, teamLabels);
 	if (economy) lines.push(economy);
+	const bonus = bonusCastLine(round, playerName);
+	if (bonus) lines.push(bonus);
 	const opening = kills[0];
 	if (opening) {
 		lines.push(`${playerName(opening.killerId)} opens on ${playerName(opening.victimId)}.`);

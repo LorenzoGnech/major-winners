@@ -4,6 +4,7 @@ import {
 	FEATURED_CLUTCH_RATES,
 	featuredClutchWindow,
 	planFeaturedClutch,
+	remainingRoundsInWindow,
 	shouldShowFeaturedClutch,
 } from "./clutch";
 import type { HighlightEvent } from "./types";
@@ -24,14 +25,14 @@ describe("planFeaturedClutch", () => {
 
 	it("only stages denials on 1v3 or larger so the clutcher can still frag", () => {
 		for (let seed = 0; seed < 400; seed += 1) {
-			const plan = planFeaturedClutch([], 1, createRng(seed), 1);
+			const plan = planFeaturedClutch([], 1, createRng(seed), 8);
 			if (plan.intent !== "none") expect(plan.against).toBeGreaterThanOrEqual(3);
 		}
 	});
 
 	it("features only the player's side from the already-decided winner", () => {
-		const won = planFeaturedClutch([], 0, createRng(3), 1);
-		const lost = planFeaturedClutch([], 1, createRng(3), 1);
+		const won = planFeaturedClutch([], 0, createRng(3), 8);
+		const lost = planFeaturedClutch([], 1, createRng(3), 8);
 		expect(won.intent === "none" || won.intent === "win").toBe(true);
 		expect(lost.intent === "none" || lost.intent === "lose").toBe(true);
 		if (won.intent !== "none" && lost.intent !== "none") {
@@ -39,11 +40,24 @@ describe("planFeaturedClutch", () => {
 		}
 	});
 
+	it("does not favor the first round of a window", () => {
+		const samples = 8_000;
+		let first = 0;
+		let last = 0;
+		for (let seed = 0; seed < samples; seed += 1) {
+			if (planFeaturedClutch([], 0, createRng(seed), 1).intent !== "none") first += 1;
+			if (planFeaturedClutch([], 0, createRng(seed), 8).intent !== "none") last += 1;
+		}
+		expect(first / samples).toBeGreaterThan(0.06);
+		expect(first / samples).toBeLessThan(0.16);
+		expect(last / samples).toBeGreaterThan(first / samples);
+	});
+
 	it("offers 1v2 most often and 1v5 least, close to the published rates", () => {
 		const counts = { 2: 0, 3: 0, 4: 0, 5: 0, none: 0 };
 		const samples = 8_000;
 		for (let seed = 0; seed < samples; seed += 1) {
-			const plan = planFeaturedClutch([], 0, createRng(seed), 1);
+			const plan = planFeaturedClutch([], 0, createRng(seed), 8);
 			if (plan.intent === "none") counts.none += 1;
 			else counts[plan.against] += 1;
 		}
@@ -90,5 +104,17 @@ describe("featuredClutchWindow", () => {
 		expect(featuredClutchWindow(16)).toBe(1);
 		expect(featuredClutchWindow(17)).toBe(2);
 		expect(featuredClutchWindow(30)).toBe(2);
+	});
+});
+
+describe("remainingRoundsInWindow", () => {
+	it("counts down inside each stretch, then holds a modest overtime leftover", () => {
+		expect(remainingRoundsInWindow(1)).toBe(8);
+		expect(remainingRoundsInWindow(8)).toBe(1);
+		expect(remainingRoundsInWindow(9)).toBe(8);
+		expect(remainingRoundsInWindow(16)).toBe(1);
+		expect(remainingRoundsInWindow(17)).toBe(8);
+		expect(remainingRoundsInWindow(24)).toBe(1);
+		expect(remainingRoundsInWindow(25)).toBe(6);
 	});
 });

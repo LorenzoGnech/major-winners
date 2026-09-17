@@ -1,10 +1,12 @@
 import type { OrgTier, Role, RosterKind } from "../../data/schema";
+import type { BonusId } from "../bonuses";
 import type { RoleFit } from "./fit";
 
 export type DraftablePlayer = {
 	id: string;
 	primaryRole: Role;
 	roles: readonly Role[];
+	revealedTraitIds?: readonly BonusId[];
 };
 
 export type RolledOrgYearCard = {
@@ -53,6 +55,12 @@ export type PickPlayerAction = {
 	role: Role;
 };
 
+export type MovePlayerAction = {
+	type: "movePlayer";
+	playerSeasonId: string;
+	role: Role;
+};
+
 export type PickCoachAction = {
 	type: "pickCoach";
 	coachId: string;
@@ -66,4 +74,9 @@ export type RerollTeamAction = {
 	type: "rerollTeam";
 };
 
-export type DraftAction = PickPlayerAction | PickCoachAction | RerollMajorAction | RerollTeamAction;
+export type DraftAction =
+	| PickPlayerAction
+	| MovePlayerAction
+	| PickCoachAction
+	| RerollMajorAction
+	| RerollTeamAction;

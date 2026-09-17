@@ -24,10 +24,12 @@ import {
 	scoreboardRating,
 	seriesFromLive,
 	shouldShowFeaturedClutch,
-	skipRemaining,
+	skipCurrentMap,
 	type TeamMemberProfile,
 	TIMEOUT_MORALE,
 } from "../engine";
+import { bonusById } from "../engine/bonuses";
+import { BonusMoment } from "./BonusMoment";
 import { ClutchMoment } from "./ClutchMoment";
 import {
 	activeClutchSequence,
@@ -271,8 +273,30 @@ export function shouldRevealTimeoutMoment(
 	return armed && caughtUp && mapOpen;
 }
 
+export function upcomingBonusRound(
+	maps: readonly MapResult[],
+	ticks: readonly PlaybackTick[],
+	revealedCount: number,
+): { round: RoundResult; mapIndex: number } | undefined {
+	const tick = ticks[revealedCount];
+	if (tick?.kind !== "kill" || tick.killIndex !== 0) return undefined;
+	const round = maps[tick.mapIndex]?.rounds[tick.roundIndex];
+	if (!round?.bonus) return undefined;
+	return { round, mapIndex: tick.mapIndex };
+}
+
+export function shouldRevealBonusMoment(
+	upcoming: { round: RoundResult; mapIndex: number } | undefined,
+	shownKey: string | null,
+): boolean {
+	if (!upcoming) return false;
+	return shownKey !== `${upcoming.mapIndex}:${upcoming.round.round}`;
+}
+
 export const TIMEOUT_MOMENT_MS = 2_200;
 export const TIMEOUT_MOMENT_REDUCED_MS = 400;
+export const BONUS_MOMENT_MS = TIMEOUT_MOMENT_MS;
+export const BONUS_MOMENT_REDUCED_MS = TIMEOUT_MOMENT_REDUCED_MS;
 
 export function formatMoralePercent(value: number): string {
 	return `${Math.round(Math.min(100, Math.max(0, value)))}%`;
@@ -358,15 +382,25 @@ export type MapWinReveal = {
 	label: string;
 };
 
+export function endOfMapRevealedCount(ticks: readonly PlaybackTick[], mapIndex: number): number {
+	let end = 0;
+	for (const [index, tick] of ticks.entries()) {
+		if (tick.mapIndex === mapIndex) end = index + 1;
+	}
+	return end;
+}
+
 export function mapWinAt(
 	maps: readonly MapResult[],
 	ticks: readonly PlaybackTick[],
 	revealedCount: number,
+	live?: LiveSeriesState,
 ): MapWinReveal | undefined {
 	const tick = ticks[revealedCount - 1];
 	if (tick?.kind !== "settle") return undefined;
 	const map = maps[tick.mapIndex];
 	if (!map || tick.roundIndex !== map.rounds.length - 1) return undefined;
+	if (live && !live.complete && tick.mapIndex >= live.maps.length) return undefined;
 	return {
 		mapIndex: tick.mapIndex,
 		winner: map.winner,
@@ -887,13 +921,15 @@ export function MatchPlayback({
 	const maps = result?.maps ?? [];
 	const playbackTicks = useMemo(() => buildPlaybackTicks(maps), [maps]);
 	const [revealedCount, setRevealedCount] = useState(0);
-	const [playing, setPlaying] = useState(false);
+	const [playing, setPlaying] = useState(true);
 	const [speed, setSpeed] = useState<PlaybackSpeed>(1);
 	const [settingsOpen, setSettingsOpen] = useState(false);
-	const [announcement, setAnnouncement] = useState("Replay ready.");
+	const [announcement, setAnnouncement] = useState("Replay playing.");
 	const [reducedMotion, setReducedMotion] = useState(false);
 	const [timeoutMoment, setTimeoutMoment] = useState(false);
 	const [timeoutHuddleArmed, setTimeoutHuddleArmed] = useState(false);
+	const [bonusMoment, setBonusMoment] = useState(false);
+	const shownBonusKey = useRef<string | null>(null);
 	const [mapWinMoment, setMapWinMoment] = useState<MapWinReveal | null>(null);
 	const completionReported = useRef(false);
 	const shownMapWin = useRef<number | null>(null);
@@ -914,10 +950,13 @@ export function MatchPlayback({
 	const waitingForPlan = isWaitingForNextMap(live, caughtUp);
 	const waitingForRound = Boolean(live && !live.complete && live.current && caughtUp);
 	const mapOpen = Boolean(live?.current && !live.current.complete);
+	const upcomingBonus = upcomingBonusRound(maps, playbackTicks, revealedCount);
 	const holdPlayback = Boolean(
 		timeoutMoment ||
+			bonusMoment ||
 			mapWinMoment ||
-			shouldRevealTimeoutMoment(timeoutHuddleArmed, caughtUp, mapOpen),
+			shouldRevealTimeoutMoment(timeoutHuddleArmed, caughtUp, mapOpen) ||
+			shouldRevealBonusMoment(upcomingBonus, shownBonusKey.current),
 	);
 
 	useEffect(() => {
@@ -948,11 +987,38 @@ export function MatchPlayback({
 	useEffect(() => {
 		if (!timeoutMoment) return;
 		const hold = window.setTimeout(
-			() => setTimeoutMoment(false),
+			() => {
+				setTimeoutMoment(false);
+				setPlaying(true);
+			},
 			reducedMotion ? TIMEOUT_MOMENT_REDUCED_MS : TIMEOUT_MOMENT_MS,
 		);
 		return () => window.clearTimeout(hold);
 	}, [timeoutMoment, reducedMotion]);
+
+	useEffect(() => {
+		if (timeoutMoment || timeoutHuddleArmed || bonusMoment) return;
+		if (!upcomingBonus || !shouldRevealBonusMoment(upcomingBonus, shownBonusKey.current)) return;
+		shownBonusKey.current = `${upcomingBonus.mapIndex}:${upcomingBonus.round.round}`;
+		setPlaying(false);
+		setBonusMoment(true);
+		if (upcomingBonus.round.bonus) {
+			const trait = bonusById(upcomingBonus.round.bonus.bonusId);
+			setAnnouncement(`${trait.name}. ${trait.blurb}`);
+		}
+	}, [upcomingBonus, timeoutMoment, timeoutHuddleArmed, bonusMoment]);
+
+	useEffect(() => {
+		if (!bonusMoment) return;
+		const hold = window.setTimeout(
+			() => {
+				setBonusMoment(false);
+				setPlaying(true);
+			},
+			reducedMotion ? BONUS_MOMENT_REDUCED_MS : BONUS_MOMENT_MS,
+		);
+		return () => window.clearTimeout(hold);
+	}, [bonusMoment, reducedMotion]);
 
 	const featuredPlayerClutch = cursor.inProgressRound
 		? (maps[cursor.mapIndex] ?? maps[0])?.highlights.find(
@@ -1004,7 +1070,7 @@ export function MatchPlayback({
 	}, [live?.complete, live?.current]);
 
 	useEffect(() => {
-		const win = mapWinAt(maps, playbackTicks, revealedCount);
+		const win = mapWinAt(maps, playbackTicks, revealedCount, live);
 		if (!win || shownMapWin.current === win.mapIndex) return;
 		shownMapWin.current = win.mapIndex;
 		setMapWinMoment(win);
@@ -1012,7 +1078,7 @@ export function MatchPlayback({
 		setAnnouncement(
 			`${win.winner === 0 ? shortLabels[0] : shortLabels[1]} take ${win.label} ${win.score[0]}–${win.score[1]}.`,
 		);
-	}, [maps, playbackTicks, revealedCount, shortLabels]);
+	}, [live, maps, playbackTicks, revealedCount, shortLabels]);
 
 	useEffect(() => {
 		if (!mapWinMoment) return;
@@ -1024,6 +1090,7 @@ export function MatchPlayback({
 					onAwaitingNextMap?.();
 					setAnnouncement("Starting the next map.");
 				}
+				if (live && !live.complete) setPlaying(true);
 			},
 			reducedMotion ? MAP_WIN_MOMENT_REDUCED_MS : MAP_WIN_MOMENT_MS,
 		);
@@ -1048,14 +1115,34 @@ export function MatchPlayback({
 
 	if (!result) return null;
 
+	function skip() {
+		setPlaying(false);
+		setTimeoutMoment(false);
+		setTimeoutHuddleArmed(false);
+		setBonusMoment(false);
+		setMapWinMoment(null);
+		shownMapWin.current = null;
+		if (live && onLiveChange && !live.complete) {
+			const mapIndex = live.current?.mapIndex ?? cursor.mapIndex;
+			const done = skipCurrentMap(live);
+			onLiveChange(done);
+			const nextTicks = buildPlaybackTicks(seriesFromLive(done).maps);
+			setRevealedCount(endOfMapRevealedCount(nextTicks, mapIndex));
+			setAnnouncement("Skipped to the end of the map.");
+			return;
+		}
+		setRevealedCount(endOfMapRevealedCount(playbackTicks, cursor.mapIndex));
+		setAnnouncement("Skipped to the end of the map.");
+	}
+
 	const activeMap = (maps[cursor.mapIndex] ?? maps[0]) as MapResult | undefined;
 	if (!activeMap) {
 		return (
 			<section className="mt-5 rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6">
-				<p className="text-center text-sm text-zinc-400">Press play to start the match.</p>
+				<p className="text-center text-sm text-zinc-400">Starting the match.</p>
 				<div className="mt-4 flex justify-center">
-					<button type="button" onClick={() => setPlaying(true)} className={CONTROL_CLASS}>
-						Play
+					<button type="button" onClick={skip} className={CONTROL_CLASS}>
+						Skip to end
 					</button>
 				</div>
 			</section>
@@ -1202,6 +1289,12 @@ export function MatchPlayback({
 
 	function dismissTimeoutMoment() {
 		setTimeoutMoment(false);
+		setPlaying(true);
+	}
+
+	function dismissBonusMoment() {
+		setBonusMoment(false);
+		setPlaying(true);
 	}
 
 	function dismissMapWinMoment() {
@@ -1211,6 +1304,7 @@ export function MatchPlayback({
 			onAwaitingNextMap?.();
 			setAnnouncement("Starting the next map.");
 		}
+		if (live && !live.complete) setPlaying(true);
 	}
 
 	function playPause() {
@@ -1234,26 +1328,12 @@ export function MatchPlayback({
 		announceTick(next);
 	}
 
-	function skip() {
-		setPlaying(false);
-		setTimeoutMoment(false);
-		setTimeoutHuddleArmed(false);
-		setMapWinMoment(null);
-		if (live && onLiveChange && !live.complete) {
-			const done = skipRemaining(live);
-			onLiveChange(done);
-			setRevealedCount(buildPlaybackTicks(done.maps).length);
-			setAnnouncement("Skipped to the final result.");
-			return;
-		}
-		setRevealedCount(playbackTicks.length);
-		setAnnouncement("Skipped to the final result.");
-	}
-
 	function restart() {
-		setPlaying(false);
+		setPlaying(true);
 		setMapWinMoment(null);
 		shownMapWin.current = null;
+		shownBonusKey.current = null;
+		setBonusMoment(false);
 		setRevealedCount(0);
 		setAnnouncement("Replay restarted.");
 	}
@@ -1323,6 +1403,23 @@ export function MatchPlayback({
 				/>
 			) : null}
 
+			{bonusMoment && upcomingBonus?.round.bonus ? (
+				<BonusMoment
+					trait={bonusById(upcomingBonus.round.bonus.bonusId)}
+					player={crestFor(
+						result.teams[0].members.find(
+							(member) => member.id === upcomingBonus.round.bonus?.seasonId,
+						) ?? result.teams[0].members[0],
+						playersById,
+					)}
+					footer={
+						<button type="button" onClick={dismissBonusMoment} className={CONTROL_CLASS}>
+							Continue
+						</button>
+					}
+				/>
+			) : null}
+
 			{showClutchMoment && clutcher && momentClutch ? (
 				<ClutchMoment
 					player={clutcher.nick}
@@ -1351,6 +1448,9 @@ export function MatchPlayback({
 								className={CONTROL_CLASS}
 							>
 								Next
+							</button>
+							<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
+								Skip to end
 							</button>
 						</fieldset>
 					}
@@ -1475,6 +1575,9 @@ export function MatchPlayback({
 									: `Timeout (${live.current?.timeoutsRemaining ?? 0})`}
 							</button>
 						) : null}
+						<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
+							Skip to end
+						</button>
 						<div className="relative">
 							<button
 								type="button"
@@ -1492,17 +1595,9 @@ export function MatchPlayback({
 								>
 									<button
 										type="button"
-										onClick={skip}
-										disabled={complete}
-										className={`${CONTROL_CLASS} w-full`}
-									>
-										Skip to result
-									</button>
-									<button
-										type="button"
 										onClick={restart}
 										disabled={revealedCount === 0}
-										className={`${CONTROL_CLASS} mt-1.5 w-full`}
+										className={`${CONTROL_CLASS} w-full`}
 									>
 										Restart replay
 									</button>
@@ -1558,9 +1653,7 @@ export function MatchPlayback({
 								<div
 									className={`${FEED_BOX_CLASS} items-center justify-center rounded-xl border border-white/12 bg-zinc-950/70 px-3 py-2.5`}
 								>
-									<p className="text-center text-sm text-zinc-600">
-										Press play, step forward, or skip to the result.
-									</p>
+									<p className="text-center text-sm text-zinc-600">Replay starting.</p>
 								</div>
 							)}
 							<RoundCast lines={castLines} />

@@ -1,4 +1,6 @@
 import { type Coach, type PlayerSeason, ROLES, type Role } from "../../data/schema";
+import type { BonusId } from "../bonuses";
+import type { CompletedDraft } from "../draft";
 import { clamp } from "../math";
 import type { Attributes } from "../ratings/attributes";
 import type { RatedPlayer } from "../ratings/rate";
@@ -119,11 +121,20 @@ function historicalTeammatePairs(playerSeasons: readonly PlayerSeason[]): Readon
 	return pairs;
 }
 
+function revealedTraits(draft: CompletedDraft, seasonId: string): readonly BonusId[] {
+	for (const card of draft.cards) {
+		const player = card.players.find((row) => row.id === seasonId);
+		if (player) return player.revealedTraitIds ?? [];
+	}
+	return [];
+}
+
 function memberFor(
 	role: Role,
 	season: PlayerSeason,
 	rated: RatedPlayer,
 	fit: TeamMemberProfile["fit"],
+	bonusIds: readonly BonusId[],
 ): TeamMemberProfile {
 	return {
 		id: season.id,
@@ -139,6 +150,7 @@ function memberFor(
 		ovr: rated.ovr,
 		effectiveOvr: round1(rated.ovr * fit),
 		attributes: rated.attributes,
+		bonusIds,
 	};
 }
 
@@ -320,7 +332,7 @@ export function buildTeamProfile({
 		if (!season || !rated) {
 			throw new Error(`missing season or rating for drafted player "${pick.playerSeasonId}"`);
 		}
-		return memberFor(role, season, rated, pick.fit);
+		return memberFor(role, season, rated, pick.fit, revealedTraits(draft, pick.playerSeasonId));
 	});
 	const baseStrength = round1(average(members.map((member) => member.ovr * member.fit)));
 	const chemistryDetail = chemistry(members, historicalTeammatePairs(playerSeasons));

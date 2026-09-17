@@ -272,6 +272,55 @@
 	}
 }
 
+@keyframes trait-glow-bonus {
+	0%,
+	100% {
+		box-shadow:
+			0 0 8px rgb(52 211 153 / 0.4),
+			0 0 16px rgb(16 185 129 / 0.18);
+	}
+	50% {
+		box-shadow:
+			0 0 16px rgb(52 211 153 / 0.9),
+			0 0 32px rgb(16 185 129 / 0.42);
+	}
+}
+
+@keyframes trait-glow-malus {
+	0%,
+	100% {
+		box-shadow:
+			0 0 8px rgb(248 113 113 / 0.4),
+			0 0 16px rgb(239 68 68 / 0.18);
+	}
+	50% {
+		box-shadow:
+			0 0 16px rgb(248 113 113 / 0.9),
+			0 0 32px rgb(239 68 68 / 0.42);
+	}
+}
+
+.trait-glow-bonus {
+	box-shadow:
+		0 0 10px rgb(52 211 153 / 0.55),
+		0 0 22px rgb(16 185 129 / 0.28);
+	animation: trait-glow-bonus 2.4s ease-in-out infinite;
+}
+
+.trait-glow-malus {
+	box-shadow:
+		0 0 10px rgb(248 113 113 / 0.55),
+		0 0 22px rgb(239 68 68 / 0.28);
+	animation: trait-glow-malus 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.trait-glow-bonus,
+	.trait-glow-malus {
+		animation: none;
+	}
+}
+
 @keyframes draft-reel-lock {
 	0% {
 		box-shadow: 0 0 0 0 rgb(110 231 183 / 0);

@@ -1,4 +1,5 @@
 import type { Coach, PlayerSeason, Role } from "../../data/schema";
+import type { BonusId } from "../bonuses";
 import type { CompletedDraft, RoleFit } from "../draft";
 import type { Attributes } from "../ratings/attributes";
 import type { RatedPlayer } from "../ratings/rate";
@@ -17,6 +18,7 @@ export type TeamMemberProfile = {
 	ovr: number;
 	effectiveOvr: number;
 	attributes: Attributes;
+	bonusIds?: readonly BonusId[];
 };
 
 export type ChemistryDetail = {

@@ -4,6 +4,7 @@ export type DraftErrorCode =
 	| "missing_player"
 	| "invalid_phase"
 	| "player_not_on_card"
+	| "player_not_on_roster"
 	| "role_occupied"
 	| "unknown_coach"
 	| "reroll_exhausted"

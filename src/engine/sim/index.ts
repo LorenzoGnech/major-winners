@@ -34,6 +34,7 @@ export {
 	queueTimeout,
 	seriesFromLive,
 	simulateSeries,
+	skipCurrentMap,
 	skipRemaining,
 	startLiveSeries,
 	startNextMap,

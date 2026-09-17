@@ -107,6 +107,7 @@ export function roundWinProbability(
 	const timeout = context.timeoutTeam === 0 ? 0.04 : context.timeoutTeam === 1 ? -0.04 : 0;
 	const pistolBias = pistol ? (context.pistolBias ?? 0) : 0;
 	const earlyRoundBias = context.earlyRoundBias ?? 0;
+	const bonus = context.bonusWinProb ?? 0;
 	return round(
 		clamp(
 			0.5 +
@@ -120,7 +121,8 @@ export function roundWinProbability(
 				comeback +
 				home +
 				morale +
-				timeout,
+				timeout +
+				bonus,
 			0.12,
 			0.88,
 		),

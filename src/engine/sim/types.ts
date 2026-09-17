@@ -1,3 +1,4 @@
+import type { LingeringBonus, RoundBonus } from "../bonuses";
 import type { TeamProfile } from "../team";
 import type { GamePlanId } from "./gamePlan";
 import type { MapStyle } from "./maps";
@@ -94,6 +95,7 @@ export type RoundResult = {
 	moraleAfter: readonly [number, number];
 	timeout: boolean;
 	summary: RoundSummary;
+	bonus?: RoundBonus;
 };
 
 type HighlightBase = {
@@ -186,6 +188,7 @@ export type RoundWinContext = {
 	timeoutTeam?: 0 | 1;
 	pistolBias?: number;
 	earlyRoundBias?: number;
+	bonusWinProb?: number;
 };
 
 export type LiveMapState = {
@@ -207,6 +210,7 @@ export type LiveMapState = {
 	comebackEmitted: [boolean, boolean];
 	timeoutsRemaining: number;
 	pendingTimeout: boolean;
+	lingeringBonuses: LingeringBonus[];
 	gamePlan: GamePlanId;
 	complete: boolean;
 	winner?: 0 | 1;

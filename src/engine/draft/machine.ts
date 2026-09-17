@@ -1,5 +1,6 @@
 import type { Dataset } from "../../data/schema";
 import { ROLES, type Role } from "../../data/schema";
+import { revealTraits } from "../bonuses";
 import { createRng, pickWeighted, shuffle } from "../rng";
 import { DraftError, type DraftResult, fail, ok } from "./error";
 import { roleFit } from "./fit";
@@ -8,6 +9,7 @@ import type {
 	DraftAction,
 	DraftablePlayer,
 	DraftState,
+	MovePlayerAction,
 	PickCoachAction,
 	PickPlayerAction,
 	PlayerPick,
@@ -15,17 +17,26 @@ import type {
 } from "./types";
 import { COACH_CANDIDATE_COUNT, orgYearWeight, PLAYER_CARD_COUNT, REROLL_BUDGET } from "./weights";
 
-function snapshotPlayer(season: Dataset["playerSeasons"][number]): DraftablePlayer {
+function snapshotPlayer(
+	season: Dataset["playerSeasons"][number],
+	seed: number,
+	round: number,
+	rerollIndex: number,
+): DraftablePlayer {
 	return {
 		id: season.id,
 		primaryRole: season.primaryRole,
 		roles: [...season.roles],
+		revealedTraitIds: revealTraits(seed, round, rerollIndex, season.id),
 	};
 }
 
 function snapshotCard(
 	orgYear: Dataset["orgYears"][number],
 	seasons: Map<string, Dataset["playerSeasons"][number]>,
+	seed: number,
+	round: number,
+	rerollIndex: number,
 ): RolledOrgYearCard {
 	const players = orgYear.playerSeasonIds.map((id) => {
 		const season = seasons.get(id);
@@ -35,7 +46,7 @@ function snapshotCard(
 				`org-year "${orgYear.id}" references missing player-season "${id}"`,
 			);
 		}
-		return snapshotPlayer(season);
+		return snapshotPlayer(season, seed, round, rerollIndex);
 	});
 	return {
 		orgYearId: orgYear.id,
@@ -121,7 +132,9 @@ export function startDraft(dataset: Dataset, seed: number | string): DraftState 
 	}
 	const rng = createRng(seed);
 	const seasons = new Map(dataset.playerSeasons.map((season) => [season.id, season]));
-	const cards = initialRosters(dataset, rng).map((orgYear) => snapshotCard(orgYear, seasons));
+	const cards = initialRosters(dataset, rng).map((orgYear, round) =>
+		snapshotCard(orgYear, seasons, rng.seed, round, 0),
+	);
 	const coachIds = shuffle(
 		dataset.coaches.map((coach) => coach.id),
 		rng,
@@ -177,7 +190,13 @@ function rerollCard(
 		);
 	}
 	const seasons = new Map(dataset.playerSeasons.map((season) => [season.id, season]));
-	const replacement = snapshotCard(pickRoster(candidates, rng), seasons);
+	const replacement = snapshotCard(
+		pickRoster(candidates, rng),
+		seasons,
+		state.seed,
+		round,
+		REROLL_BUDGET - remaining + 1,
+	);
 	const cards = state.cards.map((card, index) => (index === round ? replacement : card));
 	return ok({
 		...state,
@@ -256,6 +275,56 @@ function pickPlayer(state: DraftState, action: PickPlayerAction): DraftResult<Dr
 	});
 }
 
+function draftableForPick(state: DraftState, pick: PlayerPick): DraftablePlayer | undefined {
+	const card = state.cards.find((row) => row.orgYearId === pick.orgYearId);
+	return card?.players.find((player) => player.id === pick.playerSeasonId);
+}
+
+function reseatPick(pick: PlayerPick, role: Role, player: DraftablePlayer): PlayerPick {
+	return { ...pick, role, fit: roleFit(player, role) };
+}
+
+function movePlayer(state: DraftState, action: MovePlayerAction): DraftResult<DraftState> {
+	const source = ROLES.find((role) => state.roster[role]?.playerSeasonId === action.playerSeasonId);
+	if (!source) {
+		return fail(
+			"player_not_on_roster",
+			`player-season "${action.playerSeasonId}" is not on the live roster`,
+		);
+	}
+	if (source === action.role) {
+		return ok(state);
+	}
+	const moving = state.roster[source];
+	if (!moving) {
+		return fail(
+			"player_not_on_roster",
+			`player-season "${action.playerSeasonId}" is not on the live roster`,
+		);
+	}
+	const movingPlayer = draftableForPick(state, moving);
+	if (!movingPlayer) {
+		return fail("missing_player", `draft card for "${moving.orgYearId}" is missing that player`);
+	}
+	const occupant = state.roster[action.role];
+	const roster: DraftState["roster"] = { ...state.roster };
+	if (occupant) {
+		const occupantPlayer = draftableForPick(state, occupant);
+		if (!occupantPlayer) {
+			return fail(
+				"missing_player",
+				`draft card for "${occupant.orgYearId}" is missing that player`,
+			);
+		}
+		roster[source] = reseatPick(occupant, source, occupantPlayer);
+		roster[action.role] = reseatPick(moving, action.role, movingPlayer);
+	} else {
+		delete roster[source];
+		roster[action.role] = reseatPick(moving, action.role, movingPlayer);
+	}
+	return ok({ ...state, roster });
+}
+
 function pickCoach(state: DraftState, action: PickCoachAction): DraftResult<DraftState> {
 	if (state.phase.type !== "coach") {
 		return fail("invalid_phase", "coach picks are only legal after the five player rounds");
@@ -278,6 +347,8 @@ export function applyAction(
 	switch (action.type) {
 		case "pickPlayer":
 			return pickPlayer(state, action);
+		case "movePlayer":
+			return movePlayer(state, action);
 		case "pickCoach":
 			return pickCoach(state, action);
 		case "rerollMajor":

@@ -1,6 +1,7 @@
 import type { Major, Org, OrgTier, OrgYear } from "../data";
 
 export const LEGACY_MAJOR_REEL_ID = "legacy-wildcard";
+export const LEGACY_MAJOR_LOGO = "/logos/majors/cs16.png";
 
 export const MAJOR_SPIN_MS = 850;
 export const TEAM_SPIN_MS = 1000;
@@ -34,6 +35,13 @@ export type TeamReelSource = Pick<
 >;
 export type OrgReelSource = Pick<Org, "id" | "name">;
 
+const LEGACY_MAJOR_REEL_ITEM: MajorReelItem = {
+	id: LEGACY_MAJOR_REEL_ID,
+	title: "Legacy wildcard",
+	subtitle: "Pre-2013 legend",
+	logo: LEGACY_MAJOR_LOGO,
+};
+
 export function visibleLabel(text: string): string {
 	return text
 		.replaceAll("&nbsp;", " ")
@@ -54,11 +62,7 @@ export function majorReelPool(majors: readonly MajorReelSource[]): MajorReelItem
 			subtitle: `${visibleLabel(major.location)} · ${major.year}`,
 			logo: major.logo,
 		})),
-		{
-			id: LEGACY_MAJOR_REEL_ID,
-			title: "Legacy wildcard",
-			subtitle: "Pre-2013 legend",
-		},
+		LEGACY_MAJOR_REEL_ITEM,
 	];
 }
 
@@ -67,11 +71,7 @@ export function winnerMajorItem(
 	majorId: string | null,
 ): MajorReelItem {
 	if (majorId === null) {
-		return {
-			id: LEGACY_MAJOR_REEL_ID,
-			title: "Legacy wildcard",
-			subtitle: "Pre-2013 legend",
-		};
+		return LEGACY_MAJOR_REEL_ITEM;
 	}
 	const major = majors.find((row) => row.id === majorId);
 	if (!major) {

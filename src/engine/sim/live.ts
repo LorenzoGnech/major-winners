@@ -1,3 +1,4 @@
+import { collectTraitHolders, pickTraitHits, resolveTraitRound, tickLingering } from "../bonuses";
 import { createRng, normalizeSeed, type Rng } from "../rng";
 import type { TeamProfile } from "../team";
 import { planFeaturedClutch } from "./clutch";
@@ -12,7 +13,7 @@ import {
 } from "./gamePlan";
 import { makeKills } from "./kills";
 import { chooseSeriesMaps } from "./maps";
-import { applyTimeoutMorale, initialMorale, resolveRoundMorale } from "./morale";
+import { applyTimeoutMorale, bumpMorale, initialMorale, resolveRoundMorale } from "./morale";
 import { chooseRoundSummary } from "./roundSummary";
 import { playbackMaps, roundWinProbability, scoreboard } from "./simulate";
 import type {
@@ -84,6 +85,7 @@ function initMap(
 		comebackEmitted: [false, false],
 		timeoutsRemaining: TIMEOUTS_PER_MAP,
 		pendingTimeout: false,
+		lingeringBonuses: [],
 		gamePlan,
 		complete: false,
 	};
@@ -198,7 +200,18 @@ function playMapRound(
 		}),
 	];
 	const timeoutTeam: 0 | 1 | undefined = usedTimeout ? 0 : undefined;
-	const morale = current.morale;
+	const holders = collectTraitHolders(simTeams[0].members);
+	const hits = pickTraitHits(holders, rng);
+	const resolved = resolveTraitRound({
+		lingering: current.lingeringBonuses,
+		hits,
+		buy: buys[0],
+		pistol,
+	});
+	const morale: [number, number] = [
+		bumpMorale(current.morale[0], resolved.moraleSelf),
+		bumpMorale(current.morale[1], resolved.moraleOpponent),
+	];
 	const probability = roundWinProbability(simTeams, current.sides, buys, current.score, pistol, {
 		mapStyle: current.mapContext.style,
 		homePick: current.mapContext.homePick,
@@ -206,13 +219,18 @@ function playMapRound(
 		timeoutTeam,
 		pistolBias: plan.pistolBias,
 		earlyRoundBias: isEarlyRegulationRound(roundNumber, current.phase) ? plan.earlyRoundBias : 0,
+		bonusWinProb: resolved.winProb,
 	});
 	const winner: 0 | 1 = rng.next() < probability ? 0 : 1;
 	const loser = other(winner);
 	const loadouts = new Map<string, import("./types").WeaponId>();
 	for (const teamIndex of [0, 1] as const) {
 		for (const member of simTeams[teamIndex].members) {
-			loadouts.set(member.id, assignWeapon(member, buys[teamIndex], current.sides[teamIndex], rng));
+			const rolled = assignWeapon(member, buys[teamIndex], current.sides[teamIndex], rng);
+			loadouts.set(
+				member.id,
+				teamIndex === 0 && resolved.modifiers.forceAwp.has(member.id) ? "awp" : rolled,
+			);
 		}
 	}
 	const featuredRounds = current.highlights
@@ -226,6 +244,7 @@ function playMapRound(
 		loadouts,
 		featured.intent,
 		featured.intent === "none" ? undefined : featured.against,
+		resolved.modifiers,
 	);
 	const summary = chooseRoundSummary({
 		winner,
@@ -332,6 +351,7 @@ function playMapRound(
 		maxDeficit,
 		comebackEmitted,
 		pendingTimeout: false,
+		lingeringBonuses: tickLingering(resolved.lingering),
 		highlights,
 		rounds: [
 			...current.rounds,
@@ -348,6 +368,7 @@ function playMapRound(
 				moraleAfter,
 				timeout: usedTimeout,
 				summary,
+				...(resolved.proc ? { bonus: resolved.proc } : {}),
 			},
 		],
 	};
@@ -534,6 +555,20 @@ export function queueTimeout(state: LiveSeriesState): LiveSeriesResult {
 			},
 		},
 	};
+}
+
+export function skipCurrentMap(state: LiveSeriesState): LiveSeriesState {
+	if (state.complete || !state.current) return state;
+	let next: LiveSeriesState = {
+		...state,
+		current: { ...state.current, pendingTimeout: false },
+	};
+	while (!next.complete && next.current) {
+		const played = playRound(next);
+		if (!played.ok) break;
+		next = played.value;
+	}
+	return next;
 }
 
 export function skipRemaining(state: LiveSeriesState): LiveSeriesState {

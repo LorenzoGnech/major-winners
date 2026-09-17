@@ -39,7 +39,7 @@ import {
 	saveDailyStats,
 } from "./dailyPersistence";
 import { GAME_LABELS, TIER_LABELS, TIER_STYLES } from "./draftPresentation";
-import { visibleLabel } from "./draftReel";
+import { LEGACY_MAJOR_LOGO, LEGACY_MAJOR_REEL_ID, visibleLabel } from "./draftReel";
 import { HomeLogo } from "./HomeLogo";
 import { DailyStatsPanel, HomeScreen, type HomeView } from "./HomeScreen";
 import { MajorCrest } from "./MajorCrest";
@@ -574,8 +574,11 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				) / pickedPlayers.length;
 
 	function assignPlayer(playerSeasonId: string, role: Role) {
+		const placed = Object.values(state.roster).some(
+			(pick) => pick?.playerSeasonId === playerSeasonId,
+		);
 		const result = applyAction(state, {
-			type: "pickPlayer",
+			type: placed ? "movePlayer" : "pickPlayer",
 			playerSeasonId,
 			role,
 		});
@@ -585,7 +588,11 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		}
 		setState(result.value);
 		setError(null);
-		if (result.value.phase.type === "player") {
+		if (
+			state.phase.type === "player" &&
+			result.value.phase.type === "player" &&
+			result.value.phase.round !== state.phase.round
+		) {
 			setRollKind("full");
 		}
 	}
@@ -699,6 +706,15 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		seedLabel,
 		drag,
 		draggingPlayer,
+		onPointerDown: startDrag,
+		onAssign: assignPlayer,
+		traitsFor: (playerSeasonId: string) => {
+			for (const card of state.cards) {
+				const player = card.players.find((row) => row.id === playerSeasonId);
+				if (player) return player.revealedTraitIds ?? [];
+			}
+			return [];
+		},
 	};
 	const showSideRoster = Boolean(!simulating && state.phase.type !== "player");
 	if (mode === null) {
@@ -889,8 +905,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 															<MajorCrest
 																major={
 																	major ?? {
-																		id: "legacy-wildcard",
+																		id: LEGACY_MAJOR_REEL_ID,
 																		shortName: "Legacy wildcard",
+																		logo: LEGACY_MAJOR_LOGO,
 																	}
 																}
 																size="xl"
@@ -947,6 +964,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 													<PlayerDraftCard
 														key={player.id}
 														player={player}
+														traits={draftable.revealedTraitIds}
 														dragging={drag?.playerId === player.id}
 														onPointerDown={(event) => startDrag(player.id, event)}
 														onAssign={(role) => assignPlayer(player.id, role)}
@@ -954,7 +972,8 @@ export function DraftGame({ dataset }: DraftGameProps) {
 												);
 											})}
 											<p className="px-1 text-[11px] text-zinc-500">
-												Drag a player onto a role. Keyboard: focus a card, then press 1–5.
+												Drag onto a role, or drag a placed player to move or swap. Keyboard: focus a
+												card or roster player, then press 1–5.
 											</p>
 										</div>
 									</div>
@@ -1017,9 +1036,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										{teamName} is locked in
 									</h2>
 									<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-300">
-										Five players and {chosenCoach.nick} are locked in. This profile combines
-										individual quality, role fit, teammate and nationality chemistry, communication,
-										structure, and coaching.
+										Five players and {chosenCoach.nick} are locked in. You can still swap roles on
+										the live roster before starting. This profile combines individual quality, role
+										fit, teammate and nationality chemistry, communication, structure, and coaching.
 									</p>
 									<TeamProfilePanel profile={teamProfile} />
 									<div className="mt-5 flex flex-wrap gap-2">

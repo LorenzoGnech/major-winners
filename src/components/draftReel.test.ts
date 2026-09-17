@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
 	buildReelStrip,
+	LEGACY_MAJOR_LOGO,
 	LEGACY_MAJOR_REEL_ID,
 	majorReelPool,
 	orgAppearanceReelPool,
@@ -72,7 +73,10 @@ describe("majorReelPool", () => {
 			"atlanta-2017",
 			LEGACY_MAJOR_REEL_ID,
 		]);
-		expect(pool.at(-1)).toMatchObject({ title: "Legacy wildcard" });
+		expect(pool.at(-1)).toMatchObject({
+			title: "Legacy wildcard",
+			logo: LEGACY_MAJOR_LOGO,
+		});
 	});
 });
 
@@ -80,7 +84,10 @@ describe("winnerMajorReelId", () => {
 	it("uses the synthetic Legacy id when the card has no Major", () => {
 		expect(winnerMajorReelId("cologne-2015")).toBe("cologne-2015");
 		expect(winnerMajorReelId(null)).toBe(LEGACY_MAJOR_REEL_ID);
-		expect(winnerMajorItem(majors, null).title).toBe("Legacy wildcard");
+		expect(winnerMajorItem(majors, null)).toMatchObject({
+			title: "Legacy wildcard",
+			logo: LEGACY_MAJOR_LOGO,
+		});
 	});
 });
 

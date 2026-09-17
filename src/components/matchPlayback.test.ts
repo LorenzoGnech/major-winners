@@ -4,18 +4,20 @@ import { scoreboardRating } from "../engine";
 import {
 	aggregateSeriesScoreboard,
 	buildPlaybackTicks,
+	endOfMapRevealedCount,
 	isWaitingForNextMap,
 	latestRoundFeed,
 	liveBoardMorale,
 	liveLines,
 	mapWinAt,
 	playbackMorale,
-	shouldRevealTimeoutMoment,
-	timeoutBoostVisible,
 	playbackTickMs,
 	resolvePlayback,
 	seriesRoundsWon,
 	settleWinner,
+	shouldRevealTimeoutMoment,
+	timeoutBoostVisible,
+	upcomingBonusRound,
 } from "./MatchPlayback";
 
 function round(
@@ -289,6 +291,50 @@ describe("playback ticks", () => {
 			label: "map",
 		});
 	});
+
+	it("does not treat an in-progress live map as a map win", () => {
+		const maps = [
+			playbackMap([
+				{
+					...round(1, [{ killerTeam: 0, killerId: "a", victimTeam: 1, victimId: "x" }]),
+					scoreAfter: [1, 0] as const,
+				},
+			]),
+		];
+		const ticks = buildPlaybackTicks(maps);
+		const live = {
+			complete: false,
+			current: { complete: false, mapIndex: 0 },
+			maps: [],
+		} as unknown as LiveSeriesState;
+		expect(mapWinAt(maps, ticks, ticks.length, live)).toBeUndefined();
+		expect(endOfMapRevealedCount(ticks, 0)).toBe(ticks.length);
+	});
+
+	it("reveals a map win only after the live map is finalized", () => {
+		const maps = [
+			playbackMap([
+				{
+					...round(1, [{ killerTeam: 0, killerId: "a", victimTeam: 1, victimId: "x" }]),
+					scoreAfter: [12, 11] as const,
+				},
+				{
+					...round(2, [{ killerTeam: 0, killerId: "b", victimTeam: 1, victimId: "y" }]),
+					scoreAfter: [13, 11] as const,
+				},
+			]),
+		];
+		const ticks = buildPlaybackTicks(maps);
+		const live = {
+			complete: false,
+			current: null,
+			maps,
+		} as unknown as LiveSeriesState;
+		expect(mapWinAt(maps, ticks, ticks.length, live)).toMatchObject({
+			mapIndex: 0,
+			score: [13, 11],
+		});
+	});
 });
 
 describe("isWaitingForNextMap", () => {
@@ -300,7 +346,12 @@ describe("isWaitingForNextMap", () => {
 		expect(isWaitingForNextMap(live, false)).toBe(false);
 		expect(isWaitingForNextMap(live, true)).toBe(true);
 		expect(isWaitingForNextMap({ ...live, complete: true }, true)).toBe(false);
-		expect(isWaitingForNextMap({ ...live, current: { complete: false } }, true)).toBe(false);
+		expect(
+			isWaitingForNextMap(
+				{ ...live, current: { complete: false } as LiveSeriesState["current"] },
+				true,
+			),
+		).toBe(false);
 	});
 });
 
@@ -351,6 +402,36 @@ describe("shouldRevealTimeoutMoment", () => {
 		expect(shouldRevealTimeoutMoment(true, true, true)).toBe(true);
 		expect(shouldRevealTimeoutMoment(true, true, false)).toBe(false);
 		expect(shouldRevealTimeoutMoment(false, true, true)).toBe(false);
+	});
+});
+
+describe("upcomingBonusRound", () => {
+	it("fires on the first kill tick of a bonus round", () => {
+		const bonusRound = {
+			...round(2, [{ killerTeam: 0, killerId: "a", victimTeam: 1, victimId: "x" }]),
+			bonus: { playerId: "a", seasonId: "a-2018", bonusId: "jacked" as const },
+		};
+		const maps = [
+			{
+				label: "Mirage",
+				winner: 0 as const,
+				score: [2, 0] as const,
+				regulationScore: [2, 0] as const,
+				overtimeBlocks: 0,
+				rounds: [
+					round(1, [{ killerTeam: 0, killerId: "a", victimTeam: 1, victimId: "x" }]),
+					bonusRound,
+				],
+				scoreboard: [[], []] as const,
+				highlights: [],
+			},
+		];
+		const ticks = buildPlaybackTicks(maps);
+		const startOfBonus = ticks.findIndex(
+			(tick) => tick.kind === "kill" && tick.roundIndex === 1 && tick.killIndex === 0,
+		);
+		expect(upcomingBonusRound(maps, ticks, startOfBonus)?.round.bonus?.bonusId).toBe("jacked");
+		expect(upcomingBonusRound(maps, ticks, startOfBonus + 1)).toBeUndefined();
 	});
 });
 

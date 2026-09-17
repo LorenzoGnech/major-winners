@@ -1,3 +1,4 @@
+import type { KillModifiers } from "../bonuses";
 import type { Rng } from "../rng";
 import type { TeamMemberProfile, TeamProfile } from "../team";
 import type { FeaturedAgainst } from "./clutch";
@@ -62,6 +63,22 @@ function deniedClutcherFrags(against: FeaturedAgainst, rng: Rng): number {
 	return 1;
 }
 
+function scaledCombat(
+	member: TeamMemberProfile,
+	modifiers: KillModifiers | undefined,
+	opener: boolean,
+): number {
+	const combat =
+		(modifiers?.combatScale.get(member.id) ?? 1) * (modifiers?.clutchScale.get(member.id) ?? 1);
+	const open = opener ? (modifiers?.openerScale.get(member.id) ?? 1) : 1;
+	return combatWeight(member) * combat * open;
+}
+
+function scaledVictim(member: TeamMemberProfile, modifiers: KillModifiers | undefined): number {
+	const clutch = modifiers?.clutchScale.get(member.id) ?? 1;
+	return Math.max(0.01, (125 - member.attributes.consistency) / clutch);
+}
+
 export function makeKills(
 	teams: readonly [TeamProfile, TeamProfile],
 	winner: 0 | 1,
@@ -69,6 +86,7 @@ export function makeKills(
 	loadouts: ReadonlyMap<string, WeaponId>,
 	intent: ClutchIntent = "none",
 	against?: FeaturedAgainst,
+	modifiers?: KillModifiers,
 ): { kills: KillEvent[]; sequences: ClutchSequence[] } {
 	const loser = other(winner);
 	const alive: [Set<string>, Set<string>] = [
@@ -82,11 +100,19 @@ export function makeKills(
 
 	const recordKill = (killerTeam: 0 | 1): boolean => {
 		const victimTeam = other(killerTeam);
-		const killers = living(killerTeam);
+		const excluded = modifiers?.excludeKillers ?? new Set();
+		const livingKillers = living(killerTeam);
+		const eligibleKillers = livingKillers.filter((member) => !excluded.has(member.id));
+		const killers = eligibleKillers.length > 0 ? eligibleKillers : livingKillers;
 		const victims = living(victimTeam);
 		if (killers.length === 0 || victims.length === 0) return false;
-		const killer = weightedMember(killers, combatWeight, rng);
-		const victim = weightedMember(victims, (member) => 125 - member.attributes.consistency, rng);
+		const opener = kills.length === 0;
+		const killer = weightedMember(
+			killers,
+			(member) => scaledCombat(member, modifiers, opener),
+			rng,
+		);
+		const victim = weightedMember(victims, (member) => scaledVictim(member, modifiers), rng);
 		const assist =
 			rng.next() < 0.42
 				? weightedMember(
@@ -174,8 +200,14 @@ export function makeKills(
 		) {
 			killerTeam = winner;
 		} else {
-			const winnerWeight = living(winner).reduce((sum, member) => sum + combatWeight(member), 0);
-			const loserWeight = living(loser).reduce((sum, member) => sum + combatWeight(member), 0);
+			const winnerWeight = living(winner).reduce(
+				(sum, member) => sum + scaledCombat(member, modifiers, false),
+				0,
+			);
+			const loserWeight = living(loser).reduce(
+				(sum, member) => sum + scaledCombat(member, modifiers, false),
+				0,
+			);
 			killerTeam = rng.next() * (winnerWeight + loserWeight) < winnerWeight ? winner : loser;
 		}
 		if (!recordKill(killerTeam)) break;

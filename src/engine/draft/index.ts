@@ -16,6 +16,7 @@ export type {
 	DraftablePlayer,
 	DraftPhase,
 	DraftState,
+	MovePlayerAction,
 	PickCoachAction,
 	PickPlayerAction,
 	PlayerPick,

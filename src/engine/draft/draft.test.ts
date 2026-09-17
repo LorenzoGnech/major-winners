@@ -98,6 +98,9 @@ describe("startDraft", () => {
 		for (const card of a.cards) {
 			expect(card.players).toHaveLength(5);
 		}
+		expect(a.cards.map((card) => card.players.map((player) => player.revealedTraitIds))).toEqual(
+			b.cards.map((card) => card.players.map((player) => player.revealedTraitIds)),
+		);
 	});
 
 	it("changes the rolled sequence when the seed changes", () => {
@@ -315,6 +318,68 @@ describe("applyAction", () => {
 		}
 		expect(result.error.code).toBe("role_occupied");
 		expect(afterFirst).toEqual(snapshot);
+	});
+
+	it("moves a placed player to an empty role without advancing the round", () => {
+		const opened = startDraft(dataset, "move-empty");
+		const first = unwrap(opened, {
+			type: "pickPlayer",
+			playerSeasonId: opened.cards[0].players[0].id,
+			role: "awp",
+		});
+		expect(first.phase).toEqual({ type: "player", round: 1 });
+		const moved = unwrap(first, {
+			type: "movePlayer",
+			playerSeasonId: opened.cards[0].players[0].id,
+			role: "lurker",
+		});
+		expect(moved.phase).toEqual({ type: "player", round: 1 });
+		expect(moved.roster.awp).toBeUndefined();
+		expect(moved.roster.lurker?.playerSeasonId).toBe(opened.cards[0].players[0].id);
+		expect(moved.roster.lurker?.role).toBe("lurker");
+	});
+
+	it("swaps two placed players and recalculates fit", () => {
+		const opened = startDraft(dataset, "move-swap");
+		const firstId = opened.cards[0].players[0].id;
+		const secondId = opened.cards[1].players[0].id;
+		const afterFirst = unwrap(opened, {
+			type: "pickPlayer",
+			playerSeasonId: firstId,
+			role: "awp",
+		});
+		const afterSecond = unwrap(afterFirst, {
+			type: "pickPlayer",
+			playerSeasonId: secondId,
+			role: "igl",
+		});
+		const swapped = unwrap(afterSecond, {
+			type: "movePlayer",
+			playerSeasonId: firstId,
+			role: "igl",
+		});
+		expect(swapped.phase).toEqual(afterSecond.phase);
+		expect(swapped.roster.igl?.playerSeasonId).toBe(firstId);
+		expect(swapped.roster.awp?.playerSeasonId).toBe(secondId);
+		const firstPlayer = opened.cards[0].players[0];
+		const secondPlayer = opened.cards[1].players[0];
+		expect(swapped.roster.igl?.fit).toBe(roleFit(firstPlayer, "igl"));
+		expect(swapped.roster.awp?.fit).toBe(roleFit(secondPlayer, "awp"));
+	});
+
+	it("does not mutate when moving a player who is not on the roster", () => {
+		const opened = startDraft(dataset, "move-missing");
+		const snapshot = structuredClone(opened);
+		const result = applyAction(opened, {
+			type: "movePlayer",
+			playerSeasonId: opened.cards[0].players[0].id,
+			role: "awp",
+		});
+		expect(result.ok).toBe(false);
+		if (!result.ok) {
+			expect(result.error.code).toBe("player_not_on_roster");
+		}
+		expect(opened).toEqual(snapshot);
 	});
 
 	it("rejects a player pick during the coach phase and a coach pick during a player phase", () => {

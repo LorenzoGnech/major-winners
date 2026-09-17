@@ -118,4 +118,26 @@ describe("liveCastLines", () => {
 		});
 		expect(double).toEqual(["s1mple opens on olofmeister.", "s1mple with the double."]);
 	});
+
+	it("calls a trait proc before the opener", () => {
+		const lines = liveCastLines({
+			round: round({
+				economyBuys: ["full-buy", "full-buy"],
+				bonus: { playerId: "jw", seasonId: "jw-2015-fnatic", bonusId: "pregnant" },
+			}),
+			kills: [
+				{
+					killerTeam: 0,
+					killerId: "jw-2015-fnatic",
+					victimTeam: 1,
+					victimId: "s1mple-2018-navi",
+					weapon: "awp",
+				},
+			],
+			teamLabels: labels,
+			playerName: (id) => (id === "jw-2015-fnatic" ? "JW" : "s1mple"),
+		});
+		expect(lines[0]).toBe("JW activates Pregnant.");
+		expect(lines[1]).toBe("JW opens on s1mple.");
+	});
 });

@@ -39,6 +39,10 @@ export const roleOverrideSchema = z
 		}
 	});
 export const roleOverridesFileSchema = z.record(z.string().min(1), roleOverrideSchema);
+export const playerBonusesFileSchema = z.record(
+	z.string().min(1),
+	z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]),
+);
 
 export const sourceSchema = z.object({
 	label: z.string().min(1),
@@ -252,6 +256,7 @@ export type RoleProvenanceKind = z.infer<typeof roleProvenanceKindSchema>;
 export type RoleProvenance = z.infer<typeof roleProvenanceSchema>;
 export type RoleOverride = z.infer<typeof roleOverrideSchema>;
 export type RoleOverridesFile = z.infer<typeof roleOverridesFileSchema>;
+export type PlayerBonusesFile = z.infer<typeof playerBonusesFileSchema>;
 export type Source = z.infer<typeof sourceSchema>;
 export type Major = z.infer<typeof majorSchema>;
 export type Org = z.infer<typeof orgSchema>;

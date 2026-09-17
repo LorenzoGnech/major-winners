@@ -32,6 +32,14 @@ export function featuredClutchWindow(round: number): number {
 	return 2;
 }
 
+/** Rounds left in this featured window, including the current one. */
+export function remainingRoundsInWindow(round: number): number {
+	if (round <= 8) return 9 - round;
+	if (round <= 16) return 17 - round;
+	if (round <= 24) return 25 - round;
+	return 6;
+}
+
 export function chooseFeaturedAgainst(rng: Rng): FeaturedAgainst | undefined {
 	for (const against of FEATURED_CLUTCH_ORDER) {
 		if (rng.next() < FEATURED_CLUTCH_RATES[against]) return against;
@@ -59,9 +67,10 @@ export function shouldShowFeaturedClutch(
 
 /**
  * At most three featured 1vX windows per map, one per early/mid/late window,
- * and only for the player's side. A win plan stages the already-decided player
- * round win; a lose plan stages the player's failed clutch when the opponent
- * took the round.
+ * and only for the player's side. The slot is offered uniformly across the
+ * remaining rounds in that window so the first round is not favored. A win
+ * plan stages the already-decided player round win; a lose plan stages the
+ * player's failed clutch when the opponent took the round.
  */
 export function planFeaturedClutch(
 	featuredRounds: readonly number[],
@@ -74,6 +83,7 @@ export function planFeaturedClutch(
 	if (featuredRounds.some((featured) => featuredClutchWindow(featured) === window)) {
 		return { intent: "none" };
 	}
+	if (rng.next() >= 1 / remainingRoundsInWindow(round)) return { intent: "none" };
 	const against = chooseFeaturedAgainst(rng);
 	if (!against) return { intent: "none" };
 	if (winner === 0) return { intent: "win", against };
