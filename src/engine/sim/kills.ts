@@ -44,6 +44,9 @@ export type ClutchSequence = {
 
 export type ClutchIntent = "none" | "win" | "lose";
 
+/** Ordinary leftover 1vX never open at 1v4 or 1v5; those sizes are featured-only. */
+export const ORDINARY_CLUTCH_MAX_AGAINST = 3;
+
 function asAgainst(count: number): 2 | 3 | 4 | 5 | undefined {
 	if (count === 2 || count === 3 || count === 4 || count === 5) return count;
 	return undefined;
@@ -163,6 +166,12 @@ export function makeKills(
 		if (intent === "win" && alive[winner].size > 1) {
 			killerTeam = alive[loser].size > 2 && rng.next() < 0.35 ? winner : loser;
 		} else if (!canKillWinner) {
+			killerTeam = winner;
+		} else if (
+			intent === "none" &&
+			alive[winner].size === 2 &&
+			alive[loser].size > ORDINARY_CLUTCH_MAX_AGAINST
+		) {
 			killerTeam = winner;
 		} else {
 			const winnerWeight = living(winner).reduce((sum, member) => sum + combatWeight(member), 0);

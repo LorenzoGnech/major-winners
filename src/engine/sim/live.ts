@@ -198,7 +198,7 @@ function playMapRound(
 		}),
 	];
 	const timeoutTeam: 0 | 1 | undefined = usedTimeout ? 0 : undefined;
-	const morale = applyTimeoutMorale(current.morale, timeoutTeam);
+	const morale = current.morale;
 	const probability = roundWinProbability(simTeams, current.sides, buys, current.score, pistol, {
 		mapStyle: current.mapContext.style,
 		homePick: current.mapContext.homePick,
@@ -530,6 +530,7 @@ export function queueTimeout(state: LiveSeriesState): LiveSeriesResult {
 				...current,
 				pendingTimeout: true,
 				timeoutsRemaining: current.timeoutsRemaining - 1,
+				morale: applyTimeoutMorale(current.morale, 0),
 			},
 		},
 	};

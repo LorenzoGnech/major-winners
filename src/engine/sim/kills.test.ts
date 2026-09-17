@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Attributes } from "../ratings/attributes";
 import { createRng } from "../rng";
 import type { TeamMemberProfile, TeamProfile } from "../team";
-import { makeKills } from "./kills";
+import { makeKills, ORDINARY_CLUTCH_MAX_AGAINST } from "./kills";
 import type { WeaponId } from "./types";
 
 const attributes: Attributes = {
@@ -90,6 +90,27 @@ describe("makeKills clutch intent", () => {
 	it("stages no clutch sequence when intent is none", () => {
 		const { sequences } = makeKills(teams, 0, createRng(3), loadouts, "none");
 		expect(sequences).toEqual([]);
+	});
+
+	it("keeps ordinary leftover 1vX at 1v3 or smaller", () => {
+		let leftovers = 0;
+		for (let seed = 0; seed < 500; seed += 1) {
+			const { kills, sequences } = makeKills(teams, 0, createRng(seed), loadouts, "none");
+			expect(sequences).toEqual([]);
+			const alive = [
+				new Set(teams[0].members.map((member) => member.id)),
+				new Set(teams[1].members.map((member) => member.id)),
+			] as const;
+			for (const kill of kills) {
+				alive[kill.victimTeam].delete(kill.victimId);
+				if (alive[0].size === 1 && alive[1].size >= 2) {
+					expect(alive[1].size).toBeLessThanOrEqual(ORDINARY_CLUTCH_MAX_AGAINST);
+					leftovers += 1;
+					break;
+				}
+			}
+		}
+		expect(leftovers).toBeGreaterThan(0);
 	});
 
 	it("stages a won 1vX for the round winner", () => {

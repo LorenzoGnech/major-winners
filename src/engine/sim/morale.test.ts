@@ -86,7 +86,7 @@ describe("resolveRoundMorale", () => {
 		expect(denied[0]).toBeLessThan(standardLoss[0]);
 	});
 
-	it("applies a timeout bump before the round is resolved", () => {
+	it("applies a timeout bump when the timeout is called", () => {
 		expect(applyTimeoutMorale([40, 50], 0)).toEqual([40 + TIMEOUT_MORALE, 50]);
 		expect(applyTimeoutMorale([40, 50], undefined)).toEqual([40, 50]);
 	});

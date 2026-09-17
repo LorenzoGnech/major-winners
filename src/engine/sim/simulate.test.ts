@@ -18,6 +18,7 @@ import {
 	startLiveSeries,
 } from "./live";
 import { MAP_POOL } from "./maps";
+import { TIMEOUT_MORALE } from "./morale";
 import { formatRoundSummary } from "./roundSummary";
 import { roundWinProbability, scoreboardRating } from "./simulate";
 import { isWeaponLegalForBuy } from "./weapons";
@@ -409,6 +410,10 @@ describe("live series", () => {
 		const queued = queueTimeout(started);
 		expect(queued.ok).toBe(true);
 		if (!queued.ok) return;
+		expect(queued.value.current?.morale[0]).toBe(
+			(started.current?.morale[0] ?? 0) + TIMEOUT_MORALE,
+		);
+		expect(queued.value.current?.morale[1]).toBe(started.current?.morale[1]);
 		const withTimeout = playRound(queued.value);
 		const withoutTimeout = playRound(started);
 		expect(withTimeout.ok && withoutTimeout.ok).toBe(true);

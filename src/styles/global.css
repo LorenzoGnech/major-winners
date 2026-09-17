@@ -144,6 +144,57 @@
 	}
 }
 
+@keyframes timeout-moment-in {
+	from {
+		opacity: 0;
+		transform: scale(0.96);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes timeout-morale-pop {
+	0% {
+		opacity: 0;
+		transform: scale(0.82);
+	}
+	40% {
+		opacity: 1;
+		transform: scale(1.08);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+.timeout-morale-pop {
+	animation: timeout-morale-pop 620ms ease-out;
+}
+
+@keyframes morale-timeout-pulse {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgb(110 231 183 / 0);
+	}
+	40% {
+		box-shadow: 0 0 16px 2px rgb(110 231 183 / 0.38);
+	}
+}
+
+.morale-timeout-pulse {
+	animation: morale-timeout-pulse 900ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.timeout-morale-pop,
+	.morale-timeout-pulse {
+		animation: none;
+	}
+}
+
 @keyframes feed-stack-in {
 	from {
 		grid-template-rows: 0fr;

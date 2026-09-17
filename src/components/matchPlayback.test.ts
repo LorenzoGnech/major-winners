@@ -5,6 +5,7 @@ import {
 	aggregateSeriesScoreboard,
 	buildPlaybackTicks,
 	latestRoundFeed,
+	liveBoardMorale,
 	liveLines,
 	playbackMorale,
 	playbackTickMs,
@@ -262,16 +263,30 @@ describe("playbackMorale", () => {
 		const rounds = [
 			{
 				...round(1, [{ killerTeam: 0, killerId: "a", victimTeam: 1, victimId: "x" }]),
-				moraleAfter: [72, 41],
+				moraleAfter: [72, 41] as const,
 			},
 			{
 				...round(2, [{ killerTeam: 1, killerId: "x", victimTeam: 0, victimId: "a" }]),
-				moraleAfter: [80, 35],
+				moraleAfter: [80, 35] as const,
 			},
 		];
 		expect(playbackMorale(rounds, 0, [55, 48])).toEqual([55, 48]);
 		expect(playbackMorale(rounds, 1, [55, 48])).toEqual([72, 41]);
 		expect(playbackMorale(rounds, 2, [55, 48])).toEqual([80, 35]);
+	});
+});
+
+describe("liveBoardMorale", () => {
+	it("uses live morale when replay is caught up so a timeout bump is visible", () => {
+		const rounds = [
+			{
+				...round(1, [{ killerTeam: 0, killerId: "a", victimTeam: 1, victimId: "x" }]),
+				moraleAfter: [72, 41] as const,
+			},
+		];
+		expect(liveBoardMorale(rounds, 1, [55, 48], [82, 41], true)).toEqual([82, 41]);
+		expect(liveBoardMorale(rounds, 1, [55, 48], [82, 41], false)).toEqual([72, 41]);
+		expect(liveBoardMorale(rounds, 0, [55, 48], undefined, true)).toEqual([55, 48]);
 	});
 });
 

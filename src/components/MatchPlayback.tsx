@@ -27,6 +27,7 @@ import {
 	shouldShowFeaturedClutch,
 	skipRemaining,
 	type TeamMemberProfile,
+	TIMEOUT_MORALE,
 } from "../engine";
 import { ClutchMoment } from "./ClutchMoment";
 import {
@@ -40,6 +41,7 @@ import {
 import { OrgCrest } from "./OrgCrest";
 import { PlayerCrest } from "./PlayerCrest";
 import { lineupDeadIds, liveCastLines } from "./roundCast";
+import { TimeoutMoment } from "./TimeoutMoment";
 import { WeaponIcon } from "./WeaponIcon";
 
 type MatchPlaybackProps = {
@@ -239,6 +241,20 @@ export function playbackMorale(
 	const round = rounds[settledRoundCount - 1];
 	return round?.moraleAfter ?? fallback;
 }
+
+export function liveBoardMorale(
+	rounds: readonly RoundResult[],
+	settledRoundCount: number,
+	fallback: readonly [number, number],
+	liveMorale: readonly [number, number] | undefined,
+	caughtUp: boolean,
+): readonly [number, number] {
+	if (caughtUp && liveMorale) return liveMorale;
+	return playbackMorale(rounds, settledRoundCount, fallback);
+}
+
+export const TIMEOUT_MOMENT_MS = 2_200;
+export const TIMEOUT_MOMENT_REDUCED_MS = 400;
 
 export function formatMoralePercent(value: number): string {
 	return `${Math.round(Math.min(100, Math.max(0, value)))}%`;
@@ -754,10 +770,12 @@ function MoraleMeter({
 	value,
 	label,
 	tone,
+	boosted,
 }: {
 	value: number;
 	label: string;
 	tone: "player" | "opponent";
+	boosted?: boolean;
 }) {
 	const pct = Math.round(Math.min(100, Math.max(0, value)));
 	return (
@@ -772,7 +790,11 @@ function MoraleMeter({
 					{formatMoralePercent(value)}
 				</span>
 			</div>
-			<div className="h-2 overflow-hidden rounded-full bg-white/10">
+			<div
+				className={`h-2 overflow-hidden rounded-full bg-white/10 ${
+					boosted ? "morale-timeout-pulse" : ""
+				}`}
+			>
 				<div
 					className={`h-full motion-safe:transition-[width] ${tone === "player" ? "bg-emerald-300" : "bg-amber-300"}`}
 					style={{ width: `${pct}%` }}
@@ -785,14 +807,16 @@ function MoraleMeter({
 function MoraleBars({
 	values,
 	labels,
+	boosted,
 }: {
 	values: readonly [number, number];
 	labels: readonly [string, string];
+	boosted?: boolean;
 }) {
 	return (
 		<section className="mt-4 space-y-3" aria-label="Team morale">
 			<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">Morale</p>
-			<MoraleMeter value={values[0]} label={labels[0]} tone="player" />
+			<MoraleMeter value={values[0]} label={labels[0]} tone="player" boosted={boosted} />
 			<MoraleMeter value={values[1]} label={labels[1]} tone="opponent" />
 		</section>
 	);
@@ -818,6 +842,7 @@ export function MatchPlayback({
 	const [settingsOpen, setSettingsOpen] = useState(false);
 	const [announcement, setAnnouncement] = useState("Replay ready.");
 	const [reducedMotion, setReducedMotion] = useState(false);
+	const [timeoutMoment, setTimeoutMoment] = useState(false);
 	const completionReported = useRef(false);
 
 	useEffect(() => {
@@ -836,10 +861,29 @@ export function MatchPlayback({
 	const waitingForRound = Boolean(live && !live.complete && live.current && caughtUp);
 
 	useEffect(() => {
-		if (!playing || !live || live.complete || !live.current || !onLiveChange || !caughtUp) return;
+		if (
+			!playing ||
+			timeoutMoment ||
+			!live ||
+			live.complete ||
+			!live.current ||
+			!onLiveChange ||
+			!caughtUp
+		) {
+			return;
+		}
 		const played = playRound(live);
 		if (played.ok) onLiveChange(played.value);
-	}, [playing, live, onLiveChange, caughtUp]);
+	}, [playing, timeoutMoment, live, onLiveChange, caughtUp]);
+
+	useEffect(() => {
+		if (!timeoutMoment) return;
+		const hold = window.setTimeout(
+			() => setTimeoutMoment(false),
+			reducedMotion ? TIMEOUT_MOMENT_REDUCED_MS : TIMEOUT_MOMENT_MS,
+		);
+		return () => window.clearTimeout(hold);
+	}, [timeoutMoment, reducedMotion]);
 
 	const featuredPlayerClutch = cursor.inProgressRound
 		? (maps[cursor.mapIndex] ?? maps[0])?.highlights.find(
@@ -877,8 +921,8 @@ export function MatchPlayback({
 	}, [playing, waitingForPlan]);
 
 	useEffect(() => {
-		if (clutchMomentActive) setSettingsOpen(false);
-	}, [clutchMomentActive]);
+		if (clutchMomentActive || timeoutMoment) setSettingsOpen(false);
+	}, [clutchMomentActive, timeoutMoment]);
 
 	useEffect(() => {
 		if (complete && playing) {
@@ -938,7 +982,13 @@ export function MatchPlayback({
 		initialMorale(applyGamePlan(result.teams[0], resolveGamePlan(activeMap.gamePlan))),
 		initialMorale(result.teams[1]),
 	];
-	const morale = playbackMorale(activeMap.rounds, cursor.settledRoundCount, moraleFallback);
+	const morale = liveBoardMorale(
+		activeMap.rounds,
+		cursor.settledRoundCount,
+		moraleFallback,
+		live?.current?.morale,
+		caughtUp,
+	);
 	const killIndex = cursor.inProgressKills.length - 1;
 	const clutch =
 		cursor.inProgressRound && killIndex >= 0
@@ -1044,8 +1094,12 @@ export function MatchPlayback({
 		setAnnouncement("Replay advanced.");
 	}
 
+	function dismissTimeoutMoment() {
+		setTimeoutMoment(false);
+	}
+
 	function playPause() {
-		if (complete) return;
+		if (complete || timeoutMoment) return;
 		setPlaying((value) => !value);
 		setAnnouncement(playing ? "Replay paused." : "Replay playing.");
 	}
@@ -1067,6 +1121,7 @@ export function MatchPlayback({
 
 	function skip() {
 		setPlaying(false);
+		setTimeoutMoment(false);
 		if (live && onLiveChange && !live.complete) {
 			const done = skipRemaining(live);
 			onLiveChange(done);
@@ -1086,10 +1141,13 @@ export function MatchPlayback({
 
 	function timeout() {
 		if (!live || !onLiveChange) return;
+		setPlaying(false);
+		setSettingsOpen(false);
 		const queued = queueTimeout(live);
 		if (queued.ok) {
 			onLiveChange(queued.value);
-			setAnnouncement("Timeout queued for the next round.");
+			setTimeoutMoment(true);
+			setAnnouncement(`Timeout called. Morale up ${TIMEOUT_MORALE}.`);
 			return;
 		}
 		setAnnouncement(queued.error.message);
@@ -1115,6 +1173,21 @@ export function MatchPlayback({
 					: undefined
 			}
 		>
+			{timeoutMoment && live?.current ? (
+				<TimeoutMoment
+					teamLabel={shortLabels[0]}
+					coachNick={result.teams[0].coach.nick}
+					members={result.teams[0].members}
+					crestFor={(member) => crestFor(member, playersById)}
+					moraleGain={TIMEOUT_MORALE}
+					footer={
+						<button type="button" onClick={dismissTimeoutMoment} className={CONTROL_CLASS}>
+							Continue
+						</button>
+					}
+				/>
+			) : null}
+
 			{showClutchMoment && clutcher && momentClutch ? (
 				<ClutchMoment
 					player={clutcher.nick}
@@ -1228,14 +1301,18 @@ export function MatchPlayback({
 					/>
 
 					<EconomyBars roundValues={roundValues} totals={totals} buys={buys} labels={shortLabels} />
-					<MoraleBars values={morale} labels={shortLabels} />
+					<MoraleBars
+						values={morale}
+						labels={shortLabels}
+						boosted={Boolean(timeoutMoment || live?.current?.pendingTimeout)}
+					/>
 
 					<fieldset className="mt-5 flex flex-wrap items-start justify-center gap-2">
 						<legend className="sr-only">Replay controls</legend>
 						<button
 							type="button"
 							onClick={playPause}
-							disabled={complete || waitingForPlan}
+							disabled={complete || waitingForPlan || timeoutMoment}
 							className={CONTROL_CLASS}
 						>
 							{playing ? "Pause" : "Play"}
@@ -1243,7 +1320,7 @@ export function MatchPlayback({
 						<button
 							type="button"
 							onClick={step}
-							disabled={complete || waitingForPlan}
+							disabled={complete || waitingForPlan || timeoutMoment}
 							className={CONTROL_CLASS}
 						>
 							Next
@@ -1252,10 +1329,12 @@ export function MatchPlayback({
 							<button
 								type="button"
 								onClick={timeout}
-								disabled={!canQueueTimeout(live)}
+								disabled={!canQueueTimeout(live) || timeoutMoment}
 								className={CONTROL_CLASS}
 							>
-								Timeout ({live.current?.timeoutsRemaining ?? 0})
+								{live.current?.pendingTimeout
+									? "Timeout called"
+									: `Timeout (${live.current?.timeoutsRemaining ?? 0})`}
 							</button>
 						) : null}
 						<div className="relative">

@@ -2,14 +2,14 @@ import { clamp } from "../math";
 import type { TeamProfile } from "../team";
 
 export const TIMEOUT_MORALE = 10;
-export const WIN_MORALE = 4;
-export const LOSS_MORALE = 5;
-export const WIN_STREAK_STEP = 3;
-export const LOSS_STREAK_STEP = 3.5;
-export const STREAK_CAP = 6;
-export const CLUTCH_CONVERT = 8;
-export const CLUTCH_DENY = 7;
-export const CLUTCH_AGAINST_STEP = 3;
+export const WIN_MORALE = 3;
+export const LOSS_MORALE = 3.5;
+export const WIN_STREAK_STEP = 1.75;
+export const LOSS_STREAK_STEP = 2;
+export const STREAK_CAP = 5;
+export const CLUTCH_CONVERT = 5;
+export const CLUTCH_DENY = 4.5;
+export const CLUTCH_AGAINST_STEP = 1.5;
 export const CLUTCH_RIVAL_SHARE = 0.5;
 
 export type MoraleClutch = {

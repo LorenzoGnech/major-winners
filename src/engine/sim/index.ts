@@ -53,6 +53,7 @@ export {
 	bumpMorale,
 	initialMorale,
 	resolveRoundMorale,
+	TIMEOUT_MORALE,
 	trailingStreak,
 } from "./morale";
 export { chooseRoundSummary, formatRoundSummary, resolveRoundSummary } from "./roundSummary";

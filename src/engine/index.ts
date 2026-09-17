@@ -126,6 +126,7 @@ export {
 	skipRemaining,
 	startLiveSeries,
 	startNextMap,
+	TIMEOUT_MORALE,
 	TIMEOUTS_PER_MAP,
 	WEAPON_CLASS,
 	WEAPON_ICON,
