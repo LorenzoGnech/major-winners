@@ -232,6 +232,18 @@ describe("simulateSeries", () => {
 		expect(map?.label).toBe("Nuke");
 	});
 
+	it("shuffles the pool with no home bonus when no map is picked", () => {
+		const result = simulateSeries({
+			teams: equalTeams,
+			seed: 11,
+			format: "BO3",
+		});
+		const ids = result.maps.map((map) => map.mapContext?.mapId);
+		expect(ids.length).toBeGreaterThan(0);
+		expect(new Set(ids).size).toBe(ids.length);
+		expect(result.maps.every((map) => map.mapContext?.homePick === false)).toBe(true);
+	});
+
 	it("fills remaining BO3 maps from the pool without repeating the pick", () => {
 		const result = simulateSeries({
 			teams: equalTeams,

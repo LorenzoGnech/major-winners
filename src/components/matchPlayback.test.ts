@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
-import type { KillEvent, MapResult, PlayerMapStats, RoundResult } from "../engine";
+import type { KillEvent, LiveSeriesState, MapResult, PlayerMapStats, RoundResult } from "../engine";
 import { scoreboardRating } from "../engine";
 import {
 	aggregateSeriesScoreboard,
 	buildPlaybackTicks,
+	isWaitingForNextMap,
 	latestRoundFeed,
 	liveBoardMorale,
 	liveLines,
+	mapWinAt,
 	playbackMorale,
+	shouldRevealTimeoutMoment,
+	timeoutBoostVisible,
 	playbackTickMs,
 	resolvePlayback,
 	seriesRoundsWon,
@@ -256,6 +260,48 @@ describe("playback ticks", () => {
 		expect(next?.kills).toHaveLength(1);
 		expect(next?.settled).toBe(false);
 	});
+
+	it("keeps the final 13 on the last settle instead of freezing at 12", () => {
+		const maps = [
+			playbackMap([
+				{
+					...round(1, [{ killerTeam: 0, killerId: "a", victimTeam: 1, victimId: "x" }]),
+					scoreAfter: [12, 11] as const,
+				},
+				{
+					...round(2, [{ killerTeam: 0, killerId: "b", victimTeam: 1, victimId: "y" }]),
+					scoreAfter: [13, 11] as const,
+				},
+			]),
+		];
+		const ticks = buildPlaybackTicks(maps);
+		const beforeLast = resolvePlayback(maps, ticks, ticks.length - 1);
+		expect(beforeLast.score).toEqual([12, 11]);
+		expect(beforeLast.complete).toBe(false);
+		const last = resolvePlayback(maps, ticks, ticks.length);
+		expect(last.score).toEqual([13, 11]);
+		expect(last.seriesScore).toEqual([1, 0]);
+		expect(mapWinAt(maps, ticks, ticks.length - 1)).toBeUndefined();
+		expect(mapWinAt(maps, ticks, ticks.length)).toMatchObject({
+			mapIndex: 0,
+			winner: 0,
+			score: [13, 11],
+			label: "map",
+		});
+	});
+});
+
+describe("isWaitingForNextMap", () => {
+	it("waits only after replay has caught up on a closed map", () => {
+		const live = {
+			complete: false,
+			current: null,
+		} as LiveSeriesState;
+		expect(isWaitingForNextMap(live, false)).toBe(false);
+		expect(isWaitingForNextMap(live, true)).toBe(true);
+		expect(isWaitingForNextMap({ ...live, complete: true }, true)).toBe(false);
+		expect(isWaitingForNextMap({ ...live, current: { complete: false } }, true)).toBe(false);
+	});
 });
 
 describe("playbackMorale", () => {
@@ -287,6 +333,24 @@ describe("liveBoardMorale", () => {
 		expect(liveBoardMorale(rounds, 1, [55, 48], [82, 41], true)).toEqual([82, 41]);
 		expect(liveBoardMorale(rounds, 1, [55, 48], [82, 41], false)).toEqual([72, 41]);
 		expect(liveBoardMorale(rounds, 0, [55, 48], undefined, true)).toEqual([55, 48]);
+	});
+});
+
+describe("timeoutBoostVisible", () => {
+	it("holds the huddle pulse until the in-progress round has settled", () => {
+		expect(timeoutBoostVisible(false, true, false)).toBe(false);
+		expect(timeoutBoostVisible(true, true, false)).toBe(true);
+		expect(timeoutBoostVisible(false, false, true)).toBe(true);
+		expect(timeoutBoostVisible(true, false, false)).toBe(false);
+	});
+});
+
+describe("shouldRevealTimeoutMoment", () => {
+	it("reveals only after the current round settles on an open map", () => {
+		expect(shouldRevealTimeoutMoment(true, false, true)).toBe(false);
+		expect(shouldRevealTimeoutMoment(true, true, true)).toBe(true);
+		expect(shouldRevealTimeoutMoment(true, true, false)).toBe(false);
+		expect(shouldRevealTimeoutMoment(false, true, true)).toBe(false);
 	});
 });
 

@@ -5,7 +5,6 @@ import {
 	canQueueTimeout,
 	equipmentValue,
 	formatRoundSummary,
-	gamePlanById,
 	getMap,
 	type HighlightEvent,
 	initialMorale,
@@ -38,6 +37,7 @@ import {
 	clutchMomentStartIndex,
 	clutchOpponents,
 } from "./clutchNarrative";
+import { MapWinMoment } from "./MapWinMoment";
 import { OrgCrest } from "./OrgCrest";
 import { PlayerCrest } from "./PlayerCrest";
 import { lineupDeadIds, liveCastLines } from "./roundCast";
@@ -53,6 +53,7 @@ type MatchPlaybackProps = {
 	playersById?: ReadonlyMap<string, PlayerSeason>;
 	eyebrow?: string;
 	onComplete?: () => void;
+	onAwaitingNextMap?: () => void;
 };
 
 type LiveLine = {
@@ -253,6 +254,23 @@ export function liveBoardMorale(
 	return playbackMorale(rounds, settledRoundCount, fallback);
 }
 
+/** Huddle overlay and bar pulse wait until the in-progress round has settled. */
+export function timeoutBoostVisible(
+	caughtUp: boolean,
+	pendingTimeout: boolean,
+	timeoutMoment: boolean,
+): boolean {
+	return timeoutMoment || (caughtUp && pendingTimeout);
+}
+
+export function shouldRevealTimeoutMoment(
+	armed: boolean,
+	caughtUp: boolean,
+	mapOpen: boolean,
+): boolean {
+	return armed && caughtUp && mapOpen;
+}
+
 export const TIMEOUT_MOMENT_MS = 2_200;
 export const TIMEOUT_MOMENT_REDUCED_MS = 400;
 
@@ -332,6 +350,37 @@ export function settleWinner(
 	if (tick?.kind !== "settle") return undefined;
 	return maps[tick.mapIndex]?.rounds[tick.roundIndex]?.winner;
 }
+
+export type MapWinReveal = {
+	mapIndex: number;
+	winner: 0 | 1;
+	score: readonly [number, number];
+	label: string;
+};
+
+export function mapWinAt(
+	maps: readonly MapResult[],
+	ticks: readonly PlaybackTick[],
+	revealedCount: number,
+): MapWinReveal | undefined {
+	const tick = ticks[revealedCount - 1];
+	if (tick?.kind !== "settle") return undefined;
+	const map = maps[tick.mapIndex];
+	if (!map || tick.roundIndex !== map.rounds.length - 1) return undefined;
+	return {
+		mapIndex: tick.mapIndex,
+		winner: map.winner,
+		score: map.score,
+		label: map.label,
+	};
+}
+
+export function isWaitingForNextMap(live: LiveSeriesState | undefined, caughtUp: boolean): boolean {
+	return Boolean(live && !live.complete && !live.current && caughtUp);
+}
+
+export const MAP_WIN_MOMENT_MS = 2_600;
+export const MAP_WIN_MOMENT_REDUCED_MS = 500;
 
 function playerName(result: SeriesResult, playerId: string): string {
 	for (const team of result.teams) {
@@ -831,6 +880,7 @@ export function MatchPlayback({
 	playersById,
 	eyebrow,
 	onComplete,
+	onAwaitingNextMap,
 }: MatchPlaybackProps) {
 	const result = live ? seriesFromLive(live) : completedResult;
 	const shortLabels = [teamLabels[0], opponentOrg?.name ?? teamLabels[1]] as const;
@@ -843,7 +893,11 @@ export function MatchPlayback({
 	const [announcement, setAnnouncement] = useState("Replay ready.");
 	const [reducedMotion, setReducedMotion] = useState(false);
 	const [timeoutMoment, setTimeoutMoment] = useState(false);
+	const [timeoutHuddleArmed, setTimeoutHuddleArmed] = useState(false);
+	const [mapWinMoment, setMapWinMoment] = useState<MapWinReveal | null>(null);
 	const completionReported = useRef(false);
+	const shownMapWin = useRef<number | null>(null);
+	const awaitingNextReported = useRef(false);
 
 	useEffect(() => {
 		const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -857,13 +911,19 @@ export function MatchPlayback({
 	const cursor = resolvePlayback(maps, playbackTicks, revealedCount);
 	const caughtUp = revealedCount >= playbackTicks.length;
 	const complete = cursor.complete && seriesDone && (maps.length > 0 || seriesDone);
-	const waitingForPlan = Boolean(live && !live.complete && !live.current);
+	const waitingForPlan = isWaitingForNextMap(live, caughtUp);
 	const waitingForRound = Boolean(live && !live.complete && live.current && caughtUp);
+	const mapOpen = Boolean(live?.current && !live.current.complete);
+	const holdPlayback = Boolean(
+		timeoutMoment ||
+			mapWinMoment ||
+			shouldRevealTimeoutMoment(timeoutHuddleArmed, caughtUp, mapOpen),
+	);
 
 	useEffect(() => {
 		if (
 			!playing ||
-			timeoutMoment ||
+			holdPlayback ||
 			!live ||
 			live.complete ||
 			!live.current ||
@@ -874,7 +934,16 @@ export function MatchPlayback({
 		}
 		const played = playRound(live);
 		if (played.ok) onLiveChange(played.value);
-	}, [playing, timeoutMoment, live, onLiveChange, caughtUp]);
+	}, [playing, holdPlayback, live, onLiveChange, caughtUp]);
+
+	useEffect(() => {
+		if (!timeoutHuddleArmed || !caughtUp) return;
+		setTimeoutHuddleArmed(false);
+		if (!mapOpen) return;
+		setPlaying(false);
+		setTimeoutMoment(true);
+		setAnnouncement(`Timeout called. Morale up ${TIMEOUT_MORALE}.`);
+	}, [timeoutHuddleArmed, caughtUp, mapOpen]);
 
 	useEffect(() => {
 		if (!timeoutMoment) return;
@@ -903,7 +972,7 @@ export function MatchPlayback({
 	const clutchSlow = Boolean(!reducedMotion && clutchMomentActive);
 
 	useEffect(() => {
-		if (!playing || complete || waitingForRound || waitingForPlan) return;
+		if (!playing || complete || waitingForRound || waitingForPlan || holdPlayback) return;
 		const timer = window.setInterval(
 			() => {
 				setRevealedCount((count) => Math.min(playbackTicks.length, count + 1));
@@ -911,18 +980,55 @@ export function MatchPlayback({
 			clutchSlow ? 1_400 : playbackTickMs(speed),
 		);
 		return () => window.clearInterval(timer);
-	}, [complete, playbackTicks.length, playing, speed, waitingForPlan, waitingForRound, clutchSlow]);
+	}, [
+		complete,
+		playbackTicks.length,
+		playing,
+		speed,
+		waitingForPlan,
+		waitingForRound,
+		clutchSlow,
+		holdPlayback,
+	]);
 
 	useEffect(() => {
-		if (waitingForPlan && playing) {
-			setPlaying(false);
-			setAnnouncement("Pick a game plan for the next map.");
-		}
-	}, [playing, waitingForPlan]);
+		if ((waitingForPlan || mapWinMoment) && playing) setPlaying(false);
+	}, [playing, waitingForPlan, mapWinMoment]);
 
 	useEffect(() => {
-		if (clutchMomentActive || timeoutMoment) setSettingsOpen(false);
-	}, [clutchMomentActive, timeoutMoment]);
+		if (clutchMomentActive || timeoutMoment || mapWinMoment) setSettingsOpen(false);
+	}, [clutchMomentActive, timeoutMoment, mapWinMoment]);
+
+	useEffect(() => {
+		if (live?.current || live?.complete) awaitingNextReported.current = false;
+	}, [live?.complete, live?.current]);
+
+	useEffect(() => {
+		const win = mapWinAt(maps, playbackTicks, revealedCount);
+		if (!win || shownMapWin.current === win.mapIndex) return;
+		shownMapWin.current = win.mapIndex;
+		setMapWinMoment(win);
+		setPlaying(false);
+		setAnnouncement(
+			`${win.winner === 0 ? shortLabels[0] : shortLabels[1]} take ${win.label} ${win.score[0]}–${win.score[1]}.`,
+		);
+	}, [maps, playbackTicks, revealedCount, shortLabels]);
+
+	useEffect(() => {
+		if (!mapWinMoment) return;
+		const hold = window.setTimeout(
+			() => {
+				setMapWinMoment(null);
+				if (live && !live.complete && !live.current && !awaitingNextReported.current) {
+					awaitingNextReported.current = true;
+					onAwaitingNextMap?.();
+					setAnnouncement("Starting the next map.");
+				}
+			},
+			reducedMotion ? MAP_WIN_MOMENT_REDUCED_MS : MAP_WIN_MOMENT_MS,
+		);
+		return () => window.clearTimeout(hold);
+	}, [live, mapWinMoment, onAwaitingNextMap, reducedMotion]);
 
 	useEffect(() => {
 		if (complete && playing) {
@@ -934,11 +1040,11 @@ export function MatchPlayback({
 	}, [complete, playing, result?.score, shortLabels]);
 
 	useEffect(() => {
-		if (complete && !completionReported.current) {
+		if (complete && !mapWinMoment && !completionReported.current) {
 			completionReported.current = true;
 			onComplete?.();
 		}
-	}, [complete, onComplete]);
+	}, [complete, mapWinMoment, onComplete]);
 
 	if (!result) return null;
 
@@ -1098,8 +1204,17 @@ export function MatchPlayback({
 		setTimeoutMoment(false);
 	}
 
+	function dismissMapWinMoment() {
+		setMapWinMoment(null);
+		if (live && !live.complete && !live.current && !awaitingNextReported.current) {
+			awaitingNextReported.current = true;
+			onAwaitingNextMap?.();
+			setAnnouncement("Starting the next map.");
+		}
+	}
+
 	function playPause() {
-		if (complete || timeoutMoment) return;
+		if (complete || holdPlayback) return;
 		setPlaying((value) => !value);
 		setAnnouncement(playing ? "Replay paused." : "Replay playing.");
 	}
@@ -1122,6 +1237,8 @@ export function MatchPlayback({
 	function skip() {
 		setPlaying(false);
 		setTimeoutMoment(false);
+		setTimeoutHuddleArmed(false);
+		setMapWinMoment(null);
 		if (live && onLiveChange && !live.complete) {
 			const done = skipRemaining(live);
 			onLiveChange(done);
@@ -1135,19 +1252,22 @@ export function MatchPlayback({
 
 	function restart() {
 		setPlaying(false);
+		setMapWinMoment(null);
+		shownMapWin.current = null;
 		setRevealedCount(0);
 		setAnnouncement("Replay restarted.");
 	}
 
 	function timeout() {
 		if (!live || !onLiveChange) return;
-		setPlaying(false);
 		setSettingsOpen(false);
 		const queued = queueTimeout(live);
 		if (queued.ok) {
 			onLiveChange(queued.value);
-			setTimeoutMoment(true);
-			setAnnouncement(`Timeout called. Morale up ${TIMEOUT_MORALE}.`);
+			setTimeoutHuddleArmed(true);
+			if (!caughtUp) {
+				setAnnouncement("Timeout queued for the next round.");
+			}
 			return;
 		}
 		setAnnouncement(queued.error.message);
@@ -1173,6 +1293,21 @@ export function MatchPlayback({
 					: undefined
 			}
 		>
+			{mapWinMoment ? (
+				<MapWinMoment
+					playerWon={mapWinMoment.winner === 0}
+					winnerLabel={shortLabels[mapWinMoment.winner]}
+					mapLabel={mapWinMoment.label}
+					score={mapWinMoment.score}
+					seriesScore={cursor.seriesScore}
+					footer={
+						<button type="button" onClick={dismissMapWinMoment} className={CONTROL_CLASS}>
+							Continue
+						</button>
+					}
+				/>
+			) : null}
+
 			{timeoutMoment && live?.current ? (
 				<TimeoutMoment
 					teamLabel={shortLabels[0]}
@@ -1204,7 +1339,7 @@ export function MatchPlayback({
 							<button
 								type="button"
 								onClick={playPause}
-								disabled={complete || waitingForPlan}
+								disabled={complete || waitingForPlan || holdPlayback}
 								className={CONTROL_CLASS}
 							>
 								{playing ? "Pause" : "Play"}
@@ -1212,7 +1347,7 @@ export function MatchPlayback({
 							<button
 								type="button"
 								onClick={step}
-								disabled={complete || waitingForPlan}
+								disabled={complete || waitingForPlan || holdPlayback}
 								className={CONTROL_CLASS}
 							>
 								Next
@@ -1232,7 +1367,6 @@ export function MatchPlayback({
 				<p className="mt-1 text-xs text-zinc-500">
 					Series {cursor.seriesScore[0]}–{cursor.seriesScore[1]} · {activeMap.label}
 					{activeMap.mapContext?.homePick ? " · home pick" : ""}
-					{activeMap.gamePlan ? ` · ${gamePlanById(activeMap.gamePlan).label}` : ""}
 					{activeMap.overtimeBlocks > 0 ? ` · ${activeMap.overtimeBlocks}× OT` : ""}
 				</p>
 			</div>
@@ -1304,7 +1438,11 @@ export function MatchPlayback({
 					<MoraleBars
 						values={morale}
 						labels={shortLabels}
-						boosted={Boolean(timeoutMoment || live?.current?.pendingTimeout)}
+						boosted={timeoutBoostVisible(
+							caughtUp,
+							Boolean(live?.current?.pendingTimeout),
+							timeoutMoment,
+						)}
 					/>
 
 					<fieldset className="mt-5 flex flex-wrap items-start justify-center gap-2">
@@ -1312,7 +1450,7 @@ export function MatchPlayback({
 						<button
 							type="button"
 							onClick={playPause}
-							disabled={complete || waitingForPlan || timeoutMoment}
+							disabled={complete || waitingForPlan || holdPlayback}
 							className={CONTROL_CLASS}
 						>
 							{playing ? "Pause" : "Play"}
@@ -1320,7 +1458,7 @@ export function MatchPlayback({
 						<button
 							type="button"
 							onClick={step}
-							disabled={complete || waitingForPlan || timeoutMoment}
+							disabled={complete || waitingForPlan || holdPlayback}
 							className={CONTROL_CLASS}
 						>
 							Next
@@ -1329,7 +1467,7 @@ export function MatchPlayback({
 							<button
 								type="button"
 								onClick={timeout}
-								disabled={!canQueueTimeout(live) || timeoutMoment}
+								disabled={!canQueueTimeout(live) || holdPlayback}
 								className={CONTROL_CLASS}
 							>
 								{live.current?.pendingTimeout

@@ -199,7 +199,7 @@ export function beginNextMatch(
 	state: TournamentState,
 	playerTeam: TeamProfile,
 	_opponents: readonly HistoricalOpponent[],
-	playerMapId: string,
+	playerMapId?: string,
 	gamePlan?: GamePlanId,
 ): TournamentResult {
 	const playable = validatePlayable(state);

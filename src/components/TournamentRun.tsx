@@ -1,24 +1,14 @@
 import { type ReactNode, useState } from "react";
 import type { Org, PlayerSeason } from "../data";
-import type {
-	GamePlanId,
-	HistoricalOpponent,
-	LiveSeriesState,
-	SimMapId,
-	TeamProfile,
-	TournamentState,
-} from "../engine";
+import type { HistoricalOpponent, LiveSeriesState, TeamProfile, TournamentState } from "../engine";
 import {
 	beginNextMatch,
 	commitLiveMatch,
-	getMap,
+	DEFAULT_GAME_PLAN,
 	needsGamePlan,
-	nextMapContext,
 	setLiveSeries,
 	startNextMap,
 } from "../engine";
-import { GamePlanPicker } from "./GamePlanPicker";
-import { MapPicker } from "./MapPicker";
 import { MatchPlayback } from "./MatchPlayback";
 import { OrgCrest } from "./OrgCrest";
 import { visibleTournamentBoard } from "./tournamentBoard";
@@ -89,57 +79,33 @@ export function TournamentRun({
 	terminalExtras,
 }: TournamentRunProps) {
 	const [playbackComplete, setPlaybackComplete] = useState(false);
-	const [pickingMap, setPickingMap] = useState(false);
-	const [pickedMapId, setPickedMapId] = useState<SimMapId | null>(null);
 	const [confirmAbandon, setConfirmAbandon] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const liveSeries = state.liveSeries ?? null;
-	const awaitingPlan = Boolean(liveSeries && needsGamePlan(liveSeries));
-	const upcomingMap = liveSeries ? nextMapContext(liveSeries) : undefined;
-	const planMap = pickedMapId
-		? getMap(pickedMapId)
-		: upcomingMap
-			? getMap(upcomingMap.mapId)
-			: undefined;
-	const planMapNumber = pickedMapId ? 1 : (liveSeries?.maps.length ?? 0) + 1;
-	const pickingPlan = Boolean(planMap && (pickedMapId || awaitingPlan));
 	const board = visibleTournamentBoard(state, undefined, true);
 	const nextOpponentOrg = state.nextMatch
 		? resolveOpponentOrg(state.nextMatch.opponent, orgsById)
 		: undefined;
 
 	function playNext() {
-		setPickingMap(true);
-		setPickedMapId(null);
-		setError(null);
-	}
-
-	function pickMap(mapId: SimMapId) {
-		setPickedMapId(mapId);
-		setPickingMap(false);
-		setError(null);
-	}
-
-	function confirmPlan(plan: GamePlanId) {
-		if (liveSeries && needsGamePlan(liveSeries)) {
-			const started = startNextMap(liveSeries, plan);
-			if (!started.ok) {
-				setError(started.error.message);
-				return;
-			}
-			onChange(setLiveSeries(state, started.value));
-			setPlaybackComplete(false);
-			setError(null);
-			return;
-		}
-		if (!pickedMapId) return;
-		const result = beginNextMatch(state, playerTeam, opponents, pickedMapId, plan);
+		const result = beginNextMatch(state, playerTeam, opponents);
 		if (!result.ok) {
 			setError(result.error.message);
 			return;
 		}
-		setPickedMapId(null);
 		onChange(result.value);
+		setPlaybackComplete(false);
+		setError(null);
+	}
+
+	function continueToNextMap() {
+		if (!liveSeries || !needsGamePlan(liveSeries)) return;
+		const started = startNextMap(liveSeries, DEFAULT_GAME_PLAN);
+		if (!started.ok) {
+			setError(started.error.message);
+			return;
+		}
+		onChange(setLiveSeries(state, started.value));
 		setPlaybackComplete(false);
 		setError(null);
 	}
@@ -239,35 +205,31 @@ export function TournamentRun({
 					})}
 				</div>
 
-				{!liveSeries &&
-					!pickingMap &&
-					!pickingPlan &&
-					state.status === "active" &&
-					state.nextMatch && (
-						<div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/25 p-4">
-							<div className="flex min-w-0 items-center gap-3">
-								{nextOpponentOrg ? <OrgCrest org={nextOpponentOrg} size="md" /> : null}
-								<div className="min-w-0">
-									<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-										Next · {state.nextMatch.format}
-									</p>
-									<p className="mt-1 truncate text-lg font-semibold text-white">
-										{playerTeamName} vs {state.nextMatch.opponent.label}
-									</p>
-									<p className="text-xs text-zinc-500">
-										OVR {state.nextMatch.opponent.profile.overall}
-									</p>
-								</div>
+				{!liveSeries && state.status === "active" && state.nextMatch && (
+					<div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/25 p-4">
+						<div className="flex min-w-0 items-center gap-3">
+							{nextOpponentOrg ? <OrgCrest org={nextOpponentOrg} size="md" /> : null}
+							<div className="min-w-0">
+								<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+									Next · {state.nextMatch.format}
+								</p>
+								<p className="mt-1 truncate text-lg font-semibold text-white">
+									{playerTeamName} vs {state.nextMatch.opponent.label}
+								</p>
+								<p className="text-xs text-zinc-500">
+									OVR {state.nextMatch.opponent.profile.overall}
+								</p>
 							</div>
-							<button
-								type="button"
-								onClick={playNext}
-								className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-							>
-								Play match {state.nextMatch.matchNumber}
-							</button>
 						</div>
-					)}
+						<button
+							type="button"
+							onClick={playNext}
+							className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+						>
+							Play match {state.nextMatch.matchNumber}
+						</button>
+					</div>
+				)}
 
 				{!liveSeries && state.status !== "active" && (
 					<>
@@ -293,20 +255,6 @@ export function TournamentRun({
 				)}
 			</div>
 
-			{pickingMap && state.nextMatch && (
-				<MapPicker format={state.nextMatch.format} onPick={pickMap} />
-			)}
-
-			{pickingPlan && planMap && state.nextMatch && (
-				<GamePlanPicker
-					key={`${planMap.id}-${planMapNumber}`}
-					map={planMap}
-					mapNumber={planMapNumber}
-					format={state.nextMatch.format}
-					onConfirm={confirmPlan}
-				/>
-			)}
-
 			{liveSeries && (
 				<>
 					<MatchPlayback
@@ -318,6 +266,7 @@ export function TournamentRun({
 						playersById={playersById}
 						eyebrow={`${STAGE_LABELS[state.nextMatch?.stage ?? state.stage]} · ${state.nextMatch?.format ?? ""}`}
 						onComplete={() => setPlaybackComplete(true)}
+						onAwaitingNextMap={continueToNextMap}
 					/>
 					{playbackComplete && liveSeries.complete && (
 						<div className="mt-3 flex justify-end">

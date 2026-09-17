@@ -62,7 +62,7 @@ export function mapContextFrom(map: SimMap, homePick: boolean): MapContext {
 	};
 }
 
-/** Player pick is map 1 with a home bonus. Remaining BO3 maps are a seed shuffle without replacement. */
+/** Optional player pick is map 1 with a home bonus. Otherwise the series is a seed shuffle with no home map. Remaining BO3 maps are without replacement. */
 export function chooseSeriesMaps(
 	rng: Rng,
 	format: SeriesFormat,
