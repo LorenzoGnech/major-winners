@@ -6,6 +6,7 @@ import {
 	buildPlaybackTicks,
 	latestRoundFeed,
 	liveLines,
+	playbackMorale,
 	playbackTickMs,
 	resolvePlayback,
 	seriesRoundsWon,
@@ -253,6 +254,24 @@ describe("playback ticks", () => {
 		expect(next?.round.round).toBe(2);
 		expect(next?.kills).toHaveLength(1);
 		expect(next?.settled).toBe(false);
+	});
+});
+
+describe("playbackMorale", () => {
+	it("uses starting morale until a round has settled", () => {
+		const rounds = [
+			{
+				...round(1, [{ killerTeam: 0, killerId: "a", victimTeam: 1, victimId: "x" }]),
+				moraleAfter: [72, 41],
+			},
+			{
+				...round(2, [{ killerTeam: 1, killerId: "x", victimTeam: 0, victimId: "a" }]),
+				moraleAfter: [80, 35],
+			},
+		];
+		expect(playbackMorale(rounds, 0, [55, 48])).toEqual([55, 48]);
+		expect(playbackMorale(rounds, 1, [55, 48])).toEqual([72, 41]);
+		expect(playbackMorale(rounds, 2, [55, 48])).toEqual([80, 35]);
 	});
 });
 

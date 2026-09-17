@@ -40,6 +40,7 @@ import {
 } from "./dailyPersistence";
 import { GAME_LABELS, TIER_LABELS, TIER_STYLES } from "./draftPresentation";
 import { visibleLabel } from "./draftReel";
+import { HomeLogo } from "./HomeLogo";
 import { DailyStatsPanel, HomeScreen, type HomeView } from "./HomeScreen";
 import { MajorCrest } from "./MajorCrest";
 import { OrgCrest } from "./OrgCrest";
@@ -506,6 +507,30 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		if (homeView === "free") beginFree();
 	}
 
+	function goHome() {
+		setPendingRestart(false);
+		setNameError(null);
+		setSeedError(null);
+		setHomeView("menu");
+		setMode(null);
+		try {
+			const today = dailyIdentity();
+			setHasDailyAttempt(
+				Boolean(loadDailyAttempt(window.localStorage, dataset, today.day, today.seed)),
+			);
+			setHasFreePlaySave(
+				Boolean(
+					parsePersistedTournamentRun(
+						window.localStorage.getItem(TOURNAMENT_STORAGE_KEY) ?? "",
+						dataset,
+					),
+				),
+			);
+		} catch {
+			// Storage may be unavailable in privacy-restricted browser contexts.
+		}
+	}
+
 	function requestNewDraft() {
 		setPendingRestart(true);
 		setNameDraft(teamName === DEFAULT_TEAM_NAME ? "" : teamName);
@@ -676,363 +701,370 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		draggingPlayer,
 	};
 	const showSideRoster = Boolean(!simulating && state.phase.type !== "player");
+	const homeLogo = <HomeLogo onGoHome={goHome} />;
 	if (mode === null) {
 		return (
-			<HomeScreen
-				view={homeView}
-				identity={identity}
-				stats={dailyStats}
-				hasDailyAttempt={hasDailyAttempt}
-				hasFreePlaySave={hasFreePlaySave}
-				nameDraft={nameDraft}
-				nameError={nameError}
-				seedDraft={seedDraft}
-				seedError={seedError}
-				onView={setHomeView}
-				onNameDraft={(value) => {
-					setNameDraft(value);
-					setNameError(null);
-				}}
-				onSeedDraft={(value) => {
-					setSeedDraft(value);
-					setSeedError(null);
-				}}
-				onChoose={chooseHomeAction}
-				onStart={confirmHomeStart}
-			/>
+			<>
+				{homeLogo}
+				<HomeScreen
+					view={homeView}
+					identity={identity}
+					stats={dailyStats}
+					hasDailyAttempt={hasDailyAttempt}
+					hasFreePlaySave={hasFreePlaySave}
+					nameDraft={nameDraft}
+					nameError={nameError}
+					seedDraft={seedDraft}
+					seedError={seedError}
+					onView={setHomeView}
+					onNameDraft={(value) => {
+						setNameDraft(value);
+						setNameError(null);
+					}}
+					onSeedDraft={(value) => {
+						setSeedDraft(value);
+						setSeedError(null);
+					}}
+					onChoose={chooseHomeAction}
+					onStart={confirmHomeStart}
+				/>
+			</>
 		);
 	}
 
 	return (
-		<div
-			className={`mx-auto w-full px-4 py-5 sm:px-6 sm:py-8 ${simulating ? "max-w-360" : "max-w-7xl"}`}
-		>
-			<header className="flex items-start justify-between gap-4">
-				<div>
-					<p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300">
-						{mode === "daily"
-							? `Today’s Challenge · ${identity.day} UTC · ${identity.id}`
-							: "Free Play"}
-					</p>
-					<h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-						{teamName}
-					</h1>
-					<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
-						Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
-					</p>
-				</div>
-				{!tournament && !pendingRestart && (
-					<button
-						type="button"
-						onClick={requestNewDraft}
-						className="shrink-0 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-					>
-						New draft
-					</button>
-				)}
-			</header>
-
+		<>
+			{homeLogo}
 			<div
-				className={`mt-6 grid gap-5 ${showSideRoster ? "lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start" : ""}`}
+				className={`mx-auto w-full px-4 py-5 sm:px-6 sm:py-8 ${simulating ? "max-w-360" : "max-w-7xl"}`}
 			>
-				<main className="min-w-0">
-					{showSideRoster && (
-						<div className="mb-5 lg:hidden">
-							<LiveRoster {...rosterProps} />
-						</div>
-					)}
-
-					{pendingRestart && (
-						<section className="mb-5 rounded-2xl border border-emerald-300/30 bg-emerald-300/8 p-5">
-							<h2 className="text-xl font-semibold text-white">Name the new draft</h2>
-							<p className="mt-1 text-sm text-zinc-400">This replaces the current run.</p>
-							<div className="mt-4 max-w-md">
-								<TeamNameField
-									id="restart-team-name"
-									value={nameDraft}
-									onChange={(value) => {
-										setNameDraft(value);
-										setNameError(null);
-									}}
-									error={nameError}
-								/>
-							</div>
-							<div className="mt-4 flex flex-wrap gap-2">
-								<button
-									type="button"
-									onClick={confirmNewDraft}
-									className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200"
-								>
-									Start new draft
-								</button>
-								<button
-									type="button"
-									onClick={() => {
-										setPendingRestart(false);
-										setNameError(null);
-									}}
-									className="rounded-lg border border-white/15 px-4 py-2.5 text-sm font-semibold text-zinc-200"
-								>
-									Cancel
-								</button>
-							</div>
-						</section>
-					)}
-
-					{!pendingRestart && tournament && teamProfile && (
-						<TournamentRun
-							state={tournament}
-							playerTeam={teamProfile}
-							playerTeamName={teamName}
-							opponents={opponents}
-							orgsById={orgsById}
-							playersById={playersById}
-							onChange={setTournament}
-							onAbandon={requestNewDraft}
-							terminalExtras={
-								dailyResult ? (
-									<DailySharePanel result={dailyResult} stats={dailyStats} />
-								) : undefined
-							}
-						/>
-					)}
-
-					{!pendingRestart &&
-						!tournament &&
-						state.phase.type === "player" &&
-						card &&
-						orgYear &&
-						org &&
-						(rolling ? (
-							<DraftRoll
-								key={cardKey}
-								kind={rollKind}
-								round={state.phase.round}
-								majorId={card.majorId}
-								orgYearId={card.orgYearId}
-								majors={dataset.majors}
-								orgYears={dataset.orgYears}
-								orgsById={orgsById}
-								onSettled={() => setSettledCardKey(cardKey)}
-							/>
-						) : (
-							<section
-								key={`round-${state.phase.round}`}
-								aria-labelledby="round-heading"
-								className="motion-safe:animate-[draft-reveal_360ms_ease-out]"
-							>
-								<div className="rounded-2xl bg-zinc-900/90 p-5 sm:p-7">
-									<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-										Player round {state.phase.round + 1} of 5
-									</p>
-									<div className="mt-4 flex flex-wrap items-start justify-between gap-5">
-										<div className="grid min-w-0 flex-1 gap-5 sm:grid-cols-2">
-											<div className="flex min-w-0 items-start gap-4">
-												<CrestRerollColumn crest={<OrgCrest org={org} size="xl" />}>
-													<button
-														type="button"
-														disabled={state.rerolls.teamRemaining <= 0}
-														onClick={() => reroll("rerollTeam")}
-														className={`${REROLL_BUTTON_CLASS} enabled:hover:border-emerald-300/50 enabled:hover:bg-emerald-300/10`}
-													>
-														{state.rerolls.teamRemaining > 0
-															? `Reroll team · ${state.rerolls.teamRemaining}`
-															: "Team rerolls used"}
-													</button>
-												</CrestRerollColumn>
-												<div className="min-w-0 pt-1">
-													<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-														Team
-													</p>
-													<h2
-														id="round-heading"
-														className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-4xl"
-													>
-														{org.name} <span className="text-zinc-500">{orgYear.year}</span>
-													</h2>
-													<p className="mt-1 text-sm text-zinc-400">
-														{GAME_LABELS[orgYear.game]}
-														{major ? ` · placed #${orgYear.placement}` : " · pre-Major legend"}
-													</p>
-												</div>
-											</div>
-											<div className="flex min-w-0 items-start gap-4">
-												<CrestRerollColumn
-													crest={
-														<MajorCrest
-															major={
-																major ?? {
-																	id: "legacy-wildcard",
-																	shortName: "Legacy wildcard",
-																}
-															}
-															size="xl"
-														/>
-													}
-												>
-													<button
-														type="button"
-														disabled={majorRerollDisabled}
-														onClick={() => reroll("rerollMajor")}
-														className={`${REROLL_BUTTON_CLASS} enabled:hover:border-sky-300/50 enabled:hover:bg-sky-300/10`}
-													>
-														{state.rerolls.majorRemaining <= 0
-															? "Major rerolls used"
-															: hasOtherMajor
-																? `Reroll Major · ${state.rerolls.majorRemaining}`
-																: "Only Major for this team"}
-													</button>
-												</CrestRerollColumn>
-												<div className="min-w-0 pt-1">
-													<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-														Major
-													</p>
-													<p className="mt-1 break-words text-2xl font-semibold tracking-tight text-white sm:text-4xl">
-														{major ? visibleLabel(major.shortName) : "Legacy wildcard"}
-													</p>
-													<p className="mt-1 text-sm text-zinc-400">
-														{major
-															? `${visibleLabel(major.location)} · ${major.year}`
-															: "Pre-2013 legend card"}
-													</p>
-												</div>
-											</div>
-										</div>
-										<span
-											className={`rounded-full border px-3 py-1 text-xs font-semibold ${TIER_STYLES[orgYear.tier]}`}
-										>
-											{TIER_LABELS[orgYear.tier]} tier
-										</span>
-									</div>
-								</div>
-
-								<div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start">
-									<div className="order-1 lg:order-none lg:col-start-2 lg:row-span-2 lg:sticky lg:top-5">
-										<LiveRoster {...rosterProps} />
-									</div>
-									<div className="order-2 space-y-3 lg:col-start-1 lg:row-start-1">
-										{card.players.map((draftable) => {
-											const player = playersById.get(draftable.id);
-											if (!player) {
-												return null;
-											}
-											return (
-												<PlayerDraftCard
-													key={player.id}
-													player={player}
-													dragging={drag?.playerId === player.id}
-													onPointerDown={(event) => startDrag(player.id, event)}
-													onAssign={(role) => assignPlayer(player.id, role)}
-												/>
-											);
-										})}
-										<p className="px-1 text-[11px] text-zinc-500">
-											Drag a player onto a role. Keyboard: focus a card, then press 1–5.
-										</p>
-									</div>
-								</div>
-							</section>
-						))}
-
-					{!pendingRestart && !tournament && state.phase.type === "coach" && (
-						<section
-							aria-labelledby="coach-heading"
-							className="motion-safe:animate-[draft-reveal_360ms_ease-out]"
+				<header className="flex items-start justify-between gap-4">
+					<div className="min-w-0">
+						<p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300">
+							{mode === "daily"
+								? `Today’s Challenge · ${identity.day} UTC · ${identity.id}`
+								: "Free Play"}
+						</p>
+						<h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+							{teamName}
+						</h1>
+						<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+							Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
+						</p>
+					</div>
+					{!tournament && !pendingRestart && (
+						<button
+							type="button"
+							onClick={requestNewDraft}
+							className="shrink-0 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 						>
-							<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-								Final round · Coach
-							</p>
-							<h2
-								id="coach-heading"
-								className="mt-1 text-3xl font-semibold tracking-tight text-white"
-							>
-								Choose your sixth
-							</h2>
-							<p className="mt-2 text-sm text-zinc-400">
-								Five coaches were drafted. Their modifiers shape the run in the next phase.
-							</p>
-							<div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-								{state.coachIds.map((coachId) => {
-									const coach = coachesById.get(coachId);
-									if (!coach) {
-										return null;
-									}
-									return (
-										<CoachCard
-											key={coach.id}
-											coach={coach}
-											org={orgsById.get(coach.orgId)}
-											orgName={orgsById.get(coach.orgId)?.name ?? coach.orgId}
-											onPick={() => pickCoach(coach.id)}
-										/>
-									);
-								})}
-							</div>
-						</section>
+							New draft
+						</button>
 					)}
+				</header>
 
-					{!pendingRestart &&
-						!tournament &&
-						state.phase.type === "complete" &&
-						chosenCoach &&
-						teamProfile && (
-							<section
-								aria-labelledby="complete-heading"
-								className="rounded-2xl border border-emerald-300/30 bg-emerald-300/7 p-5 motion-safe:animate-[draft-reveal_360ms_ease-out] sm:p-7"
-							>
-								<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-									Draft complete
-								</p>
-								<h2
-									id="complete-heading"
-									className="mt-1 text-3xl font-semibold tracking-tight text-white"
-								>
-									{teamName} is locked in
-								</h2>
-								<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-300">
-									Five players and {chosenCoach.nick} are locked in. This profile combines
-									individual quality, role fit, teammate and nationality chemistry, communication,
-									structure, and coaching.
-								</p>
-								<TeamProfilePanel profile={teamProfile} />
-								<div className="mt-5 flex flex-wrap gap-2">
+				<div
+					className={`mt-6 grid gap-5 ${showSideRoster ? "lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start" : ""}`}
+				>
+					<main className="min-w-0">
+						{showSideRoster && (
+							<div className="mb-5 lg:hidden">
+								<LiveRoster {...rosterProps} />
+							</div>
+						)}
+
+						{pendingRestart && (
+							<section className="mb-5 rounded-2xl border border-emerald-300/30 bg-emerald-300/8 p-5">
+								<h2 className="text-xl font-semibold text-white">Name the new draft</h2>
+								<p className="mt-1 text-sm text-zinc-400">This replaces the current run.</p>
+								<div className="mt-4 max-w-md">
+									<TeamNameField
+										id="restart-team-name"
+										value={nameDraft}
+										onChange={(value) => {
+											setNameDraft(value);
+											setNameError(null);
+										}}
+										error={nameError}
+									/>
+								</div>
+								<div className="mt-4 flex flex-wrap gap-2">
 									<button
 										type="button"
-										onClick={startMajor}
-										className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+										onClick={confirmNewDraft}
+										className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200"
 									>
-										Start Major run
+										Start new draft
 									</button>
 									<button
 										type="button"
-										onClick={requestNewDraft}
-										className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+										onClick={() => {
+											setPendingRestart(false);
+											setNameError(null);
+										}}
+										className="rounded-lg border border-white/15 px-4 py-2.5 text-sm font-semibold text-zinc-200"
 									>
-										Start another draft
+										Cancel
 									</button>
 								</div>
 							</section>
 						)}
 
-					{error && (
-						<p
-							role="alert"
-							className="mt-4 rounded-lg border border-red-300/30 bg-red-300/10 p-3 text-sm text-red-200"
-						>
-							{error}
-						</p>
-					)}
-				</main>
+						{!pendingRestart && tournament && teamProfile && (
+							<TournamentRun
+								state={tournament}
+								playerTeam={teamProfile}
+								playerTeamName={teamName}
+								opponents={opponents}
+								orgsById={orgsById}
+								playersById={playersById}
+								onChange={setTournament}
+								onAbandon={requestNewDraft}
+								terminalExtras={
+									dailyResult ? (
+										<DailySharePanel result={dailyResult} stats={dailyStats} />
+									) : undefined
+								}
+							/>
+						)}
 
-				{showSideRoster && (
-					<aside className="sticky top-5 hidden lg:block">
-						<LiveRoster {...rosterProps} />
-					</aside>
-				)}
+						{!pendingRestart &&
+							!tournament &&
+							state.phase.type === "player" &&
+							card &&
+							orgYear &&
+							org &&
+							(rolling ? (
+								<DraftRoll
+									key={cardKey}
+									kind={rollKind}
+									round={state.phase.round}
+									majorId={card.majorId}
+									orgYearId={card.orgYearId}
+									majors={dataset.majors}
+									orgYears={dataset.orgYears}
+									orgsById={orgsById}
+									onSettled={() => setSettledCardKey(cardKey)}
+								/>
+							) : (
+								<section
+									key={`round-${state.phase.round}`}
+									aria-labelledby="round-heading"
+									className="motion-safe:animate-[draft-reveal_360ms_ease-out]"
+								>
+									<div className="rounded-2xl bg-zinc-900/90 p-5 sm:p-7">
+										<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+											Player round {state.phase.round + 1} of 5
+										</p>
+										<div className="mt-4 flex flex-wrap items-start justify-between gap-5">
+											<div className="grid min-w-0 flex-1 gap-5 sm:grid-cols-2">
+												<div className="flex min-w-0 items-start gap-4">
+													<CrestRerollColumn crest={<OrgCrest org={org} size="xl" />}>
+														<button
+															type="button"
+															disabled={state.rerolls.teamRemaining <= 0}
+															onClick={() => reroll("rerollTeam")}
+															className={`${REROLL_BUTTON_CLASS} enabled:hover:border-emerald-300/50 enabled:hover:bg-emerald-300/10`}
+														>
+															{state.rerolls.teamRemaining > 0
+																? `Reroll team · ${state.rerolls.teamRemaining}`
+																: "Team rerolls used"}
+														</button>
+													</CrestRerollColumn>
+													<div className="min-w-0 pt-1">
+														<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+															Team
+														</p>
+														<h2
+															id="round-heading"
+															className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-4xl"
+														>
+															{org.name} <span className="text-zinc-500">{orgYear.year}</span>
+														</h2>
+														<p className="mt-1 text-sm text-zinc-400">
+															{GAME_LABELS[orgYear.game]}
+															{major ? ` · placed #${orgYear.placement}` : " · pre-Major legend"}
+														</p>
+													</div>
+												</div>
+												<div className="flex min-w-0 items-start gap-4">
+													<CrestRerollColumn
+														crest={
+															<MajorCrest
+																major={
+																	major ?? {
+																		id: "legacy-wildcard",
+																		shortName: "Legacy wildcard",
+																	}
+																}
+																size="xl"
+															/>
+														}
+													>
+														<button
+															type="button"
+															disabled={majorRerollDisabled}
+															onClick={() => reroll("rerollMajor")}
+															className={`${REROLL_BUTTON_CLASS} enabled:hover:border-sky-300/50 enabled:hover:bg-sky-300/10`}
+														>
+															{state.rerolls.majorRemaining <= 0
+																? "Major rerolls used"
+																: hasOtherMajor
+																	? `Reroll Major · ${state.rerolls.majorRemaining}`
+																	: "Only Major for this team"}
+														</button>
+													</CrestRerollColumn>
+													<div className="min-w-0 pt-1">
+														<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+															Major
+														</p>
+														<p className="mt-1 break-words text-2xl font-semibold tracking-tight text-white sm:text-4xl">
+															{major ? visibleLabel(major.shortName) : "Legacy wildcard"}
+														</p>
+														<p className="mt-1 text-sm text-zinc-400">
+															{major
+																? `${visibleLabel(major.location)} · ${major.year}`
+																: "Pre-2013 legend card"}
+														</p>
+													</div>
+												</div>
+											</div>
+											<span
+												className={`rounded-full border px-3 py-1 text-xs font-semibold ${TIER_STYLES[orgYear.tier]}`}
+											>
+												{TIER_LABELS[orgYear.tier]} tier
+											</span>
+										</div>
+									</div>
+
+									<div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start">
+										<div className="order-1 lg:order-none lg:col-start-2 lg:row-span-2 lg:sticky lg:top-5">
+											<LiveRoster {...rosterProps} />
+										</div>
+										<div className="order-2 space-y-3 lg:col-start-1 lg:row-start-1">
+											{card.players.map((draftable) => {
+												const player = playersById.get(draftable.id);
+												if (!player) {
+													return null;
+												}
+												return (
+													<PlayerDraftCard
+														key={player.id}
+														player={player}
+														dragging={drag?.playerId === player.id}
+														onPointerDown={(event) => startDrag(player.id, event)}
+														onAssign={(role) => assignPlayer(player.id, role)}
+													/>
+												);
+											})}
+											<p className="px-1 text-[11px] text-zinc-500">
+												Drag a player onto a role. Keyboard: focus a card, then press 1–5.
+											</p>
+										</div>
+									</div>
+								</section>
+							))}
+
+						{!pendingRestart && !tournament && state.phase.type === "coach" && (
+							<section
+								aria-labelledby="coach-heading"
+								className="motion-safe:animate-[draft-reveal_360ms_ease-out]"
+							>
+								<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+									Final round · Coach
+								</p>
+								<h2
+									id="coach-heading"
+									className="mt-1 text-3xl font-semibold tracking-tight text-white"
+								>
+									Choose your sixth
+								</h2>
+								<p className="mt-2 text-sm text-zinc-400">
+									Five coaches were drafted. Their modifiers shape the run in the next phase.
+								</p>
+								<div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+									{state.coachIds.map((coachId) => {
+										const coach = coachesById.get(coachId);
+										if (!coach) {
+											return null;
+										}
+										return (
+											<CoachCard
+												key={coach.id}
+												coach={coach}
+												org={orgsById.get(coach.orgId)}
+												orgName={orgsById.get(coach.orgId)?.name ?? coach.orgId}
+												onPick={() => pickCoach(coach.id)}
+											/>
+										);
+									})}
+								</div>
+							</section>
+						)}
+
+						{!pendingRestart &&
+							!tournament &&
+							state.phase.type === "complete" &&
+							chosenCoach &&
+							teamProfile && (
+								<section
+									aria-labelledby="complete-heading"
+									className="rounded-2xl border border-emerald-300/30 bg-emerald-300/7 p-5 motion-safe:animate-[draft-reveal_360ms_ease-out] sm:p-7"
+								>
+									<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+										Draft complete
+									</p>
+									<h2
+										id="complete-heading"
+										className="mt-1 text-3xl font-semibold tracking-tight text-white"
+									>
+										{teamName} is locked in
+									</h2>
+									<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-300">
+										Five players and {chosenCoach.nick} are locked in. This profile combines
+										individual quality, role fit, teammate and nationality chemistry, communication,
+										structure, and coaching.
+									</p>
+									<TeamProfilePanel profile={teamProfile} />
+									<div className="mt-5 flex flex-wrap gap-2">
+										<button
+											type="button"
+											onClick={startMajor}
+											className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+										>
+											Start Major run
+										</button>
+										<button
+											type="button"
+											onClick={requestNewDraft}
+											className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+										>
+											Start another draft
+										</button>
+									</div>
+								</section>
+							)}
+
+						{error && (
+							<p
+								role="alert"
+								className="mt-4 rounded-lg border border-red-300/30 bg-red-300/10 p-3 text-sm text-red-200"
+							>
+								{error}
+							</p>
+						)}
+					</main>
+
+					{showSideRoster && (
+						<aside className="sticky top-5 hidden lg:block">
+							<LiveRoster {...rosterProps} />
+						</aside>
+					)}
+				</div>
+				{drag && draggingPlayer ? (
+					<PlayerDragGhost player={draggingPlayer} x={drag.x} y={drag.y} />
+				) : null}
 			</div>
-			{drag && draggingPlayer ? (
-				<PlayerDragGhost player={draggingPlayer} x={drag.x} y={drag.y} />
-			) : null}
-		</div>
+		</>
 	);
 }

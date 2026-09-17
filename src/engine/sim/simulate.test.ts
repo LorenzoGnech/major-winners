@@ -536,16 +536,28 @@ describe("economy", () => {
 		expect(win.state.losses).toBe(0);
 	});
 
-	it("builds a reserve over a win streak so one gun-round loss is not an eco", () => {
+	it("affords another full buy after two consecutive wins", () => {
 		const buy = { pistol: false, economyDiscipline: 50 };
 		let state = resolveEconomyRound(INITIAL_ECONOMY, "pistol", true).state;
 		expect(chooseBuy(state, buy)).toBe("full-buy");
 		state = resolveEconomyRound(state, "full-buy", true).state;
-		state = resolveEconomyRound(state, "full-buy", true).state;
-		state = resolveEconomyRound(state, "full-buy", true).state;
-		expect(state.bank).toBeGreaterThan(5_000);
-		const afterLoss = resolveEconomyRound(state, "full-buy", false).state;
-		expect(chooseBuy(afterLoss, buy)).not.toBe("eco");
+		expect(chooseBuy(state, buy)).toBe("full-buy");
+	});
+
+	it("after four consecutive wins, allows two full buys before an eco or force", () => {
+		const buy = { pistol: false, economyDiscipline: 50 };
+		let state = resolveEconomyRound(INITIAL_ECONOMY, "pistol", true).state;
+		for (let i = 0; i < 3; i++) {
+			expect(chooseBuy(state, buy)).toBe("full-buy");
+			state = resolveEconomyRound(state, "full-buy", true).state;
+		}
+		expect(chooseBuy(state, buy)).toBe("full-buy");
+		state = resolveEconomyRound(state, "full-buy", false).state;
+		expect(chooseBuy(state, buy)).toBe("full-buy");
+		state = resolveEconomyRound(state, "full-buy", false).state;
+		expect(chooseBuy(state, buy)).toBe("full-buy");
+		state = resolveEconomyRound(state, "full-buy", false).state;
+		expect(["eco", "force"]).toContain(chooseBuy(state, buy));
 	});
 
 	it("shows five-player equipment, with pistols even and a full buy above an eco", () => {

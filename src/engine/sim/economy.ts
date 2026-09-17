@@ -15,7 +15,7 @@ export const BUY_COST: Record<BuyType, number> = {
 };
 
 export const WIN_REWARD = 3_250;
-export const KILL_REWARD_WIN = 800;
+export const KILL_REWARD_WIN = 1_250;
 export const KILL_REWARD_LOSS = 300;
 
 /** Five-player loadout value shown on the this-round bar. */

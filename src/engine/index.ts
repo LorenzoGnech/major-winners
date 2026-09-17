@@ -86,6 +86,7 @@ export {
 	getMap,
 	type HighlightEvent,
 	INITIAL_ECONOMY,
+	initialMorale,
 	isGamePlanId,
 	type KillEvent,
 	type LiveMapState,

@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Org, PlayerSeason, Role } from "../data";
 import {
+	applyGamePlan,
 	canQueueTimeout,
 	equipmentValue,
 	formatRoundSummary,
 	gamePlanById,
 	getMap,
 	type HighlightEvent,
+	initialMorale,
 	type KillEvent,
 	type LiveSeriesState,
 	type MapResult,
@@ -16,6 +18,7 @@ import {
 	queueTimeout,
 	type RoundResult,
 	type RoundSummary,
+	resolveGamePlan,
 	resolveRoundSummary,
 	type SeriesResult,
 	type Side,
@@ -225,6 +228,20 @@ export function latestRoundFeed(
 		settled: true,
 		highlights: map.highlights.filter((highlight) => highlight.round === settled.round),
 	};
+}
+
+export function playbackMorale(
+	rounds: readonly RoundResult[],
+	settledRoundCount: number,
+	fallback: readonly [number, number],
+): readonly [number, number] {
+	if (settledRoundCount <= 0) return fallback;
+	const round = rounds[settledRoundCount - 1];
+	return round?.moraleAfter ?? fallback;
+}
+
+export function formatMoralePercent(value: number): string {
+	return `${Math.round(Math.min(100, Math.max(0, value)))}%`;
 }
 
 export function resolvePlayback(
@@ -733,6 +750,54 @@ function EconomyBars({
 	);
 }
 
+function MoraleMeter({
+	value,
+	label,
+	tone,
+}: {
+	value: number;
+	label: string;
+	tone: "player" | "opponent";
+}) {
+	const pct = Math.round(Math.min(100, Math.max(0, value)));
+	return (
+		<div>
+			<div className="mb-1 flex justify-between gap-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+				<span className={tone === "player" ? "text-emerald-200/90" : "text-amber-200/90"}>
+					{label}
+				</span>
+				<span
+					className={`tabular-nums ${tone === "player" ? "text-emerald-200" : "text-amber-200"}`}
+				>
+					{formatMoralePercent(value)}
+				</span>
+			</div>
+			<div className="h-2 overflow-hidden rounded-full bg-white/10">
+				<div
+					className={`h-full motion-safe:transition-[width] ${tone === "player" ? "bg-emerald-300" : "bg-amber-300"}`}
+					style={{ width: `${pct}%` }}
+				/>
+			</div>
+		</div>
+	);
+}
+
+function MoraleBars({
+	values,
+	labels,
+}: {
+	values: readonly [number, number];
+	labels: readonly [string, string];
+}) {
+	return (
+		<section className="mt-4 space-y-3" aria-label="Team morale">
+			<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">Morale</p>
+			<MoraleMeter value={values[0]} label={labels[0]} tone="player" />
+			<MoraleMeter value={values[1]} label={labels[1]} tone="opponent" />
+		</section>
+	);
+}
+
 export function MatchPlayback({
 	result: completedResult,
 	live,
@@ -869,6 +934,11 @@ export function MatchPlayback({
 		equipmentValue(feed?.round.economy[1]?.buy),
 	];
 	const totals = playbackBanks(feed?.round.economy, Boolean(feed?.settled));
+	const moraleFallback: readonly [number, number] = [
+		initialMorale(applyGamePlan(result.teams[0], resolveGamePlan(activeMap.gamePlan))),
+		initialMorale(result.teams[1]),
+	];
+	const morale = playbackMorale(activeMap.rounds, cursor.settledRoundCount, moraleFallback);
 	const killIndex = cursor.inProgressKills.length - 1;
 	const clutch =
 		cursor.inProgressRound && killIndex >= 0
@@ -1158,6 +1228,7 @@ export function MatchPlayback({
 					/>
 
 					<EconomyBars roundValues={roundValues} totals={totals} buys={buys} labels={shortLabels} />
+					<MoraleBars values={morale} labels={shortLabels} />
 
 					<fieldset className="mt-5 flex flex-wrap items-start justify-center gap-2">
 						<legend className="sr-only">Replay controls</legend>
