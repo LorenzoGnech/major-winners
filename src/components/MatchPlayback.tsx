@@ -29,6 +29,7 @@ import { ClutchMoment } from "./ClutchMoment";
 import {
 	activeClutchSequence,
 	clutchBeatLine,
+	clutchEnemiesLeft,
 	clutchMomentLines,
 	clutchMomentStartIndex,
 	clutchOpponents,
@@ -867,9 +868,13 @@ export function MatchPlayback({
 			)
 		: undefined;
 	const remainingAfter = clutch
-		? (cursor.inProgressRound?.kills
-				.slice(killIndex + 1)
-				.filter((kill) => kill.victimTeam !== clutch.team).length ?? 0)
+		? clutchEnemiesLeft(
+				cursor.inProgressRound?.kills ?? [],
+				clutch.startKillIndex,
+				killIndex,
+				clutch.team,
+				clutch.against,
+			)
 		: 0;
 	const clutchLine =
 		clutch && latestKill && cursor.inProgressRound

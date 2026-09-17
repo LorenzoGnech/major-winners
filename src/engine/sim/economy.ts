@@ -7,12 +7,16 @@ export const INITIAL_ECONOMY: EconomyState = {
 	losses: 0,
 };
 
-const BUY_COST: Record<BuyType, number> = {
+export const BUY_COST: Record<BuyType, number> = {
 	pistol: 0,
-	"full-buy": 4_500,
+	"full-buy": 3_600,
 	force: 2_200,
 	eco: 500,
 };
+
+export const WIN_REWARD = 3_250;
+export const KILL_REWARD_WIN = 800;
+export const KILL_REWARD_LOSS = 300;
 
 /** Five-player loadout value shown on the this-round bar. */
 export const EQUIPMENT_VALUE: Record<BuyType, number> = {
@@ -63,9 +67,9 @@ export function chooseBuy(
 ): BuyType {
 	if (options.pistol) return "pistol";
 	const discipline = clamp(options.economyDiscipline, 0, 100);
-	const fullBuyThreshold = 4_100 - (discipline - 50) * 4;
+	const fullBuyThreshold = Math.max(BUY_COST["full-buy"], 4_100 - (discipline - 50) * 4);
 	if (state.bank >= fullBuyThreshold) return "full-buy";
-	const forceThreshold = 2_000 + (discipline - 50) * 8;
+	const forceThreshold = Math.max(BUY_COST.force, 2_000 + (discipline - 50) * 8);
 	return state.bank >= forceThreshold ? "force" : "eco";
 }
 
@@ -75,7 +79,7 @@ export function resolveEconomyRound(
 	won: boolean,
 ): { state: EconomyState; round: EconomyRound } {
 	const spent = Math.min(state.bank, BUY_COST[buy]);
-	const income = won ? 3_250 : state.lossBonus;
+	const income = won ? WIN_REWARD + KILL_REWARD_WIN : state.lossBonus + KILL_REWARD_LOSS;
 	const losses = won ? 0 : state.losses + 1;
 	const lossBonus = won ? 1_400 : Math.min(3_400, 1_400 + losses * 500);
 	const bank = Math.min(16_000, state.bank - spent + income);

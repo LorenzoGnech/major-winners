@@ -143,6 +143,7 @@ describe("makeKills clutch intent", () => {
 		const { kills, sequences } = makeKills(teams, 1, createRng(9), loadouts, "lose", 3);
 		expect(sequences).toEqual([expect.objectContaining({ team: 0, against: 3, won: false })]);
 		const start = sequences[0]?.startKillIndex ?? 0;
+		const clutcherId = sequences[0]?.playerId;
 		const alive = new Set(teams[0].members.map((member) => member.id));
 		const enemies = new Set(teams[1].members.map((member) => member.id));
 		for (const kill of kills.slice(0, start)) {
@@ -151,6 +152,9 @@ describe("makeKills clutch intent", () => {
 		}
 		expect(alive.size).toBe(1);
 		expect(enemies.size).toBe(3);
-		expect(kills.at(-1)?.victimTeam).toBe(0);
+		const clutchKills = kills.slice(start);
+		expect(clutchKills.some((kill) => kill.killerId === clutcherId)).toBe(true);
+		expect(clutchKills.at(-1)?.victimId).toBe(clutcherId);
+		expect(clutchKills.filter((kill) => kill.killerId === clutcherId).length).toBeLessThan(3);
 	});
 });

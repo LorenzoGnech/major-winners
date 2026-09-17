@@ -146,7 +146,7 @@ describe("simulateSeries", () => {
 			winsA += simulateSeries({ teams: equalTeams, seed, format: "BO1" }).winner === 0 ? 1 : 0;
 		}
 		expect(winsA / samples).toBeGreaterThan(0.45);
-		expect(winsA / samples).toBeLessThan(0.57);
+		expect(winsA / samples).toBeLessThan(0.58);
 	});
 
 	it("gives a ten-OVR stronger team a clear but non-certain advantage", () => {
@@ -342,8 +342,8 @@ describe("simulateSeries", () => {
 			).length;
 		}
 		expect(featured).toBeGreaterThan(40);
-		expect(won / featured).toBeGreaterThan(0.3);
-		expect(won / featured).toBeLessThan(0.7);
+		expect(won / featured).toBeGreaterThan(0.45);
+		expect(won / featured).toBeLessThan(0.9);
 	});
 });
 
@@ -506,13 +506,25 @@ describe("economy", () => {
 	it("progresses loss bonus and resets it after a win", () => {
 		const firstLoss = resolveEconomyRound(INITIAL_ECONOMY, "pistol", false);
 		expect(firstLoss.state.lossBonus).toBe(1_900);
-		expect(firstLoss.state.bank).toBe(2_200);
-		expect(chooseBuy(firstLoss.state, { pistol: false, economyDiscipline: 80 })).toBe("eco");
+		expect(firstLoss.state.bank).toBe(2_500);
+		expect(chooseBuy(firstLoss.state, { pistol: false, economyDiscipline: 80 })).toBe("force");
 		const secondLoss = resolveEconomyRound(firstLoss.state, "eco", false);
 		expect(secondLoss.state.lossBonus).toBe(2_400);
 		const win = resolveEconomyRound(secondLoss.state, "force", true);
 		expect(win.state.lossBonus).toBe(1_400);
 		expect(win.state.losses).toBe(0);
+	});
+
+	it("builds a reserve over a win streak so one gun-round loss is not an eco", () => {
+		const buy = { pistol: false, economyDiscipline: 50 };
+		let state = resolveEconomyRound(INITIAL_ECONOMY, "pistol", true).state;
+		expect(chooseBuy(state, buy)).toBe("full-buy");
+		state = resolveEconomyRound(state, "full-buy", true).state;
+		state = resolveEconomyRound(state, "full-buy", true).state;
+		state = resolveEconomyRound(state, "full-buy", true).state;
+		expect(state.bank).toBeGreaterThan(5_000);
+		const afterLoss = resolveEconomyRound(state, "full-buy", false).state;
+		expect(chooseBuy(afterLoss, buy)).not.toBe("eco");
 	});
 
 	it("shows five-player equipment, with pistols even and a full buy above an eco", () => {

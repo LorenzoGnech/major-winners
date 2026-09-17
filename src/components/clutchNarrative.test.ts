@@ -161,4 +161,29 @@ describe("clutchNarrative", () => {
 				.map((row) => row.member.nick),
 		).toEqual(["electronic"]);
 	});
+
+	it("keeps a denied clutch in suspense after a clutcher frag", () => {
+		const kills: KillEvent[] = [
+			{ killerTeam: 1, killerId: "s1mple", victimTeam: 0, victimId: "olof", weapon: "awp" },
+			{ killerTeam: 0, killerId: "krimz", victimTeam: 1, victimId: "electronic", weapon: "m4a1s" },
+			{ killerTeam: 1, killerId: "s1mple", victimTeam: 0, victimId: "krimz", weapon: "awp" },
+		];
+		expect(
+			clutchMomentLines({
+				player: "KRIMZ",
+				playerId: "krimz",
+				clutchTeam: 0,
+				against: 2,
+				won: false,
+				startKillIndex: 1,
+				kills,
+				revealedCount: 3,
+				nameOf: (id) => (id === "krimz" ? "KRIMZ" : id),
+			}),
+		).toEqual([
+			"KRIMZ is left 1 vs 2 with the M4A1-S.",
+			"KRIMZ finds electronic. One left.",
+			"s1mple shuts down the 1 vs 2.",
+		]);
+	});
 });

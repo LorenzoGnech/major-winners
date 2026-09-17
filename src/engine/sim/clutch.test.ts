@@ -22,6 +22,13 @@ describe("planFeaturedClutch", () => {
 		expect(planFeaturedClutch([19], 0, createRng(1), 22)).toEqual({ intent: "none" });
 	});
 
+	it("only stages denials on 1v3 or larger so the clutcher can still frag", () => {
+		for (let seed = 0; seed < 400; seed += 1) {
+			const plan = planFeaturedClutch([], 1, createRng(seed), 1);
+			if (plan.intent !== "none") expect(plan.against).toBeGreaterThanOrEqual(3);
+		}
+	});
+
 	it("features only the player's side from the already-decided winner", () => {
 		const won = planFeaturedClutch([], 0, createRng(3), 1);
 		const lost = planFeaturedClutch([], 1, createRng(3), 1);

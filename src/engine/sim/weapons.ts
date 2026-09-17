@@ -68,8 +68,8 @@ export const WEAPON_LABEL: Record<WeaponId, string> = {
 
 /** Public path for the killfeed silhouette, or `null` when no file is committed. */
 export const WEAPON_ICON: Record<WeaponId, string | null> = {
-	glock: null,
-	usp_s: null,
+	glock: "/weapons/glock.png",
+	usp_s: "/weapons/usps.png",
 	p250: "/weapons/p250.png",
 	deagle: "/weapons/deagle.png",
 	cz75: "/weapons/cz75.png",

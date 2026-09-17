@@ -49,6 +49,16 @@ function asAgainst(count: number): 2 | 3 | 4 | 5 | undefined {
 	return undefined;
 }
 
+/** Leave at least one opponent; always take at least one so a denial still has action. */
+function deniedClutcherFrags(against: FeaturedAgainst, rng: Rng): number {
+	const max = against - 1;
+	if (max <= 1) return 1;
+	const roll = rng.next();
+	if (roll < 0.55) return max;
+	if (roll < 0.85) return Math.max(1, max - 1);
+	return 1;
+}
+
 export function makeKills(
 	teams: readonly [TeamProfile, TeamProfile],
 	winner: 0 | 1,
@@ -129,6 +139,13 @@ export function makeKills(
 		}
 		if (intent === "win") {
 			while (alive[loser].size > 0) recordKill(winner);
+		} else if (survivor && facing) {
+			const clutcherFrags = deniedClutcherFrags(facing, rng);
+			for (let index = 0; index < clutcherFrags; index += 1) {
+				if (alive[facingTeam].size <= 1) break;
+				recordKill(clutcherTeam);
+			}
+			while (alive[clutcherTeam].size > 0) recordKill(winner);
 		} else if (alive[loser].size > 0) {
 			recordKill(winner);
 		}

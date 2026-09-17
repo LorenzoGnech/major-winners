@@ -102,9 +102,7 @@ export function clutchMomentLines({
 	for (let index = startKillIndex; index < revealedCount; index += 1) {
 		const kill = kills[index];
 		if (!kill) continue;
-		const remainingAfter = kills
-			.slice(index + 1)
-			.filter((event) => event.victimTeam !== clutchTeam).length;
+		const remainingAfter = clutchEnemiesLeft(kills, startKillIndex, index, clutchTeam, against);
 		if (kill.killerId === playerId) {
 			const victim = nameOf(kill.victimId);
 			if (remainingAfter <= 0) {
@@ -119,6 +117,19 @@ export function clutchMomentLines({
 		}
 	}
 	return lines;
+}
+
+export function clutchEnemiesLeft(
+	kills: readonly KillEvent[],
+	startKillIndex: number,
+	throughIndex: number,
+	clutchTeam: 0 | 1,
+	against: number,
+): number {
+	const dropped = kills
+		.slice(startKillIndex, throughIndex + 1)
+		.filter((kill) => kill.victimTeam !== clutchTeam).length;
+	return Math.max(0, against - dropped);
 }
 
 export function clutchBeatLine({

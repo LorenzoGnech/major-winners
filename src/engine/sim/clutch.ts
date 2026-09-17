@@ -76,8 +76,7 @@ export function planFeaturedClutch(
 	}
 	const against = chooseFeaturedAgainst(rng);
 	if (!against) return { intent: "none" };
-	return {
-		intent: winner === 0 ? "win" : "lose",
-		against,
-	};
+	if (winner === 0) return { intent: "win", against };
+	if (against < 3) return { intent: "none" };
+	return { intent: "lose", against };
 }
