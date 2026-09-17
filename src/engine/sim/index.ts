@@ -48,7 +48,13 @@ export {
 	type SimMap,
 	type SimMapId,
 } from "./maps";
-export { bumpMorale, decayMorale, initialMorale } from "./morale";
+export {
+	applyTimeoutMorale,
+	bumpMorale,
+	initialMorale,
+	resolveRoundMorale,
+	trailingStreak,
+} from "./morale";
 export { chooseRoundSummary, formatRoundSummary, resolveRoundSummary } from "./roundSummary";
 export {
 	partialMapResult,

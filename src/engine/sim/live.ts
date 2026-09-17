@@ -12,7 +12,7 @@ import {
 } from "./gamePlan";
 import { makeKills } from "./kills";
 import { chooseSeriesMaps } from "./maps";
-import { bumpMorale, decayMorale, initialMorale } from "./morale";
+import { applyTimeoutMorale, initialMorale, resolveRoundMorale } from "./morale";
 import { chooseRoundSummary } from "./roundSummary";
 import { playbackMaps, roundWinProbability, scoreboard } from "./simulate";
 import type {
@@ -198,10 +198,7 @@ function playMapRound(
 		}),
 	];
 	const timeoutTeam: 0 | 1 | undefined = usedTimeout ? 0 : undefined;
-	const morale: [number, number] = [
-		bumpMorale(decayMorale(current.morale[0]), usedTimeout ? 10 : 0),
-		decayMorale(current.morale[1]),
-	];
+	const morale = applyTimeoutMorale(current.morale, timeoutTeam);
 	const probability = roundWinProbability(simTeams, current.sides, buys, current.score, pistol, {
 		mapStyle: current.mapContext.style,
 		homePick: current.mapContext.homePick,
@@ -250,10 +247,13 @@ function playMapRound(
 		Math.max(current.maxDeficit[0], score[1] - score[0]),
 		Math.max(current.maxDeficit[1], score[0] - score[1]),
 	];
-	const moraleAfter: [number, number] = [...morale];
-	for (const sequence of sequences) {
-		moraleAfter[sequence.team] = bumpMorale(moraleAfter[sequence.team], sequence.won ? 8 : -6);
-	}
+	const moraleAfter = resolveRoundMorale({
+		morale,
+		winner,
+		priorWinners: current.rounds.map((round) => round.winner),
+		clutches: sequences,
+		teams: simTeams,
+	});
 
 	const highlights: HighlightEvent[] = [...current.highlights];
 	if (usedTimeout) {
