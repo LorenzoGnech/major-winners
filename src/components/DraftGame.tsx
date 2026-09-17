@@ -701,40 +701,36 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		draggingPlayer,
 	};
 	const showSideRoster = Boolean(!simulating && state.phase.type !== "player");
-	const homeLogo = <HomeLogo onGoHome={goHome} />;
 	if (mode === null) {
 		return (
-			<>
-				{homeLogo}
-				<HomeScreen
-					view={homeView}
-					identity={identity}
-					stats={dailyStats}
-					hasDailyAttempt={hasDailyAttempt}
-					hasFreePlaySave={hasFreePlaySave}
-					nameDraft={nameDraft}
-					nameError={nameError}
-					seedDraft={seedDraft}
-					seedError={seedError}
-					onView={setHomeView}
-					onNameDraft={(value) => {
-						setNameDraft(value);
-						setNameError(null);
-					}}
-					onSeedDraft={(value) => {
-						setSeedDraft(value);
-						setSeedError(null);
-					}}
-					onChoose={chooseHomeAction}
-					onStart={confirmHomeStart}
-				/>
-			</>
+			<HomeScreen
+				view={homeView}
+				identity={identity}
+				stats={dailyStats}
+				hasDailyAttempt={hasDailyAttempt}
+				hasFreePlaySave={hasFreePlaySave}
+				nameDraft={nameDraft}
+				nameError={nameError}
+				seedDraft={seedDraft}
+				seedError={seedError}
+				onView={setHomeView}
+				onNameDraft={(value) => {
+					setNameDraft(value);
+					setNameError(null);
+				}}
+				onSeedDraft={(value) => {
+					setSeedDraft(value);
+					setSeedError(null);
+				}}
+				onChoose={chooseHomeAction}
+				onStart={confirmHomeStart}
+			/>
 		);
 	}
 
 	return (
 		<>
-			{homeLogo}
+			<HomeLogo onGoHome={goHome} />
 			<div
 				className={`mx-auto w-full px-4 py-5 sm:px-6 sm:py-8 ${simulating ? "max-w-360" : "max-w-7xl"}`}
 			>

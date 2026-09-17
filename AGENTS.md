@@ -101,7 +101,7 @@ Contemporaries means a **documented elite LAN-pool distribution per rating versi
 
 ## Daily challenge
 
-The home screen is a centered brand mark (`public/logo.png`, also the favicon) with four actions: Today's Challenge, Free Play, Custom Game, and Stats. The same mark is fixed at the top left of the viewport on every screen and returns to the home menu without wiping a saved Daily or Free Play attempt. The team name is requested after a mode is chosen. Saved Daily and Free Play attempts resume immediately and keep their team name.
+The home screen is a centered brand mark (`public/logo.png`, also the favicon) with four actions: Today's Challenge, Free Play, Custom Game, and Stats. During a run the same mark sits at the top left of the viewport and returns to that home screen without wiping a saved Daily or Free Play attempt. The team name is requested after a mode is chosen. Saved Daily and Free Play attempts resume immediately and keep their team name.
 
 Today's Challenge uses the UTC day and `seedFromUtcDate`, making the draft, coach order, and opponents deterministic for identical choices. Match results are deterministic for the same map pick, per-map game plans, and timeout timings. Restarting uses the same daily seed; Free Play remains random unless started as a Custom Game.
 
