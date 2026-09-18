@@ -6,7 +6,7 @@ const SIZE_CLASS = {
 	md: "size-12 text-xs",
 	lg: "size-16 text-sm",
 	xl: "size-24 text-lg",
-	hero: "h-44 w-32 text-2xl sm:h-56 sm:w-40",
+	hero: "h-32 w-24 text-xl sm:h-56 sm:w-40",
 	card: "aspect-[3/4] w-full text-2xl",
 } as const;
 

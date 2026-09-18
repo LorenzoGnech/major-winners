@@ -137,13 +137,19 @@ export function RunSummary({
 					<Stat label="Team OVR" value={summary.teamOverall.toFixed(1)} wide />
 				</dl>
 
-				<ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5" aria-label="Your roster">
+				<ul className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-5 sm:gap-3" aria-label="Your roster">
 					{summary.players.map((player, index) => {
 						const mvp = player.seasonId === summary.mvpSeasonId;
+						const highlights = [
+							player.aces > 0 ? `${player.aces} ace${player.aces === 1 ? "" : "s"}` : null,
+							player.clutches > 0
+								? `${player.clutches} clutch${player.clutches === 1 ? "" : "es"}`
+								: null,
+						].filter(Boolean);
 						return (
 							<li
 								key={player.seasonId}
-								className={`run-player-in min-w-0 rounded-2xl border p-2 sm:p-3 ${
+								className={`run-player-in flex min-w-0 items-center gap-3 rounded-2xl border p-2 sm:block sm:p-3 ${
 									champion
 										? mvp
 											? "border-amber-300/55 bg-amber-300/10"
@@ -152,54 +158,52 @@ export function RunSummary({
 								}`}
 								style={{ animationDelay: `${120 + index * 90}ms` }}
 							>
-								<div className="overflow-hidden rounded-xl">
+								<div className="shrink-0 sm:hidden">
+									<PlayerCrest player={crestFor(player, playersById)} size="md" loading="eager" />
+								</div>
+								<div className="hidden overflow-hidden rounded-xl sm:block">
 									<PlayerCrest player={crestFor(player, playersById)} size="card" loading="eager" />
 								</div>
-								<p className="mt-2 truncate text-center text-sm font-semibold text-zinc-100">
-									{player.nick}
-								</p>
-								<p className="mt-0.5 truncate text-center text-[10px] uppercase tracking-wider text-zinc-500">
-									{ROLE_LABELS[player.slot]}
-									<span className="mx-1 text-zinc-700">·</span>
-									<span aria-hidden>{flagEmoji(player.nationality)}</span>
-									<span className="ml-1">{player.year}</span>
-								</p>
-								{mvp ? (
-									<p className="mt-1 text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-200">
-										Run MVP
+								<div className="min-w-0 flex-1 sm:mt-2 sm:text-center">
+									<p className="truncate text-sm font-semibold text-zinc-100">{player.nick}</p>
+									<p className="mt-0.5 truncate text-[10px] uppercase tracking-wider text-zinc-500">
+										{ROLE_LABELS[player.slot]}
+										<span className="mx-1 text-zinc-700">·</span>
+										<span aria-hidden>{flagEmoji(player.nationality)}</span>
+										<span className="ml-1">{player.year}</span>
 									</p>
-								) : null}
-								<p className="mt-2 text-center text-sm font-semibold tabular-nums text-zinc-100">
-									{player.kills}
-									<span className="text-zinc-600">–</span>
-									{player.deaths}
-									<span className="text-zinc-600">–</span>
-									{player.assists}
-								</p>
-								<p className="mt-0.5 text-center text-[11px] tabular-nums text-zinc-500">
-									{player.rounds > 0
-										? `${player.adr} ADR · ${player.kast}% KAST`
-										: "No rounds logged"}
-								</p>
-								<p
-									className={`mt-1 text-center text-lg font-bold tabular-nums ${
-										player.rounds > 0 ? ratingClass(player.rating) : "text-zinc-600"
-									}`}
-								>
-									{player.rounds > 0 ? player.rating.toFixed(2) : "—"}
-								</p>
-								{player.aces > 0 || player.clutches > 0 ? (
-									<p className="mt-1 text-center text-[10px] font-semibold uppercase tracking-wider text-emerald-200">
-										{[
-											player.aces > 0 ? `${player.aces} ace${player.aces === 1 ? "" : "s"}` : null,
-											player.clutches > 0
-												? `${player.clutches} clutch${player.clutches === 1 ? "" : "es"}`
-												: null,
-										]
-											.filter(Boolean)
-											.join(" · ")}
+									{mvp ? (
+										<p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-200 sm:text-center">
+											Run MVP
+										</p>
+									) : null}
+									{highlights.length > 0 ? (
+										<p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-200 sm:text-center">
+											{highlights.join(" · ")}
+										</p>
+									) : null}
+								</div>
+								<div className="shrink-0 text-right sm:mt-2 sm:w-full sm:text-center">
+									<p className="text-sm font-semibold tabular-nums text-zinc-100">
+										{player.kills}
+										<span className="text-zinc-600">–</span>
+										{player.deaths}
+										<span className="text-zinc-600">–</span>
+										{player.assists}
 									</p>
-								) : null}
+									<p className="mt-0.5 text-[11px] tabular-nums text-zinc-500">
+										{player.rounds > 0
+											? `${player.adr} ADR · ${player.kast}%`
+											: "No rounds"}
+									</p>
+									<p
+										className={`mt-1 text-lg font-bold tabular-nums ${
+											player.rounds > 0 ? ratingClass(player.rating) : "text-zinc-600"
+										}`}
+									>
+										{player.rounds > 0 ? player.rating.toFixed(2) : "—"}
+									</p>
+								</div>
 							</li>
 						);
 					})}

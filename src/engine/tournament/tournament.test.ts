@@ -1,8 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { loadDataset } from "../../data";
 import { ratePlayers } from "../ratings/rate";
-import { buildHistoricalOpponents, createTournament, runNextMatch } from ".";
-import type { SeriesResolver } from "./types";
+import {
+	buildHistoricalOpponents,
+	COMMUNITY_OVERALL_SLACK,
+	createTournament,
+	FINAL_OPPONENT_OVERALL_FLOOR,
+	runNextMatch,
+	SEMI_OPPONENT_OVERALL_CEILING,
+	SEMI_OPPONENT_OVERALL_FLOOR,
+} from ".";
+import type { HistoricalOpponent, SeriesResolver } from "./types";
 
 const dataset = loadDataset();
 const opponents = buildHistoricalOpponents(dataset, ratePlayers(dataset.playerSeasons));
@@ -151,17 +159,57 @@ describe("Major tournament runner", () => {
 			}
 			expect(overalls[3]).toBeGreaterThan(overalls[0]);
 			expect(overalls[6]).toBeGreaterThan(overalls[3]);
+			expect(overalls[7]).toBeGreaterThanOrEqual(SEMI_OPPONENT_OVERALL_FLOOR);
+			expect(overalls[7]).toBeLessThanOrEqual(SEMI_OPPONENT_OVERALL_CEILING);
 			expect(overalls[8]).toBeGreaterThanOrEqual(topDecile);
+			expect(overalls[8]).toBeGreaterThanOrEqual(FINAL_OPPONENT_OVERALL_FLOOR);
 		}
 	});
 
-	it("prefers community opponents that still meet the strength floor, then fills historically", () => {
-		const weak = opponents[8];
-		const mid = opponents[Math.floor(opponents.length / 2)];
-		if (!weak || !mid) throw new Error("need historical fixtures");
+	it("floors the grand final opponent at 90 overall", () => {
+		for (const rootSeed of [42, "foo", 2026, "daily"]) {
+			let state = createTournament({ rootSeed, playerTeam, opponents });
+			for (let index = 0; index < 7; index += 1) {
+				state = play(state, true);
+			}
+			expect(state.nextMatch?.playoffRound).toBe("semifinal");
+			expect(state.nextMatch?.opponent.profile.overall).toBeGreaterThanOrEqual(
+				SEMI_OPPONENT_OVERALL_FLOOR,
+			);
+			expect(state.nextMatch?.opponent.profile.overall).toBeLessThanOrEqual(
+				SEMI_OPPONENT_OVERALL_CEILING,
+			);
+			state = play(state, true);
+			expect(state.nextMatch?.playoffRound).toBe("final");
+			expect(state.nextMatch?.opponent.profile.overall).toBeGreaterThanOrEqual(
+				FINAL_OPPONENT_OVERALL_FLOOR,
+			);
+		}
+	});
+
+	it("prefers a community opponent near the historical target, not a stacked published roster", () => {
+		const firstTarget = opponents[Math.round(0.14 * (opponents.length - 1))];
+		const legendsTarget = opponents[Math.round(0.55 * (opponents.length - 1))];
+		const stackedBase = opponents.at(-1);
+		if (!firstTarget || !legendsTarget || !stackedBase) {
+			throw new Error("need historical fixtures");
+		}
+		const asCommunity = (
+			base: HistoricalOpponent,
+			id: string,
+			overall = base.profile.overall,
+		): HistoricalOpponent => ({
+			...base,
+			id,
+			source: "community",
+			org: { id, name: id },
+			profile: { ...base.profile, overall },
+		});
 		const community = [
-			{ ...weak, id: "community-weak", source: "community" as const },
-			{ ...mid, id: "community-mid", source: "community" as const },
+			asCommunity(firstTarget, "community-near"),
+			asCommunity(legendsTarget, "community-legends"),
+			asCommunity(stackedBase, "community-semi", 89),
+			asCommunity(stackedBase, "community-stacked", 100),
 		];
 		const mixed = [...opponents, ...community].sort(
 			(left, right) =>
@@ -173,15 +221,31 @@ describe("Major tournament runner", () => {
 			return result.value;
 		};
 		let state = createTournament({ rootSeed: 3, playerTeam, opponents: mixed });
-		const used: string[] = [];
+		const used: { id: string; overall: number; stage: string }[] = [];
 		for (let index = 0; index < 9; index += 1) {
-			const opponent = state.nextMatch?.opponent;
-			if (!opponent) throw new Error("expected an opponent");
-			used.push(opponent.id);
+			const next = state.nextMatch;
+			if (!next) throw new Error("expected an opponent");
+			used.push({
+				id: next.opponent.id,
+				overall: next.opponent.profile.overall,
+				stage: next.stage,
+			});
 			state = playMixed(state, true);
 		}
-		expect(used[0]?.startsWith("community-")).toBe(true);
-		expect(used.some((id) => id.startsWith("community-"))).toBe(true);
-		expect(used.some((id) => !id.startsWith("community-"))).toBe(true);
+		expect(used[0]?.id).toBe("community-near");
+		expect(used.some((row) => row.id === "community-legends")).toBe(true);
+		expect(used.some((row) => !row.id.startsWith("community-"))).toBe(true);
+		const beforeFinal = used.slice(0, 8);
+		expect(beforeFinal.every((row) => row.id !== "community-stacked")).toBe(true);
+		expect(used[3]?.stage).toBe("legends");
+		expect(used[3]?.overall).toBeLessThanOrEqual(
+			legendsTarget.profile.overall + COMMUNITY_OVERALL_SLACK,
+		);
+		expect(used[3]?.overall).toBeLessThan(90);
+		expect(used[7]?.id).toBe("community-semi");
+		expect(used[7]?.overall).toBeGreaterThanOrEqual(SEMI_OPPONENT_OVERALL_FLOOR);
+		expect(used[7]?.overall).toBeLessThanOrEqual(SEMI_OPPONENT_OVERALL_CEILING);
+		expect(used[8]?.id).toBe("community-stacked");
+		expect(used[8]?.overall).toBe(100);
 	});
 });

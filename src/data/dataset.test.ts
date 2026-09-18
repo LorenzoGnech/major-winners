@@ -40,6 +40,11 @@ describe("complete Major dataset", () => {
 			economy: 2,
 			antistrat: 2,
 		});
+		expect(dataset.coaches.find((coach) => coach.id === "jabich")).toMatchObject({
+			nick: "jab jabich",
+			tier: "legendary",
+			modifiers: { comeback: 2, economy: 2, antistrat: 2 },
+		});
 	});
 
 	it("keeps known AWPers and IGLs after role inference", () => {

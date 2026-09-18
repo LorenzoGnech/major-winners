@@ -81,7 +81,7 @@ export function ClutchMoment({
 				</section>
 
 				<ul
-					className="flex flex-wrap items-center justify-center gap-3 sm:justify-end"
+					className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 sm:justify-end"
 					aria-label="Remaining opponents"
 				>
 					{opponents.map(({ member, crest, dead }) => (
@@ -97,9 +97,13 @@ export function ClutchMoment({
 									dead ? "" : "ring-2 ring-amber-300/70 ring-offset-2 ring-offset-zinc-950"
 								}`}
 							>
-								<PlayerCrest player={crest} size="xl" loading="eager" />
+								<PlayerCrest player={crest} size="lg" loading="eager" />
 							</div>
-							<p className={`text-xs font-semibold ${dead ? "text-zinc-500" : "text-amber-200"}`}>
+							<p
+								className={`max-w-16 truncate text-[10px] font-semibold sm:max-w-none sm:text-xs ${
+									dead ? "text-zinc-500" : "text-amber-200"
+								}`}
+							>
 								{member.nick}
 							</p>
 						</li>

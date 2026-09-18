@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Attributes } from "../ratings/attributes";
 import type { MapResult, PlayerMapStats, RoundResult, SeriesResult } from "../sim";
 import type { TeamMemberProfile, TeamProfile } from "../team";
-import { summarizeTournamentRun, tournamentFinishLabel } from "./summary";
+import { summarizeDuelSeries, summarizeTournamentRun, tournamentFinishLabel } from "./summary";
 import type { HistoricalOpponent, TournamentMatch, TournamentState } from "./types";
 
 const attributes: Attributes = {
@@ -320,5 +320,46 @@ describe("summarizeTournamentRun", () => {
 		const awpRow = summary.players.find((player) => player.seasonId === awp);
 		expect(awpRow).toMatchObject({ kills: 36, deaths: 22, assists: 7, aces: 1, clutches: 1 });
 		expect(summary.mvpSeasonId).toBe(awp);
+	});
+});
+
+describe("summarizeDuelSeries", () => {
+	it("names both sides, the winner, and guest-side stats", () => {
+		const hostAwp = "alpha-awp";
+		const guestAwp = "bravo-awp";
+		const map: MapResult = {
+			label: "Nuke",
+			winner: 1,
+			score: [11, 13],
+			regulationScore: [11, 13],
+			overtimeBlocks: 0,
+			rounds: [emptyRound({ kind: "ace", team: 1, playerId: guestAwp })],
+			scoreboard: [
+				[stats(hostAwp, { kills: 12, deaths: 16, assists: 3, adr: 70, kast: 60 })],
+				[stats(guestAwp, { kills: 24, deaths: 10, assists: 4, adr: 98, kast: 82 })],
+			],
+			highlights: [],
+		};
+		const summary = summarizeDuelSeries(
+			{
+				seed: 9,
+				format: "BO5",
+				teams: [playerTeam, weakOpp],
+				winner: 1,
+				score: [1, 3],
+				maps: [map],
+			},
+			["Host Five", "Guest Five"],
+		);
+		expect(summary.winner).toBe(1);
+		expect(summary.score).toEqual([1, 3]);
+		expect(summary.rounds).toEqual([11, 13]);
+		expect(summary.sides[0]?.name).toBe("Host Five");
+		expect(summary.sides[1]?.name).toBe("Guest Five");
+		expect(summary.sides[1]?.mvpSeasonId).toBe(guestAwp);
+		expect(summary.sides[1]?.players.find((player) => player.seasonId === guestAwp)).toMatchObject({
+			kills: 24,
+			aces: 1,
+		});
 	});
 });

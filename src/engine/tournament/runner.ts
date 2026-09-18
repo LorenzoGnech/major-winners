@@ -14,11 +14,24 @@ import type {
 	TournamentState,
 } from "./types";
 
+/** Grand final opponents are elite. The unused pool only falls below this if nothing 90+ remains. */
+export const FINAL_OPPONENT_OVERALL_FLOOR = 90;
+
+/** Semifinal opponents sit in this band. Stacked 90+ rosters wait for the title match. */
+export const SEMI_OPPONENT_OVERALL_FLOOR = 88;
+export const SEMI_OPPONENT_OVERALL_CEILING = 90;
+
+/**
+ * Versus community may swap in a published roster only when it sits this close to the
+ * historical target. Stacked community teams otherwise wait until the curve reaches them.
+ */
+export const COMMUNITY_OVERALL_SLACK = 3;
+
 /** Percentile of the remaining strength-sorted pool. Later matches sit higher. */
 function desiredPercentile(state: TournamentState): number {
 	if (state.stage === "champions") {
-		if (state.playoffRound === "semifinal") return 0.92;
-		if (state.playoffRound === "final") return 0.98;
+		if (state.playoffRound === "semifinal") return 0.98;
+		if (state.playoffRound === "final") return 1;
 		return 0.84;
 	}
 	const wins = swissRecord(state).wins;
@@ -62,6 +75,49 @@ function pickFromCandidates(
 	return candidates[index] as HistoricalOpponent;
 }
 
+function nearestOverall(
+	targetOverall: number,
+	rows: readonly HistoricalOpponent[],
+): HistoricalOpponent | undefined {
+	let best: HistoricalOpponent | undefined;
+	for (const row of rows) {
+		if (!best) {
+			best = row;
+			continue;
+		}
+		const bestDist = Math.abs(best.profile.overall - targetOverall);
+		const rowDist = Math.abs(row.profile.overall - targetOverall);
+		if (rowDist < bestDist || (rowDist === bestDist && row.id.localeCompare(best.id) < 0)) {
+			best = row;
+		}
+	}
+	return best;
+}
+
+function playoffRoundIs(state: TournamentState, round: PlayoffRound): boolean {
+	return state.stage === "champions" && state.playoffRound === round;
+}
+
+function preferCommunityThenPick(
+	state: TournamentState,
+	candidates: readonly HistoricalOpponent[],
+): HistoricalOpponent {
+	const community = candidates.filter((opponent) => opponent.source === "community");
+	return pickFromCandidates(state, community.length > 0 ? community : candidates);
+}
+
+function inOverallRange(
+	candidates: readonly HistoricalOpponent[],
+	minOverall: number,
+	maxOverall: number,
+	previousOverall: number,
+): HistoricalOpponent[] {
+	const floor = Math.max(minOverall, previousOverall);
+	return candidates.filter(
+		(opponent) => opponent.profile.overall >= floor && opponent.profile.overall <= maxOverall,
+	);
+}
+
 function chooseOpponent(
 	state: TournamentState,
 	playerTeam: TeamProfile,
@@ -80,12 +136,44 @@ function chooseOpponent(
 		notUsed.length > 0 ? notUsed : noImmediateRepeat.length > 0 ? noImmediateRepeat : available;
 	const previousOverall =
 		state.history.at(-1)?.opponent.profile.overall ?? Number.NEGATIVE_INFINITY;
-	const community = candidates.filter((opponent) => opponent.source === "community");
-	const communityFloor = community.filter(
-		(opponent) => opponent.profile.overall >= previousOverall,
-	);
-	if (communityFloor.length > 0) return pickFromCandidates(state, communityFloor);
-	return pickFromCandidates(state, candidates);
+
+	if (playoffRoundIs(state, "final")) {
+		const elite = candidates.filter(
+			(opponent) => opponent.profile.overall >= FINAL_OPPONENT_OVERALL_FLOOR,
+		);
+		return preferCommunityThenPick(state, elite.length > 0 ? elite : candidates);
+	}
+
+	if (playoffRoundIs(state, "semifinal")) {
+		const band = inOverallRange(
+			candidates,
+			SEMI_OPPONENT_OVERALL_FLOOR,
+			SEMI_OPPONENT_OVERALL_CEILING,
+			previousOverall,
+		);
+		if (band.length > 0) return preferCommunityThenPick(state, band);
+		const underCeiling = candidates.filter(
+			(opponent) =>
+				opponent.profile.overall >= previousOverall &&
+				opponent.profile.overall <= SEMI_OPPONENT_OVERALL_CEILING,
+		);
+		if (underCeiling.length > 0) return preferCommunityThenPick(state, underCeiling);
+		const stronger = candidates.filter((opponent) => opponent.profile.overall >= previousOverall);
+		return (stronger[0] ?? candidates[0]) as HistoricalOpponent;
+	}
+
+	const historical = candidates.filter((opponent) => opponent.source === "historical");
+	const target = pickFromCandidates(state, historical.length > 0 ? historical : candidates);
+	const communityNear = candidates.filter((opponent) => {
+		if (opponent.source !== "community") return false;
+		const overall = opponent.profile.overall;
+		return (
+			overall >= previousOverall &&
+			overall <= SEMI_OPPONENT_OVERALL_CEILING &&
+			Math.abs(overall - target.profile.overall) <= COMMUNITY_OVERALL_SLACK
+		);
+	});
+	return nearestOverall(target.profile.overall, communityNear) ?? target;
 }
 
 function prepareNext(

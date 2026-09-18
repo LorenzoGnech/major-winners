@@ -4,6 +4,7 @@ import {
 	compareBestRuns,
 	compareHighestRated,
 	type PublishedRunSnapshot,
+	type RankedProfile,
 	type SavedTeamSnapshot,
 	teamOverallFromSnapshot,
 	uniqueTeamsByRoster,
@@ -79,7 +80,7 @@ function RosterStrip({
 	photos: ReadonlyMap<string, { playerId: string; nick: string; photo?: string }>;
 }) {
 	return (
-		<ul className="mt-2 grid grid-cols-5 justify-items-center gap-1">
+		<ul className="mt-2 grid grid-cols-5 justify-items-center gap-1 sm:gap-2">
 			{ROLES.map((role) => {
 				const season = photos.get(roster[role]);
 				const nick = nicks.get(roster[role]) ?? "—";
@@ -103,11 +104,13 @@ function RosterStrip({
 export function HomeLeaderboards({
 	runs,
 	teams,
+	eloBoard,
 	dataset,
 	ratedPlayers,
 }: {
 	runs: readonly PublishedRunSnapshot[];
 	teams: readonly SavedTeamSnapshot[];
+	eloBoard: readonly RankedProfile[];
 	dataset: Dataset;
 	ratedPlayers: readonly RatedPlayer[];
 }) {
@@ -117,7 +120,7 @@ export function HomeLeaderboards({
 	const photos = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
 
 	return (
-		<div className="grid w-full grid-cols-1 gap-4 min-[900px]:grid-cols-2">
+		<div className="grid w-full grid-cols-1 gap-4 min-[900px]:grid-cols-2 xl:grid-cols-3">
 			<BoardShell title="Best runs">
 				{best.length > 0 ? (
 					<ol className="space-y-2">
@@ -183,6 +186,32 @@ export function HomeLeaderboards({
 					</ol>
 				) : (
 					<p className="text-sm text-zinc-500">No saved teams yet.</p>
+				)}
+			</BoardShell>
+			<BoardShell title="Highest Elo">
+				{eloBoard.length > 0 ? (
+					<ol className="space-y-2">
+						{eloBoard.map((row, index) => (
+							<li key={row.userId} className="border border-white/10 px-2.5 py-2">
+								<div className="flex items-start justify-between gap-2">
+									<div className="min-w-0">
+										<p className="truncate text-sm font-semibold text-white">
+											<span className="mr-2 tabular-nums text-zinc-500">{index + 1}</span>
+											{row.displayName}
+										</p>
+										<p className="truncate text-[11px] text-zinc-500">
+											{row.wins}–{row.losses} ranked
+										</p>
+									</div>
+									<p className="shrink-0 text-sm font-bold tabular-nums text-amber-200">
+										{row.elo}
+									</p>
+								</div>
+							</li>
+						))}
+					</ol>
+				) : (
+					<p className="text-sm text-zinc-500">No ranked players yet. Queue a match to place.</p>
 				)}
 			</BoardShell>
 		</div>

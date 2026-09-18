@@ -1,6 +1,8 @@
 export {
 	fetchBestRuns,
-	fetchMyTeams,
+	fetchEloLeaderboard,
+	fetchMyDuelResults,
+	fetchMyProfile,
 	fetchSavedTeams,
 	getSession,
 	getSupabase,
@@ -8,6 +10,8 @@ export {
 	onAuthChange,
 	type PublishResult,
 	publishFinishedRun,
+	publishSavedTeam,
+	recordDuelResult,
 	rosterNicks,
 	signInWithMagicLink,
 	signOut,
@@ -21,6 +25,7 @@ export {
 	DUEL_STORAGE_KEY,
 	DUEL_STORAGE_VERSION,
 	type DuelClaim,
+	type DuelKind,
 	type DuelMapQueueRow,
 	type DuelRoom,
 	type DuelRosterSnapshot,
@@ -46,9 +51,22 @@ export {
 	createDuel,
 	fetchDuel,
 	joinDuel,
+	leaveRankedQueue,
+	queueRankedMatch,
 	submitDuelRoster,
 	submitDuelVeto,
+	submitRankedResult,
 } from "./duelClient";
+export { type DuelStatsSummary, EMPTY_DUEL_STATS, summarizeDuelStats } from "./duelStats";
+export {
+	DISPLAY_NAME_MAX,
+	ELO_START,
+	eloDelta,
+	formatEloDelta,
+	nextElo,
+	parseDisplayName,
+	rankedSearchWindow,
+} from "./elo";
 export { loadPublishedFingerprints, rememberPublishedFingerprint } from "./local";
 export {
 	buildCommunityOpponents,
@@ -62,12 +80,16 @@ export {
 	type CommunityGameMode,
 	communityModeSchema,
 	DEFAULT_AUTHOR_NAME,
+	type DuelResultSnapshot,
 	type PublishedRunSnapshot,
 	parseAuthorName,
+	type RankedProfile,
+	type RankedResult,
 	type RosterSnapshot,
 	rosterSnapshotSchema,
 	runFingerprint,
 	type SavedTeamSnapshot,
 	savedTeamSnapshotSchema,
+	teamFingerprint,
 } from "./schema";
 export { rosterFromDraft, snapshotDraftFields, traitsFromDraft } from "./snapshot";

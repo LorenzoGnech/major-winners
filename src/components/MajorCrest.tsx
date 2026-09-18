@@ -6,7 +6,7 @@ const SIZE_CLASS = {
 	sm: "h-9 w-14 text-[10px]",
 	md: "h-11 w-[4.5rem] text-xs",
 	lg: "h-14 w-24 text-sm sm:h-16 sm:w-28",
-	xl: "size-24 text-lg sm:size-28 sm:text-xl",
+	xl: "size-14 text-sm sm:size-24 sm:text-lg lg:size-28 lg:text-xl",
 } as const;
 
 type MajorCrestProps = {

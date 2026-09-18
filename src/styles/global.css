@@ -49,6 +49,13 @@
 	--font-sans: "Stratum 2", ui-sans-serif, system-ui, sans-serif;
 }
 
+:root {
+	--safe-top: env(safe-area-inset-top, 0px);
+	--safe-right: env(safe-area-inset-right, 0px);
+	--safe-bottom: env(safe-area-inset-bottom, 0px);
+	--safe-left: env(safe-area-inset-left, 0px);
+}
+
 /* Tailwind v4 preflight resets buttons to the default arrow. */
 @layer base {
 	button:not(:disabled),
@@ -508,6 +515,33 @@
 	}
 }
 
+@keyframes coach-glow-legendary {
+	0%,
+	100% {
+		box-shadow:
+			0 0 12px rgb(251 191 36 / 0.45),
+			0 0 28px rgb(245 158 11 / 0.22);
+	}
+	50% {
+		box-shadow:
+			0 0 18px rgb(253 224 71 / 0.7),
+			0 0 36px rgb(251 191 36 / 0.35);
+	}
+}
+
+.coach-glow-legendary {
+	box-shadow:
+		0 0 12px rgb(251 191 36 / 0.45),
+		0 0 28px rgb(245 158 11 / 0.22);
+	animation: coach-glow-legendary 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.coach-glow-legendary {
+		animation: none;
+	}
+}
+
 @keyframes trait-glow-malus {
 	0%,
 	100% {
@@ -664,6 +698,7 @@
 .draft-dragging {
 	cursor: grabbing;
 	user-select: none;
+	touch-action: none;
 }
 
 ::selection {

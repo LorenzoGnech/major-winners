@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { loadDataset, ROLES } from "../data";
 import { ratePlayers } from "../engine";
 import { completedDraftFromSnapshot } from "./draft";
+import { summarizeDuelStats } from "./duelStats";
+import { eloDelta, nextElo, parseDisplayName, rankedSearchWindow } from "./elo";
 import { buildCommunityOpponents, mergeOpponentPools } from "./opponents";
 import { compareBestRuns, compareHighestRated, uniqueTeamsByRoster } from "./ranking";
 import {
@@ -9,6 +11,7 @@ import {
 	parseAuthorName,
 	runFingerprint,
 	type SavedTeamSnapshot,
+	teamFingerprint,
 } from "./schema";
 import { rosterFromDraft } from "./snapshot";
 
@@ -62,6 +65,15 @@ describe("community schema", () => {
 				roundsLost: 80,
 			}),
 		).toContain(team.roster.awp);
+	});
+
+	it("fingerprints a saved roster with a mode tag", () => {
+		const team = snapshot();
+		expect(
+			teamFingerprint({ roster: team.roster, coachId: team.coachId, tag: "duel:K7M2QX" }),
+		).toBe(
+			`${team.roster.awp},${team.roster.igl},${team.roster.entry},${team.roster.support},${team.roster.lurker}|${team.coachId}|duel:K7M2QX`,
+		);
 	});
 });
 
@@ -147,5 +159,73 @@ describe("community opponents", () => {
 		];
 		const merged = mergeOpponentPools(community, historical);
 		expect(merged.map((row) => row.id)).toEqual(["hist-low", built.id, "hist-high"]);
+	});
+});
+
+describe("ranked elo", () => {
+	it("moves 16 points between equal ratings", () => {
+		expect(nextElo(1000, 1000, true)).toBe(1016);
+		expect(nextElo(1000, 1000, false)).toBe(984);
+		expect(eloDelta(1000, 1000, true)).toBe(16);
+	});
+
+	it("rewards an underdog more than a favorite", () => {
+		expect(nextElo(1000, 1200, true)).toBe(1024);
+		expect(nextElo(1200, 1000, true)).toBe(1208);
+		expect(nextElo(1200, 1000, false)).toBe(1176);
+	});
+
+	it("floors at 100", () => {
+		expect(nextElo(100, 2000, false)).toBe(100);
+	});
+
+	it("widens the search window with wait time", () => {
+		expect(rankedSearchWindow(0)).toBe(100);
+		expect(rankedSearchWindow(4999)).toBe(100);
+		expect(rankedSearchWindow(5000)).toBe(150);
+		expect(rankedSearchWindow(60_000)).toBe(400);
+	});
+
+	it("accepts a 3–16 character handle", () => {
+		expect(parseDisplayName("ab")).toBeNull();
+		expect(parseDisplayName("lore")).toBe("lore");
+		expect(parseDisplayName("Lore_2018")).toBe("Lore_2018");
+		expect(parseDisplayName("not a name")).toBeNull();
+	});
+});
+
+describe("duel profile stats", () => {
+	it("summarizes wins, maps, and win rate", () => {
+		expect(
+			summarizeDuelStats([
+				{
+					roomCode: "K7M2QX",
+					won: true,
+					mapsWon: 3,
+					mapsLost: 1,
+					roundsWon: 48,
+					roundsLost: 36,
+					createdAt: "2026-09-18T00:00:00.000Z",
+				},
+				{
+					roomCode: "AB23CD",
+					won: false,
+					mapsWon: 1,
+					mapsLost: 3,
+					roundsWon: 30,
+					roundsLost: 45,
+					createdAt: "2026-09-17T00:00:00.000Z",
+				},
+			]),
+		).toEqual({
+			played: 2,
+			wins: 1,
+			losses: 1,
+			winRate: 50,
+			mapsWon: 4,
+			mapsLost: 4,
+			roundsWon: 78,
+			roundsLost: 81,
+		});
 	});
 });

@@ -85,3 +85,47 @@ export function runFingerprint(input: {
 		`${input.roundsWon}-${input.roundsLost}`,
 	].join("|");
 }
+
+export function teamFingerprint(input: {
+	roster: RosterSnapshot;
+	coachId: string;
+	tag: string;
+}): string {
+	return [rosterSignature(input.roster), input.coachId, input.tag].join("|");
+}
+
+export const duelResultSnapshotSchema = z.object({
+	roomCode: z.string().min(1),
+	won: z.boolean(),
+	mapsWon: z.number().int().min(0).max(3),
+	mapsLost: z.number().int().min(0).max(3),
+	roundsWon: z.number().int().min(0),
+	roundsLost: z.number().int().min(0),
+	createdAt: z.string().min(1),
+});
+export type DuelResultSnapshot = z.infer<typeof duelResultSnapshotSchema>;
+
+export const rankedProfileSchema = z.object({
+	userId: z.string().min(1),
+	displayName: z.string().min(1).max(16),
+	elo: z.number().int().min(100),
+	wins: z.number().int().min(0),
+	losses: z.number().int().min(0),
+});
+export type RankedProfile = z.infer<typeof rankedProfileSchema>;
+
+export const rankedEloSideSchema = z.object({
+	displayName: z.string().min(1),
+	elo: z.number().int(),
+	delta: z.number().int().nullable().optional(),
+});
+export type RankedEloSide = z.infer<typeof rankedEloSideSchema>;
+
+export const rankedResultSchema = z.object({
+	pending: z.boolean(),
+	eloApplied: z.boolean(),
+	mismatch: z.boolean().optional().default(false),
+	you: rankedEloSideSchema.nullable(),
+	opponent: rankedEloSideSchema.nullable(),
+});
+export type RankedResult = z.infer<typeof rankedResultSchema>;

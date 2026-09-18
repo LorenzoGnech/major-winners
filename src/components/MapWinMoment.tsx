@@ -46,7 +46,7 @@ export function MapWinMoment({
 				</h4>
 				<p className="mt-3 text-sm text-zinc-300 sm:text-base">{winnerLabel}</p>
 			</div>
-			<div className="relative z-10 mx-auto mt-4 w-full max-w-4xl shrink-0 overflow-y-auto rounded-2xl border border-white/12 bg-zinc-950/90 p-4 max-h-[min(46vh,28rem)] sm:p-5">
+			<div className="relative z-10 mx-auto mt-4 w-full max-w-4xl shrink-0 overflow-y-auto rounded-2xl border border-white/12 bg-zinc-950/90 p-4 max-h-[min(38vh,28rem)] sm:max-h-[min(46vh,28rem)] sm:p-5">
 				<p className={`text-center text-4xl font-semibold tabular-nums sm:text-5xl ${tone}`}>
 					{score[0]}
 					<span className="text-zinc-600">–</span>

@@ -1,20 +1,24 @@
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
 	buildCommunityOpponents,
 	clearPersistedDuel,
-	completedDraftFromSnapshot,
 	createDuel,
 	DUEL_POLL_MS,
 	DUEL_STORAGE_VERSION,
+	type DuelKind,
+	type DuelResultSnapshot,
 	type DuelRoom,
 	type DuelSide,
 	fetchBestRuns,
 	fetchDuel,
-	fetchMyTeams,
+	fetchEloLeaderboard,
+	fetchMyDuelResults,
+	fetchMyProfile,
 	fetchSavedTeams,
 	getSession,
 	isCommunityEnabled,
 	joinDuel,
+	leaveRankedQueue,
 	liveSeriesFromDuelRoom,
 	loadPersistedDuel,
 	loadPublishedFingerprints,
@@ -24,7 +28,13 @@ import {
 	otherSide,
 	type PublishedRunSnapshot,
 	parseAuthorName,
+	parseDisplayName,
 	publishFinishedRun,
+	publishSavedTeam,
+	queueRankedMatch,
+	type RankedProfile,
+	type RankedResult,
+	recordDuelResult,
 	rememberPublishedFingerprint,
 	rosterForSide,
 	runFingerprint,
@@ -36,9 +46,11 @@ import {
 	snapshotDraftFields,
 	submitDuelRoster,
 	submitDuelVeto,
+	submitRankedResult,
+	teamFingerprint,
 } from "../community";
 import type { Coach, Dataset, Org, Role } from "../data";
-import { ROLES } from "../data";
+import { isLegendaryCoach, ROLES } from "../data";
 import {
 	applyAction,
 	buildHistoricalOpponents,
@@ -61,15 +73,24 @@ import {
 	ratePlayer,
 	ratePlayers,
 	recordDailyResult,
+	seriesFromLive,
 	startDraft,
 	startNextMap,
+	summarizeDuelSeries,
 	summarizeTournamentRun,
 	type TeamProfile,
 	type TournamentState,
 } from "../engine";
 import { parseCustomSeed } from "./customSeed";
-import { LiveRoster, PlayerDraftCard, PlayerDragGhost, usePlayerDrag } from "./DraftBoard.tsx";
+import {
+	CompactRosterBar,
+	LiveRoster,
+	PlayerDraftCard,
+	PlayerDragGhost,
+	usePlayerDrag,
+} from "./DraftBoard.tsx";
 import { DraftRoll, type DraftRollKind } from "./DraftRoll";
+import { DuelSummary } from "./DuelSummary";
 import { DuelRoomBanner, DuelVeto } from "./DuelVeto";
 import {
 	clearDailyAttempt,
@@ -80,7 +101,7 @@ import {
 	saveDailyAttempt,
 	saveDailyStats,
 } from "./dailyPersistence";
-import { GAME_LABELS, TIER_LABELS, TIER_STYLES } from "./draftPresentation";
+import { GAME_LABELS } from "./draftPresentation";
 import { LEGACY_MAJOR_LOGO, LEGACY_MAJOR_REEL_ID, visibleLabel } from "./draftReel";
 import { HomeLogo } from "./HomeLogo";
 import { DailyStatsPanel, type HomeAction, HomeScreen, type HomeView } from "./HomeScreen";
@@ -165,12 +186,12 @@ function signedModifier(value: number): string {
 }
 
 const REROLL_BUTTON_CLASS =
-	"h-10 w-full rounded-lg border border-white/12 bg-white/5 px-1.5 text-center text-[11px] font-semibold leading-none text-zinc-200 transition disabled:cursor-not-allowed disabled:opacity-40";
+	"min-h-11 w-full rounded-lg border border-white/12 bg-white/5 px-1.5 text-center text-[11px] font-semibold leading-none text-zinc-200 transition disabled:cursor-not-allowed disabled:opacity-40";
 
 function CrestRerollColumn({ crest, children }: { crest: ReactNode; children: ReactNode }) {
 	return (
-		<div className="flex w-28 shrink-0 flex-col items-stretch gap-2">
-			<div className="flex size-28 items-center justify-center rounded-2xl bg-black/40 p-2">
+		<div className="flex w-14 shrink-0 flex-col items-stretch gap-1.5 sm:w-20 sm:gap-2 lg:w-28">
+			<div className="flex size-14 items-center justify-center rounded-xl bg-black/40 p-1 sm:size-20 sm:rounded-2xl sm:p-2 lg:size-28">
 				{crest}
 			</div>
 			{children}
@@ -189,24 +210,37 @@ function CoachCard({
 	orgName: string;
 	onPick: () => void;
 }) {
+	const legendary = isLegendaryCoach(coach);
 	return (
 		<button
 			type="button"
 			onClick={onPick}
-			className="rounded-xl border border-white/10 bg-zinc-900/80 p-4 text-left transition hover:border-emerald-300/50 hover:bg-emerald-300/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+			className={
+				legendary
+					? "coach-glow-legendary rounded-xl border border-amber-300/70 bg-amber-300/10 p-4 text-left transition hover:border-amber-200 hover:bg-amber-300/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+					: "rounded-xl border border-white/10 bg-zinc-900/80 p-4 text-left transition hover:border-emerald-300/50 hover:bg-emerald-300/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+			}
 		>
 			<div className="flex items-start justify-between gap-4">
 				<div className="flex min-w-0 items-start gap-3">
 					{org ? <OrgCrest org={org} size="sm" /> : null}
 					<div>
-						<p className="text-lg font-semibold text-white">{coach.nick}</p>
-						<p className="mt-1 text-xs text-zinc-500">
+						<p className={`text-lg font-semibold ${legendary ? "text-amber-50" : "text-white"}`}>
+							{coach.nick}
+						</p>
+						<p className={`mt-1 text-xs ${legendary ? "text-amber-200/70" : "text-zinc-500"}`}>
 							{orgName} · {coach.year} · {coach.nationality}
 						</p>
 					</div>
 				</div>
-				<span className="rounded-md bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-					Coach
+				<span
+					className={
+						legendary
+							? "rounded-md bg-amber-300/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-100"
+							: "rounded-md bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400"
+					}
+				>
+					{legendary ? "Legendary" : "Coach"}
 				</span>
 			</div>
 			<dl className="mt-4 grid grid-cols-3 gap-2">
@@ -217,15 +251,28 @@ function CoachCard({
 						["Anti-strat", coach.modifiers.antistrat],
 					] as const
 				).map(([label, value]) => (
-					<div key={label} className="rounded-lg bg-black/30 p-2 text-center">
-						<dt className="text-[9px] uppercase tracking-wide text-zinc-500">{label}</dt>
-						<dd className="mt-1 text-base font-bold tabular-nums text-emerald-200">
+					<div
+						key={label}
+						className={`rounded-lg p-2 text-center ${legendary ? "bg-amber-950/40" : "bg-black/30"}`}
+					>
+						<dt
+							className={`text-[9px] uppercase tracking-wide ${legendary ? "text-amber-200/70" : "text-zinc-500"}`}
+						>
+							{label}
+						</dt>
+						<dd
+							className={`mt-1 text-base font-bold tabular-nums ${legendary ? "text-amber-100" : "text-emerald-200"}`}
+						>
 							{signedModifier(value)}
 						</dd>
 					</div>
 				))}
 			</dl>
-			<p className="mt-3 text-xs font-semibold text-zinc-500">Select coach</p>
+			<p
+				className={`mt-3 text-xs font-semibold ${legendary ? "text-amber-200/80" : "text-zinc-500"}`}
+			>
+				Select coach
+			</p>
 		</button>
 	);
 }
@@ -291,9 +338,12 @@ function TeamProfilePanel({ profile }: { profile: TeamProfile }) {
 					<h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
 						Aggregate attributes
 					</h3>
-					<p className="text-[10px] text-zinc-500">
-						Coach: {profile.coach.nick} · comeback {profile.details.coaching.comebackResilience} ·
-						economy {profile.details.coaching.economyDiscipline} · anti-strat{" "}
+					<p
+						className={`text-[10px] ${profile.coach.legendary ? "text-amber-200" : "text-zinc-500"}`}
+					>
+						{profile.coach.legendary ? "Legendary coach" : "Coach"}: {profile.coach.nick} · comeback{" "}
+						{profile.details.coaching.comebackResilience} · economy{" "}
+						{profile.details.coaching.economyDiscipline} · anti-strat{" "}
 						{profile.details.coaching.antiStrat}
 					</p>
 				</div>
@@ -400,11 +450,24 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [hasFreePlaySave, setHasFreePlaySave] = useState(false);
 	const [hasCommunitySave, setHasCommunitySave] = useState(false);
 	const [hasDuelSave, setHasDuelSave] = useState(false);
+	const [duelSaveKind, setDuelSaveKind] = useState<DuelKind | null>(null);
 	const [duelCode, setDuelCode] = useState("");
 	const [duelSecret, setDuelSecret] = useState("");
 	const [duelSide, setDuelSide] = useState<DuelSide>("host");
+	const [duelKind, setDuelKind] = useState<DuelKind>("casual");
 	const [duelRoom, setDuelRoom] = useState<DuelRoom | null>(null);
 	const [duelLive, setDuelLive] = useState<LiveSeriesState | null>(null);
+	const [duelRecap, setDuelRecap] = useState(false);
+	const [duelResults, setDuelResults] = useState<DuelResultSnapshot[]>([]);
+	const [rankedResult, setRankedResult] = useState<RankedResult | null>(null);
+	const [rankedProfile, setRankedProfile] = useState<RankedProfile | null>(null);
+	const [eloBoard, setEloBoard] = useState<RankedProfile[]>([]);
+	const [handleDraft, setHandleDraft] = useState("");
+	const [handleError, setHandleError] = useState<string | null>(null);
+	const [rankedError, setRankedError] = useState<string | null>(null);
+	const [rankedElo, setRankedElo] = useState<number | null>(null);
+	const [rankedWindow, setRankedWindow] = useState<number | null>(null);
+	const duelStatsRecorded = useRef<string | null>(null);
 	const [joinCode, setJoinCode] = useState("");
 	const [joinError, setJoinError] = useState<string | null>(null);
 	const [duelBusy, setDuelBusy] = useState(false);
@@ -413,9 +476,11 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [confirmAbandon, setConfirmAbandon] = useState(false);
 	const [rollKind, setRollKind] = useState<DraftRollKind>("full");
 	const [settledCardKey, setSettledCardKey] = useState<string | null>(null);
+	const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+	const selectedPlayerIdRef = useRef<string | null>(null);
+	selectedPlayerIdRef.current = selectedPlayerId;
 	const [communityRuns, setCommunityRuns] = useState<PublishedRunSnapshot[]>([]);
 	const [communityTeams, setCommunityTeams] = useState<SavedTeamSnapshot[]>([]);
-	const [myTeams, setMyTeams] = useState<SavedTeamSnapshot[]>([]);
 	const [userEmail, setUserEmail] = useState<string | null>(null);
 	const [userId, setUserId] = useState<string | null>(null);
 	const [emailDraft, setEmailDraft] = useState("");
@@ -487,6 +552,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				),
 			);
 			setHasDuelSave(Boolean(loadPersistedDuel(window.localStorage)));
+			setDuelSaveKind(loadPersistedDuel(window.localStorage)?.kind ?? null);
 			setSavedFingerprints(loadPublishedFingerprints(window.localStorage));
 		} catch {
 			// Storage may be unavailable in privacy-restricted browser contexts.
@@ -496,11 +562,14 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	useEffect(() => {
 		if (!communityEnabled) return;
 		let cancelled = false;
-		void Promise.all([fetchBestRuns(), fetchSavedTeams()]).then(([runs, teams]) => {
-			if (cancelled) return;
-			setCommunityRuns(runs);
-			setCommunityTeams(teams);
-		});
+		void Promise.all([fetchBestRuns(), fetchSavedTeams(), fetchEloLeaderboard()]).then(
+			([runs, teams, board]) => {
+				if (cancelled) return;
+				setCommunityRuns(runs);
+				setCommunityTeams(teams);
+				setEloBoard(board);
+			},
+		);
 		return () => {
 			cancelled = true;
 		};
@@ -526,13 +595,18 @@ export function DraftGame({ dataset }: DraftGameProps) {
 
 	useEffect(() => {
 		if (!communityEnabled || !userId) {
-			setMyTeams([]);
+			setDuelResults([]);
+			setRankedProfile(null);
 			return;
 		}
 		let cancelled = false;
-		void fetchMyTeams(userId).then((teams) => {
-			if (!cancelled) setMyTeams(teams);
-		});
+		void Promise.all([fetchMyDuelResults(userId), fetchMyProfile(userId)]).then(
+			([results, profile]) => {
+				if (cancelled) return;
+				setDuelResults(results);
+				setRankedProfile(profile);
+			},
+		);
 		return () => {
 			cancelled = true;
 		};
@@ -621,21 +695,34 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		beginPersistedMode("free", options);
 	}
 
-	function applyDuelClaim(code: string, secret: string, side: DuelSide, room: DuelRoom) {
+	function applyDuelClaim(
+		code: string,
+		secret: string,
+		side: DuelSide,
+		room: DuelRoom,
+		kind?: DuelKind,
+	) {
 		setDuelCode(code);
 		setDuelSecret(secret);
 		setDuelSide(side);
+		setDuelKind(kind ?? room.kind ?? "casual");
 		setDuelRoom(room);
 		setDuelError(null);
+		setRankedResult(null);
 	}
 
 	function resetDuelLocal() {
 		setDuelCode("");
 		setDuelSecret("");
 		setDuelSide("host");
+		setDuelKind("casual");
 		setDuelRoom(null);
 		setDuelLive(null);
+		setDuelRecap(false);
 		setDuelError(null);
+		setRankedResult(null);
+		setHasDuelSave(false);
+		setDuelSaveKind(null);
 		try {
 			clearPersistedDuel(window.localStorage);
 		} catch {
@@ -653,7 +740,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			if (persisted) {
 				const fetched = await fetchDuel(persisted.code, persisted.secret);
 				if (fetched.ok) {
-					applyDuelClaim(persisted.code, persisted.secret, persisted.side, fetched.value);
+					applyDuelClaim(
+						persisted.code,
+						persisted.secret,
+						persisted.side,
+						fetched.value,
+						persisted.kind ?? fetched.value.kind,
+					);
 					setTeamName(persisted.teamName ?? DEFAULT_TEAM_NAME);
 					setNameDraft(
 						persisted.teamName && persisted.teamName !== DEFAULT_TEAM_NAME
@@ -669,9 +762,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					}
 					setRollKind("full");
 					setTournament(null);
-					setDuelLive(
-						persisted.liveSeries ?? liveSeriesFromDuelRoom(fetched.value, dataset, ratedPlayers),
-					);
+					const live =
+						persisted.liveSeries ?? liveSeriesFromDuelRoom(fetched.value, dataset, ratedPlayers);
+					setDuelLive(live);
+					setDuelRecap(Boolean(live?.complete));
 					setMode("duel");
 					return;
 				}
@@ -689,6 +783,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			created.value.secret,
 			created.value.side,
 			created.value.room,
+			"casual",
 		);
 		setTeamName(DEFAULT_TEAM_NAME);
 		setNameDraft("");
@@ -698,6 +793,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setSettledCardKey(null);
 		setTournament(null);
 		setDuelLive(null);
+		setDuelRecap(false);
 		setMode("duel");
 	}
 
@@ -711,7 +807,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			setJoinError(joined.error);
 			return;
 		}
-		applyDuelClaim(joined.value.code, joined.value.secret, joined.value.side, joined.value.room);
+		applyDuelClaim(
+			joined.value.code,
+			joined.value.secret,
+			joined.value.side,
+			joined.value.room,
+			"casual",
+		);
 		setTeamName(DEFAULT_TEAM_NAME);
 		setNameDraft("");
 		setNameError(null);
@@ -720,9 +822,94 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setSettledCardKey(null);
 		setTournament(null);
 		setDuelLive(null);
+		setDuelRecap(false);
 		setMode("duel");
 		setHomeView("menu");
 	}
+
+	function openRanked() {
+		setRankedError(null);
+		setHandleError(null);
+		if (!userEmail) {
+			setHomeView("signin");
+			return;
+		}
+		if (hasDuelSave && duelSaveKind === "ranked") {
+			void beginDuel({ restore: true });
+			return;
+		}
+		if (!rankedProfile) {
+			setHomeView("ranked-handle");
+			return;
+		}
+		setHomeView("ranked");
+	}
+
+	function submitRankedHandle() {
+		const name = parseDisplayName(handleDraft);
+		if (!name) {
+			setHandleError("Use 3–16 letters, numbers, or underscore.");
+			return;
+		}
+		setHandleError(null);
+		setHomeView("ranked");
+	}
+
+	async function cancelRankedQueue() {
+		await leaveRankedQueue();
+		setHomeView("community");
+		setRankedError(null);
+	}
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: ranked poll must not reset when claim helpers change identity
+	useEffect(() => {
+		if (homeView !== "ranked") return;
+		let cancelled = false;
+		const tick = async () => {
+			const name = rankedProfile ? undefined : (parseDisplayName(handleDraft) ?? undefined);
+			const result = await queueRankedMatch(name);
+			if (cancelled) return;
+			if (!result.ok) {
+				setRankedError(result.error);
+				return;
+			}
+			if ("matched" in result.value && result.value.matched === false) {
+				setRankedElo(result.value.elo);
+				setRankedWindow(result.value.window);
+				return;
+			}
+			if ("code" in result.value) {
+				const claim = result.value;
+				setDuelCode(claim.code);
+				setDuelSecret(claim.secret);
+				setDuelSide(claim.side);
+				setDuelKind("ranked");
+				setDuelRoom(claim.room);
+				setDuelError(null);
+				setRankedResult(null);
+				setTeamName(DEFAULT_TEAM_NAME);
+				setNameDraft("");
+				setNameError(null);
+				setState(startDraft(dataset, freePlaySeed()));
+				setRollKind("full");
+				setSettledCardKey(null);
+				setTournament(null);
+				setDuelLive(null);
+				setDuelRecap(false);
+				setMode("duel");
+				setHomeView("menu");
+			}
+		};
+		void tick();
+		const timer = window.setInterval(() => {
+			void tick();
+		}, DUEL_POLL_MS);
+		return () => {
+			cancelled = true;
+			window.clearInterval(timer);
+			void leaveRankedQueue();
+		};
+	}, [handleDraft, homeView, rankedProfile]);
 
 	function chooseHomeAction(action: HomeAction) {
 		setNameError(null);
@@ -757,41 +944,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		beginFree({ seed });
 	}
 
-	function beginFromSavedTeam(team: SavedTeamSnapshot, nextMode: "free" | "community") {
-		const draft = completedDraftFromSnapshot(team, dataset);
-		if (!draft) {
-			setAuthError("That roster is no longer valid in the current dataset.");
-			return;
-		}
-		setError(null);
-		setPendingRestart(false);
-		setSaveError(null);
-		setSaveMessage(null);
-		setNameError(null);
-		setTeamName(team.teamName);
-		setNameDraft(team.teamName);
-		setState({
-			seed: draft.seed,
-			phase: { type: "complete" },
-			cards: draft.cards,
-			coachIds: dataset.coaches.map((row) => row.id),
-			rerolls: { majorRemaining: 0, teamRemaining: 0 },
-			roster: draft.roster,
-			coachId: draft.coachId,
-		});
-		setRollKind("full");
-		setSettledCardKey(null);
-		setTournament(null);
-		setMode(nextMode);
-		setHomeView("menu");
-		try {
-			const key = persistKey(nextMode);
-			if (key) window.localStorage.removeItem(key);
-		} catch {
-			// In-memory reused roster is authoritative until Start Major.
-		}
-	}
-
 	async function submitMagicLink() {
 		const email = emailDraft.trim();
 		if (!email.includes("@")) {
@@ -812,7 +964,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 
 	async function submitSignOut() {
 		await signOutCommunity();
-		setMyTeams([]);
+		setDuelResults([]);
 		setHomeView("menu");
 	}
 
@@ -845,6 +997,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				),
 			);
 			setHasDuelSave(Boolean(loadPersistedDuel(window.localStorage)));
+			setDuelSaveKind(
+				loadPersistedDuel(window.localStorage)?.kind ??
+					(loadPersistedDuel(window.localStorage) ? "casual" : null),
+			);
 		} catch {
 			// Storage may be unavailable in privacy-restricted browser contexts.
 		}
@@ -930,6 +1086,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		}
 		setState(result.value);
 		setError(null);
+		setSelectedPlayerId(null);
 		if (
 			state.phase.type === "player" &&
 			result.value.phase.type === "player" &&
@@ -939,7 +1096,19 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		}
 	}
 
-	const { drag, startDrag } = usePlayerDrag(assignPlayer);
+	function toggleSelectedPlayer(playerSeasonId: string) {
+		const selected = selectedPlayerIdRef.current;
+		const occupantRole = ROLES.find(
+			(role) => state.roster[role]?.playerSeasonId === playerSeasonId,
+		);
+		if (selected && selected !== playerSeasonId && occupantRole) {
+			assignPlayer(selected, occupantRole);
+			return;
+		}
+		setSelectedPlayerId((current) => (current === playerSeasonId ? null : playerSeasonId));
+	}
+
+	const { drag, startDrag } = usePlayerDrag(assignPlayer, toggleSelectedPlayer);
 
 	function pickCoach(coachId: string) {
 		const result = applyAction(state, { type: "pickCoach", coachId });
@@ -967,6 +1136,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const major = orgYear?.majorId ? majorsById.get(orgYear.majorId) : undefined;
 	const cardKey = revealKey(state);
 	const rolling = cardKey !== null && cardKey !== settledCardKey;
+	useEffect(() => {
+		setSelectedPlayerId(cardKey ? null : null);
+	}, [cardKey]);
 	const majorRerollDisabled = !canRerollMajor(state, dataset);
 	const hasOtherMajor = otherMajorAppearances(state, dataset).length > 0;
 	const chosenCoach = state.coachId ? coachesById.get(state.coachId) : undefined;
@@ -1068,15 +1240,17 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				code: duelCode,
 				secret: duelSecret,
 				side: duelSide,
+				kind: duelKind,
 				draft: state,
 				teamName,
 				...(duelLive ? { liveSeries: duelLive } : {}),
 			});
 			setHasDuelSave(true);
+			setDuelSaveKind(duelKind);
 		} catch {
 			// The room remains playable if storage is unavailable.
 		}
-	}, [duelCode, duelLive, duelSecret, duelSide, mode, state, teamName]);
+	}, [duelCode, duelKind, duelLive, duelSecret, duelSide, mode, state, teamName]);
 	useEffect(() => {
 		if (mode !== "duel" || !duelCode || !duelSecret) return;
 		let cancelled = false;
@@ -1124,6 +1298,65 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			return next;
 		});
 	}, [identity.day, mode, tournament]);
+	useEffect(() => {
+		if (mode !== "duel" || !userId || !duelCode || !duelLive?.complete) return;
+		const viewer = sideIndex(duelSide);
+		const winner = duelLive.winner ?? (duelLive.seriesScore[0] >= duelLive.seriesScore[1] ? 0 : 1);
+		const other = viewer === 0 ? 1 : 0;
+		const series = seriesFromLive(duelLive);
+		const recap = summarizeDuelSeries(series, ["", ""]);
+		const mapsWon = duelLive.seriesScore[viewer];
+		const mapsLost = duelLive.seriesScore[other];
+		const roundsWon = recap.rounds[viewer];
+		const roundsLost = recap.rounds[other];
+		if (duelKind === "ranked") {
+			if (rankedResult?.eloApplied || !duelSecret) return;
+			let cancelled = false;
+			const tick = async () => {
+				const result = await submitRankedResult({
+					code: duelCode,
+					secret: duelSecret,
+					mapsWon,
+					mapsLost,
+					roundsWon,
+					roundsLost,
+				});
+				if (cancelled || !result.ok) return;
+				setRankedResult(result.value);
+				if (result.value.eloApplied) {
+					void fetchMyDuelResults(userId).then(setDuelResults);
+					void fetchMyProfile(userId).then(setRankedProfile);
+					void fetchEloLeaderboard().then(setEloBoard);
+				}
+			};
+			void tick();
+			const timer = window.setInterval(() => {
+				void tick();
+			}, DUEL_POLL_MS);
+			return () => {
+				cancelled = true;
+				window.clearInterval(timer);
+			};
+		}
+		const key = `${userId}:${duelCode}`;
+		if (duelStatsRecorded.current === key) return;
+		duelStatsRecorded.current = key;
+		void recordDuelResult({
+			userId,
+			roomCode: duelCode,
+			won: winner === viewer,
+			mapsWon,
+			mapsLost,
+			roundsWon,
+			roundsLost,
+		}).then((error) => {
+			if (error) {
+				duelStatsRecorded.current = null;
+				return;
+			}
+			void fetchMyDuelResults(userId).then(setDuelResults);
+		});
+	}, [duelCode, duelKind, duelLive, duelSecret, duelSide, mode, rankedResult, userId]);
 	const dailyResult =
 		mode === "daily" && tournament ? dailyResultFromTournament(identity.day, tournament) : null;
 	const runSummary =
@@ -1144,10 +1377,48 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					roundsLost: runSummary.roundsLost,
 				})
 			: null;
-	const alreadySaved = Boolean(publishFingerprint && savedFingerprints.has(publishFingerprint));
+	const duelTeamFingerprint =
+		completedDraft && mode === "duel" && duelCode
+			? teamFingerprint({
+					...snapshotDraftFields(completedDraft),
+					tag: `duel:${duelCode}`,
+				})
+			: null;
+	const alreadySaved = Boolean(
+		(publishFingerprint && savedFingerprints.has(publishFingerprint)) ||
+			(duelTeamFingerprint && savedFingerprints.has(duelTeamFingerprint)),
+	);
 
 	async function saveFinishedTeam(authorName: string) {
-		if (!completedDraft || !runSummary || !publishMode || !communityEnabled) return;
+		if (!completedDraft || !communityEnabled) return;
+		if (mode === "duel") {
+			if (!duelTeamFingerprint) return;
+			setSaveBusy(true);
+			setSaveError(null);
+			setSaveMessage(null);
+			const result = await publishSavedTeam({
+				authorName: parseAuthorName(authorName),
+				teamName,
+				draft: completedDraft,
+				userId,
+				fingerprint: duelTeamFingerprint,
+			});
+			setSaveBusy(false);
+			if (!result.ok) {
+				setSaveError(result.error);
+				return;
+			}
+			setSaveMessage(saveResultMessage(result));
+			setSavedFingerprints((current) => new Set(current).add(result.fingerprint));
+			try {
+				rememberPublishedFingerprint(window.localStorage, result.fingerprint);
+			} catch {
+				// Remembering locally is best-effort.
+			}
+			void fetchSavedTeams().then(setCommunityTeams);
+			return;
+		}
+		if (!runSummary || !publishMode) return;
 		setSaveBusy(true);
 		setSaveError(null);
 		setSaveMessage(null);
@@ -1173,10 +1444,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		}
 		void fetchBestRuns().then(setCommunityRuns);
 		void fetchSavedTeams().then(setCommunityTeams);
-		if (userId) void fetchMyTeams(userId).then(setMyTeams);
 	}
 	const simulating = Boolean(
-		!pendingRestart && ((tournament && teamProfile) || (mode === "duel" && duelLive)),
+		!pendingRestart && ((tournament && teamProfile) || (mode === "duel" && duelLive && !duelRecap)),
 	);
 	const seedLabel =
 		mode === "daily" ? `${identity.id} · UTC seed ${state.seed}` : `Seed ${state.seed}`;
@@ -1189,6 +1459,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		seedLabel,
 		drag,
 		draggingPlayer,
+		selectedPlayerId,
 		onPointerDown: startDrag,
 		onAssign: assignPlayer,
 		traitsFor: (playerSeasonId: string) => {
@@ -1202,9 +1473,14 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const duelOwnRoster = duelRoom ? rosterForSide(duelRoom, duelSide) : null;
 	const duelLocked = mode === "duel" && Boolean(duelOwnRoster);
 	const showDuelVeto = mode === "duel" && duelRoom?.status === "veto";
-	const showDuelMatch = mode === "duel" && Boolean(duelLive);
+	const showDuelRecap = mode === "duel" && Boolean(duelLive?.complete && duelRecap);
+	const showDuelMatch = mode === "duel" && Boolean(duelLive) && !showDuelRecap;
 	const showSideRoster = Boolean(
-		!simulating && !showDuelVeto && !showDuelMatch && state.phase.type !== "player",
+		!simulating &&
+			!showDuelVeto &&
+			!showDuelMatch &&
+			!showDuelRecap &&
+			state.phase.type !== "player",
 	);
 	if (mode === null) {
 		return (
@@ -1219,6 +1495,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					enabled: communityEnabled,
 					hasSave: hasCommunitySave,
 					hasDuelSave,
+					duelSaveKind,
 					joinCode,
 					joinError,
 					onJoinCode: (value) => {
@@ -1235,7 +1512,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					emailDraft,
 					runs: communityRuns,
 					teams: communityTeams,
-					myTeams,
 					dataset,
 					ratedPlayers,
 					onEmailDraft: (value) => {
@@ -1248,9 +1524,30 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					onSignOut: () => {
 						void submitSignOut();
 					},
-					onPlayTeam: beginFromSavedTeam,
+					duelResults,
+					profile: rankedProfile,
+					eloBoard,
+					handleDraft,
+					handleError,
+					rankedError,
+					rankedElo,
+					rankedWindow,
+					onHandleDraft: (value) => {
+						setHandleDraft(value);
+						setHandleError(null);
+					},
+					onRanked: openRanked,
+					onSubmitHandle: submitRankedHandle,
+					onLeaveQueue: () => {
+						void cancelRankedQueue();
+					},
 				}}
-				onView={setHomeView}
+				onView={(view) => {
+					if (homeView === "ranked" && view !== "ranked") {
+						void leaveRankedQueue();
+					}
+					setHomeView(view);
+				}}
 				onSeedDraft={(value) => {
 					setSeedDraft(value);
 					setSeedError(null);
@@ -1265,7 +1562,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		<>
 			<HomeLogo onGoHome={goHome} />
 			<div
-				className={`mx-auto w-full px-4 py-5 sm:px-6 sm:py-8 ${simulating ? "max-w-360" : "max-w-7xl"}`}
+				className={`mx-auto w-full px-4 pb-5 pt-[calc(var(--safe-top)+4.75rem)] sm:px-6 sm:pb-8 sm:pt-[calc(var(--safe-top)+5.75rem)] ${simulating ? "max-w-360" : "max-w-7xl"} ${state.phase.type === "player" && !rolling && !simulating ? "max-lg:pb-28" : ""}`}
 			>
 				<header className="flex items-start justify-between gap-4">
 					<div className="min-w-0">
@@ -1273,15 +1570,21 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							{mode === "daily"
 								? `Today’s Challenge · ${identity.day} UTC · ${identity.id}`
 								: mode === "community"
-									? "Versus community"
+									? "Free play with community teams"
 									: mode === "duel"
-										? `Private match · ${duelCode || "lobby"}`
+										? duelKind === "ranked"
+											? "Ranked match"
+											: `Private match · ${duelCode || "lobby"}`
 										: "Free Play"}
 						</p>
-						<h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+						<h1
+							className={`mt-1 font-semibold tracking-tight text-white ${simulating ? "text-2xl sm:text-4xl" : "text-3xl sm:text-4xl"}`}
+						>
 							{teamName}
 						</h1>
-						<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+						<p
+							className={`mt-2 max-w-xl text-sm leading-6 text-zinc-400 ${simulating ? "max-lg:hidden" : ""}`}
+						>
 							Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
 						</p>
 					</div>
@@ -1294,7 +1597,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							New draft
 						</button>
 					)}
-					{mode === "duel" && !showDuelMatch && (
+					{mode === "duel" && !showDuelMatch && !showDuelRecap && (
 						<button
 							type="button"
 							onClick={requestAbandon}
@@ -1306,14 +1609,14 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					)}
 				</header>
 
-				{mode === "duel" && duelCode && !showDuelMatch ? (
+				{mode === "duel" && duelCode && !showDuelMatch && !showDuelRecap ? (
 					<DuelRoomBanner
 						code={duelCode}
+						ranked={duelKind === "ranked"}
 						detail={
-							duelRoom?.status === "open"
-								? "Share this code. Draft while you wait for your opponent."
-								: duelRoom?.status === "veto"
-									? "Both rosters are in. Ban four maps, then pick four."
+							duelKind === "ranked"
+								? duelRoom?.status === "veto"
+									? "Both rosters are in. Ban two, pick two, then two more bans and picks."
 									: duelLocked
 										? `Locked in. Waiting for ${
 												(duelRoom
@@ -1321,6 +1624,17 @@ export function DraftGame({ dataset }: DraftGameProps) {
 													: null) ?? "your opponent"
 											}.`
 										: "Draft five players and a coach, then lock in."
+								: duelRoom?.status === "open"
+									? "Share this code. Draft while you wait for your opponent."
+									: duelRoom?.status === "veto"
+										? "Both rosters are in. Ban two, pick two, then two more bans and picks."
+										: duelLocked
+											? `Locked in. Waiting for ${
+													(duelRoom
+														? rosterForSide(duelRoom, otherSide(duelSide))?.teamName
+														: null) ?? "your opponent"
+												}.`
+											: "Draft five players and a coach, then lock in."
 						}
 					/>
 				) : null}
@@ -1376,7 +1690,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										<div className="mt-4 space-y-4">
 											<SaveTeamPanel
 												teamName={teamName}
-												signedIn={Boolean(userId)}
 												alreadySaved={alreadySaved}
 												busy={saveBusy}
 												message={saveMessage}
@@ -1424,9 +1737,8 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
 											Player round {state.phase.round + 1} of 5
 										</p>
-										<div className="mt-4 flex flex-wrap items-start justify-between gap-5">
-											<div className="grid min-w-0 flex-1 gap-5 sm:grid-cols-2">
-												<div className="flex min-w-0 items-start gap-4">
+										<div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-2 sm:gap-5">
+												<div className="flex min-w-0 items-start gap-2.5 sm:gap-4">
 													<CrestRerollColumn crest={<OrgCrest org={org} size="xl" />}>
 														<button
 															type="button"
@@ -1455,7 +1767,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 														</p>
 													</div>
 												</div>
-												<div className="flex min-w-0 items-start gap-4">
+												<div className="flex min-w-0 items-start gap-2.5 sm:gap-4">
 													<CrestRerollColumn
 														crest={
 															<MajorCrest
@@ -1498,19 +1810,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 													</div>
 												</div>
 											</div>
-											<span
-												className={`rounded-full border px-3 py-1 text-xs font-semibold ${TIER_STYLES[orgYear.tier]}`}
-											>
-												{TIER_LABELS[orgYear.tier]} tier
-											</span>
-										</div>
 									</div>
 
 									<div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start">
-										<div className="order-1 lg:order-none lg:col-start-2 lg:row-span-2 lg:sticky lg:top-5">
+										<div className="hidden lg:col-start-2 lg:row-span-2 lg:block lg:sticky lg:top-24">
 											<LiveRoster {...rosterProps} />
 										</div>
-										<div className="order-2 space-y-3 lg:col-start-1 lg:row-start-1">
+										<div className="space-y-3 lg:col-start-1 lg:row-start-1">
 											{card.players.map((draftable) => {
 												const player = playersById.get(draftable.id);
 												if (!player) {
@@ -1522,14 +1828,18 @@ export function DraftGame({ dataset }: DraftGameProps) {
 														player={player}
 														traits={draftable.revealedTraitIds}
 														dragging={drag?.playerId === player.id}
+														selected={selectedPlayerId === player.id}
 														onPointerDown={(event) => startDrag(player.id, event)}
 														onAssign={(role) => assignPlayer(player.id, role)}
 													/>
 												);
 											})}
-											<p className="px-1 text-[11px] text-zinc-500">
+											<p className="px-1 text-[11px] text-zinc-500 max-lg:hidden">
 												Drag onto a role, or drag a placed player to move or swap. Keyboard: focus a
 												card or roster player, then press 1–5.
+											</p>
+											<p className="px-1 text-[11px] text-zinc-500 lg:hidden">
+												Tap a player, then tap a role. You can also drag onto the roster bar.
 											</p>
 										</div>
 									</div>
@@ -1596,7 +1906,12 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										duelRoom.guestRoster?.teamName ?? "Guest",
 									]}
 									playersById={playersById}
-									eyebrow="Private match · BO5"
+									eyebrow={duelKind === "ranked" ? "Ranked match · BO5" : "Private match · BO5"}
+									onComplete={() => {
+										setSaveError(null);
+										setSaveMessage(null);
+										setDuelRecap(true);
+									}}
 									onAwaitingNextMap={() => {
 										const started = startNextMap(duelLive);
 										if (started.ok) setDuelLive(started.value);
@@ -1615,10 +1930,47 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							</div>
 						) : null}
 
+						{!pendingRestart && showDuelRecap && duelLive && duelRoom ? (
+							<DuelSummary
+								summary={summarizeDuelSeries(seriesFromLive(duelLive), [
+									duelRoom.hostRoster?.teamName ?? "Host",
+									duelRoom.guestRoster?.teamName ?? "Guest",
+								])}
+								viewerSide={sideIndex(duelSide)}
+								playersById={playersById}
+								ranked={duelKind === "ranked"}
+								rankedResult={rankedResult}
+								extras={
+									<div className="space-y-4">
+										{communityEnabled ? (
+											<SaveTeamPanel
+												teamName={teamName}
+												alreadySaved={alreadySaved}
+												busy={saveBusy}
+												message={saveMessage}
+												error={saveError}
+												onSave={(author) => {
+													void saveFinishedTeam(author);
+												}}
+											/>
+										) : null}
+										<button
+											type="button"
+											onClick={abandonRun}
+											className="w-full rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+										>
+											Back to Home
+										</button>
+									</div>
+								}
+							/>
+						) : null}
+
 						{!pendingRestart &&
 							!tournament &&
 							!showDuelVeto &&
 							!showDuelMatch &&
+							!showDuelRecap &&
 							state.phase.type === "complete" &&
 							chosenCoach &&
 							teamProfile && (
@@ -1702,11 +2054,19 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					</main>
 
 					{showSideRoster && (
-						<aside className="sticky top-5 hidden lg:block">
+						<aside className="sticky top-24 hidden lg:block">
 							<LiveRoster {...rosterProps} />
 						</aside>
 					)}
 				</div>
+				{state.phase.type === "player" &&
+				!rolling &&
+				!simulating &&
+				!showDuelVeto &&
+				!showDuelMatch &&
+				!showDuelRecap ? (
+					<CompactRosterBar {...rosterProps} onSelectPlayer={toggleSelectedPlayer} />
+				) : null}
 				{drag && draggingPlayer ? (
 					<PlayerDragGhost player={draggingPlayer} x={drag.x} y={drag.y} />
 				) : null}

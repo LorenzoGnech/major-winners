@@ -7,6 +7,7 @@ export {
 	emptyRoles,
 	getCompletedDraft,
 	otherMajorAppearances,
+	sampleCoachIds,
 	startDraft,
 } from "./machine";
 export { type SampleableOrgYear, sampleOrgYears } from "./sample";

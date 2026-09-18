@@ -49,15 +49,21 @@ export const duelMapQueueRowSchema = z.object({
 });
 export type DuelMapQueueRow = z.infer<typeof duelMapQueueRowSchema>;
 
+export const duelKindSchema = z.enum(["casual", "ranked"]);
+export type DuelKind = z.infer<typeof duelKindSchema>;
+
 export const duelRoomSchema = z.object({
 	code: z.string().min(DUEL_CODE_LENGTH).max(DUEL_CODE_LENGTH),
 	status: duelStatusSchema,
 	seriesSeed: z.coerce.number().int(),
 	side: duelSideSchema,
+	kind: duelKindSchema.default("casual"),
 	hostRoster: duelRosterSchema.nullable(),
 	guestRoster: duelRosterSchema.nullable(),
 	vetoLog: z.array(duelVetoActionSchema),
 	mapQueue: z.array(duelMapQueueRowSchema).nullable(),
+	hostName: z.string().min(1).nullable().optional(),
+	guestName: z.string().min(1).nullable().optional(),
 });
 export type DuelRoom = z.infer<typeof duelRoomSchema>;
 
@@ -72,6 +78,7 @@ export type PersistedDuel = {
 	code: string;
 	secret: string;
 	side: DuelSide;
+	kind?: DuelKind;
 	draft?: DraftState;
 	teamName?: string;
 	liveSeries?: LiveSeriesState;
@@ -137,11 +144,13 @@ export function parsePersistedDuel(raw: string): PersistedDuel | null {
 		if (!code || !side.success || typeof value.secret !== "string" || value.secret.length < 8) {
 			return null;
 		}
+		const kind = duelKindSchema.safeParse(value.kind);
 		return {
 			version: DUEL_STORAGE_VERSION,
 			code,
 			secret: value.secret,
 			side: side.data,
+			...(kind.success ? { kind: kind.data } : {}),
 			...(isObject(value.draft) ? { draft: value.draft as DraftState } : {}),
 			...(typeof value.teamName === "string" ? { teamName: value.teamName } : {}),
 			...(isObject(value.liveSeries) ? { liveSeries: value.liveSeries as LiveSeriesState } : {}),

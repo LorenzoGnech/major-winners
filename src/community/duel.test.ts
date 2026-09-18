@@ -17,6 +17,7 @@ function room(overrides: Partial<DuelRoom> = {}): DuelRoom {
 		status: "veto",
 		seriesSeed: 11,
 		side: "host",
+		kind: "casual",
 		hostRoster: null,
 		guestRoster: null,
 		vetoLog: [],
@@ -62,11 +63,33 @@ describe("duel helpers", () => {
 		);
 		expect(state.next).toEqual({ side: 1, kind: "ban" });
 		expect(state.remaining).not.toContain("mirage");
+		const afterGuestBan = vetoStateFromRoom(
+			room({
+				vetoLog: [
+					{ side: 0, kind: "ban", mapId: "mirage" },
+					{ side: 1, kind: "ban", mapId: "dust2" },
+				],
+			}),
+		);
+		expect(afterGuestBan.next).toEqual({ side: 0, kind: "pick" });
 	});
 
 	it("rejects a persisted duel without a secret", () => {
 		expect(
 			parsePersistedDuel(JSON.stringify({ version: 1, code: "K7M2QX", side: "host" })),
 		).toBeNull();
+	});
+
+	it("keeps a ranked kind on restore", () => {
+		const parsed = parsePersistedDuel(
+			JSON.stringify({
+				version: 1,
+				code: "K7M2QX",
+				side: "host",
+				secret: "abcd1234secret",
+				kind: "ranked",
+			}),
+		);
+		expect(parsed?.kind).toBe("ranked");
 	});
 });

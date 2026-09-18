@@ -23,7 +23,7 @@ function TraitArt({ trait }: { trait: BonusDefinition }) {
 			onError={() => {
 				if (src !== trait.icon) setSrc(trait.icon);
 			}}
-			className="bonus-art-drift max-h-[min(22rem,46vh)] w-auto max-w-full object-contain"
+			className="bonus-art-drift max-h-[min(14rem,32vh)] w-auto max-w-full object-contain sm:max-h-[min(22rem,46vh)]"
 		/>
 	);
 }

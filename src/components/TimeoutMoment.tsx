@@ -43,15 +43,17 @@ export function TimeoutMoment({
 					+{moraleGain} morale
 				</p>
 				<ul
-					className="mt-7 flex flex-wrap items-end justify-center gap-3"
+					className="mt-7 grid grid-cols-5 gap-1 sm:flex sm:flex-wrap sm:items-end sm:justify-center sm:gap-3"
 					aria-label={`${teamLabel} huddle`}
 				>
 					{members.map((member) => (
 						<li key={member.id} className="flex flex-col items-center gap-1.5">
 							<div className="rounded-xl ring-2 ring-emerald-300/55 ring-offset-2 ring-offset-zinc-950">
-								<PlayerCrest player={crestFor(member)} size="lg" loading="eager" />
+								<PlayerCrest player={crestFor(member)} size="md" loading="eager" />
 							</div>
-							<p className="text-xs font-semibold text-emerald-100">{member.nick}</p>
+							<p className="truncate text-[10px] font-semibold text-emerald-100 sm:text-xs">
+								{member.nick}
+							</p>
 						</li>
 					))}
 				</ul>

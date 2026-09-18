@@ -1,4 +1,4 @@
-import { type Coach, type PlayerSeason, ROLES, type Role } from "../../data/schema";
+import { type Coach, isLegendaryCoach, type PlayerSeason, ROLES, type Role } from "../../data/schema";
 import type { BonusId } from "../bonuses";
 import type { CompletedDraft } from "../draft";
 import { clamp } from "../math";
@@ -380,7 +380,7 @@ export function buildTeamProfile({
 		},
 		attributes,
 		members,
-		coach: { id: coach.id, nick: coach.nick },
+		coach: { id: coach.id, nick: coach.nick, ...(isLegendaryCoach(coach) ? { legendary: true } : {}) },
 		...profileLabels,
 	};
 }

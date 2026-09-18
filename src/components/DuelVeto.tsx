@@ -1,18 +1,41 @@
 import type { DuelRoom, DuelSide } from "../community";
 import { otherSide, rosterForSide, sideIndex, vetoStateFromRoom } from "../community";
-import { MAP_POOL, type SimMapId } from "../engine";
+import { DUEL_VETO_STEPS, MAP_POOL, type SimMapId } from "../engine";
 
-export function DuelRoomBanner({ code, detail }: { code: string; detail: string }) {
+export function DuelRoomBanner({
+	code,
+	detail,
+	ranked = false,
+}: {
+	code: string;
+	detail: string;
+	ranked?: boolean;
+}) {
 	return (
 		<section className="mb-5 rounded-2xl border border-white/10 bg-zinc-950/70 p-4">
 			<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-				Private match
+				{ranked ? "Ranked match" : "Private match"}
 			</p>
-			<p className="mt-1 font-mono text-2xl tracking-[0.28em] text-white">{code}</p>
+			{ranked ? (
+				<p className="mt-1 text-sm font-semibold text-white">Match {code}</p>
+			) : (
+				<p className="mt-1 font-mono text-2xl tracking-[0.28em] text-white">{code}</p>
+			)}
 			<p className="mt-2 text-sm text-zinc-400">{detail}</p>
 		</section>
 	);
 }
+
+const VETO_STEP_IDS = [
+	"host-ban-1",
+	"guest-ban-1",
+	"host-pick-1",
+	"guest-pick-1",
+	"host-ban-2",
+	"guest-ban-2",
+	"host-pick-2",
+	"guest-pick-2",
+] as const;
 
 const STYLE_LABEL = {
 	aim: "Aim",
@@ -38,6 +61,7 @@ export function DuelVeto({
 	const theirs = rosterForSide(room, otherSide(side));
 	const yourTurn = veto.next?.side === sideIndex(side);
 	const kind = veto.next?.kind;
+	const stepNumber = veto.complete ? DUEL_VETO_STEPS.length : veto.actions.length + 1;
 
 	return (
 		<section className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6">
@@ -54,22 +78,39 @@ export function DuelVeto({
 						: `Waiting for ${theirs?.teamName ?? "opponent"}`}
 			</h3>
 			<p className="mx-auto mt-2 max-w-lg text-center text-sm text-zinc-400">
-				Four bans, then four picks. Your picks get the home boost. The leftover map is the decider.
+				Ban, ban, pick, pick, then two more bans and picks. Your picks get the home boost. The
+				leftover map is the decider.
 			</p>
 			<p className="mt-3 text-center text-xs text-zinc-500">
 				{yours?.teamName ?? "You"} vs {theirs?.teamName ?? "Opponent"} · room {room.code}
 			</p>
-			<ol className="mt-4 flex flex-wrap justify-center gap-2 text-[11px] text-zinc-400">
-				{veto.actions.map((action) => (
-					<li
-						key={action.mapId}
-						className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1"
-					>
-						{action.kind === "ban" ? "Ban" : "Pick"}{" "}
-						{action.side === sideIndex(side) ? "you" : (theirs?.teamName ?? "them")} ·{" "}
-						{action.mapId}
-					</li>
-				))}
+			<p className="mt-3 text-center text-xs text-zinc-400 sm:hidden">
+				{veto.complete
+					? "Veto complete"
+					: `${kind === "ban" ? "Ban" : "Pick"} · step ${stepNumber} of ${DUEL_VETO_STEPS.length}`}
+			</p>
+			<ol className="mt-4 hidden flex-wrap justify-center gap-2 text-[11px] text-zinc-400 sm:flex">
+				{DUEL_VETO_STEPS.map((step, index) => {
+					const action = veto.actions[index];
+					const yoursStep = step.side === sideIndex(side);
+					const current = !veto.complete && veto.next === DUEL_VETO_STEPS[index];
+					const stepId = VETO_STEP_IDS[index];
+					return (
+						<li
+							key={stepId}
+							className={`rounded-full border px-2.5 py-1 ${
+								action
+									? "border-white/10 bg-white/5"
+									: current
+										? "border-emerald-300/40 bg-emerald-300/10 text-emerald-100"
+										: "border-white/8 text-zinc-600"
+							}`}
+						>
+							{step.kind === "ban" ? "Ban" : "Pick"} {yoursStep ? "you" : "them"}
+							{action ? ` · ${action.mapId}` : null}
+						</li>
+					);
+				})}
 			</ol>
 			<ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 				{MAP_POOL.map((map) => {

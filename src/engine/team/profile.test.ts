@@ -163,6 +163,15 @@ describe("buildTeamProfile", () => {
 		expect(result.overall).toBeGreaterThan(75);
 	});
 
+	it("marks a legendary coach on the team profile", () => {
+		const coach = dataset.coaches.find((row) => row.id === "jabich");
+		if (!coach) throw new Error("missing jabich");
+		const result = profile(ASTRALIS_ROSTER, coach);
+
+		expect(result.coach).toMatchObject({ id: "jabich", nick: "jab jabich", legendary: true });
+		expect(result.details.coaching.overallImpact).toBe(1.5);
+	});
+
 	it("turns coach modifiers into tactical scores with modest OVR impact", () => {
 		const eliteCoach = coachById("zonic-2018");
 		const weakCoach: Coach = {

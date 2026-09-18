@@ -342,6 +342,11 @@
 		"logo": "/logos/into-the-breach.png"
 	},
 	{
+		"id": "jabich",
+		"name": "Jabich",
+		"country": "ZZ"
+	},
+	{
 		"id": "intz-esports",
 		"name": "INTZ eSports",
 		"country": "BR",

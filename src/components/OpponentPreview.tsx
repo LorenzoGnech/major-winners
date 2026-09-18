@@ -72,21 +72,29 @@ export function OpponentPreview({
 				</div>
 			</div>
 
-			<ul className="mt-4 grid grid-cols-5 gap-2 sm:gap-3" aria-label="Opponent roster">
+			<ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-5 sm:gap-3" aria-label="Opponent roster">
 				{roster.map((member) => (
-					<li key={member.id} className="min-w-0">
-						<PlayerCrest player={crestFor(member, playersById)} size="card" />
-						<p className="mt-2 truncate text-center text-sm font-semibold text-zinc-100">
-							{member.nick}
-						</p>
-						<p className="mt-0.5 truncate text-center text-[10px] uppercase tracking-wider text-zinc-500">
-							{ROLE_LABELS[member.slot]}
-						</p>
-						<p className="mt-0.5 flex items-center justify-center gap-1 text-[10px] text-zinc-500">
-							<span aria-hidden>{flagEmoji(member.nationality)}</span>
-							<span>{member.year}</span>
-						</p>
-						<p className="mt-1 text-center text-sm font-semibold tabular-nums text-amber-100">
+					<li
+						key={member.id}
+						className="flex min-w-0 items-center gap-3 rounded-xl border border-white/8 bg-black/20 px-2 py-2 sm:block sm:border-0 sm:bg-transparent sm:px-0 sm:py-0"
+					>
+						<div className="shrink-0 sm:hidden">
+							<PlayerCrest player={crestFor(member, playersById)} size="md" />
+						</div>
+						<div className="hidden sm:block">
+							<PlayerCrest player={crestFor(member, playersById)} size="card" />
+						</div>
+						<div className="min-w-0 flex-1 sm:mt-2 sm:text-center">
+							<p className="truncate text-sm font-semibold text-zinc-100">{member.nick}</p>
+							<p className="mt-0.5 truncate text-[10px] uppercase tracking-wider text-zinc-500">
+								{ROLE_LABELS[member.slot]}
+							</p>
+							<p className="mt-0.5 flex items-center gap-1 text-[10px] text-zinc-500 sm:justify-center">
+								<span aria-hidden>{flagEmoji(member.nationality)}</span>
+								<span>{member.year}</span>
+							</p>
+						</div>
+						<p className="shrink-0 text-sm font-semibold tabular-nums text-amber-100 sm:mt-1 sm:w-full sm:text-center">
 							{Math.round(member.ovr)}
 						</p>
 					</li>

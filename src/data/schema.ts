@@ -155,6 +155,7 @@ export const coachSchema = z.object({
 	nationality: z.string().length(2),
 	year: z.number().int(),
 	orgId: z.string().min(1),
+	tier: z.enum(["legendary"]).optional(),
 	modifiers: z.object({
 		comeback: z.number().int().min(-2).max(2),
 		economy: z.number().int().min(-2).max(2),
@@ -264,3 +265,7 @@ export type OrgYear = z.infer<typeof orgYearSchema>;
 export type PlayerSeason = z.infer<typeof playerSeasonSchema>;
 export type Coach = z.infer<typeof coachSchema>;
 export type Dataset = z.infer<typeof datasetSchema>;
+
+export function isLegendaryCoach(coach: Pick<Coach, "tier">): boolean {
+	return coach.tier === "legendary";
+}

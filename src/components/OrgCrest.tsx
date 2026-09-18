@@ -5,7 +5,7 @@ const SIZE_CLASS = {
 	sm: "size-9 text-[11px]",
 	md: "size-14 text-sm",
 	lg: "size-16 text-base sm:size-20 sm:text-lg",
-	xl: "size-24 text-lg sm:size-28 sm:text-xl",
+	xl: "size-14 text-sm sm:size-24 sm:text-lg lg:size-28 lg:text-xl",
 } as const;
 
 type OrgCrestProps = {

@@ -17,10 +17,10 @@ export type VetoErrorCode = "WRONG_TURN" | "MAP_GONE" | "UNKNOWN_MAP" | "ALREADY
 export const DUEL_VETO_STEPS: readonly VetoStep[] = [
 	{ side: 0, kind: "ban" },
 	{ side: 1, kind: "ban" },
-	{ side: 0, kind: "ban" },
-	{ side: 1, kind: "ban" },
 	{ side: 0, kind: "pick" },
 	{ side: 1, kind: "pick" },
+	{ side: 0, kind: "ban" },
+	{ side: 1, kind: "ban" },
 	{ side: 0, kind: "pick" },
 	{ side: 1, kind: "pick" },
 ];

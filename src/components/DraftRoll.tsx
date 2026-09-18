@@ -161,7 +161,7 @@ export function DraftRoll({
 				<button
 					type="button"
 					onClick={skip}
-					className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+					className="min-h-11 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 				>
 					{majorStatus === "locked" && teamStatus === "locked" ? "Continue" : "Skip reveal"}
 				</button>

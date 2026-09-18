@@ -12,6 +12,7 @@ import {
 	duelVetoActionSchema,
 	parseDuelCode,
 } from "./duel";
+import { type RankedResult, rankedResultSchema } from "./schema";
 
 export type DuelClientResult<T> = { ok: true; value: T } | { ok: false; error: string };
 
@@ -27,10 +28,13 @@ function parseRoom(value: unknown): DuelRoom | null {
 		status: row.status ?? row.Status,
 		seriesSeed: row.seriesSeed ?? row.series_seed,
 		side: row.side,
+		kind: row.kind ?? "casual",
 		hostRoster: row.hostRoster ?? row.host_roster ?? null,
 		guestRoster: row.guestRoster ?? row.guest_roster ?? null,
 		vetoLog: row.vetoLog ?? row.veto_log ?? [],
 		mapQueue: row.mapQueue ?? row.map_queue ?? null,
+		hostName: row.hostName ?? row.host_name ?? null,
+		guestName: row.guestName ?? row.guest_name ?? null,
 	});
 	return parsed.success ? parsed.data : null;
 }
@@ -112,6 +116,66 @@ export async function submitDuelVeto(
 	});
 	if (!result.ok) return result;
 	return asRoom(result.value);
+}
+
+export type RankedQueueWaiting = {
+	matched: false;
+	elo: number;
+	window: number;
+	displayName: string;
+};
+
+function asRankedQueue(
+	data: unknown,
+): DuelClientResult<(DuelClaim & { room: DuelRoom }) | RankedQueueWaiting> {
+	if (!data || typeof data !== "object") return fail("Could not queue for ranked.");
+	const row = data as Record<string, unknown>;
+	if (row.matched === true) return asClaim(row);
+	const elo = typeof row.elo === "number" ? row.elo : Number(row.elo);
+	const window = typeof row.window === "number" ? row.window : Number(row.window);
+	const displayName = typeof row.displayName === "string" ? row.displayName : "";
+	if (!Number.isFinite(elo) || !Number.isFinite(window) || !displayName) {
+		return fail("Could not queue for ranked.");
+	}
+	return { ok: true, value: { matched: false, elo, window, displayName } };
+}
+
+export async function queueRankedMatch(
+	displayName?: string,
+): Promise<DuelClientResult<(DuelClaim & { room: DuelRoom }) | RankedQueueWaiting>> {
+	const result = await rpc("queue_ranked_match", {
+		p_display_name: displayName ?? null,
+	});
+	if (!result.ok) return result;
+	return asRankedQueue(result.value);
+}
+
+export async function leaveRankedQueue(): Promise<DuelClientResult<true>> {
+	const result = await rpc("leave_ranked_queue", {});
+	if (!result.ok) return result;
+	return { ok: true, value: true };
+}
+
+export async function submitRankedResult(input: {
+	code: string;
+	secret: string;
+	mapsWon: number;
+	mapsLost: number;
+	roundsWon: number;
+	roundsLost: number;
+}): Promise<DuelClientResult<RankedResult>> {
+	const result = await rpc("submit_ranked_result", {
+		p_code: input.code,
+		p_secret: input.secret,
+		p_maps_won: input.mapsWon,
+		p_maps_lost: input.mapsLost,
+		p_rounds_won: input.roundsWon,
+		p_rounds_lost: input.roundsLost,
+	});
+	if (!result.ok) return result;
+	const parsed = rankedResultSchema.safeParse(result.value);
+	if (!parsed.success) return fail("Could not record that ranked result.");
+	return { ok: true, value: parsed.data };
 }
 
 export type { DuelMapQueueRow };

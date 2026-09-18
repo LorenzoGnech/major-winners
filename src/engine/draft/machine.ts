@@ -1,7 +1,7 @@
-import type { Dataset } from "../../data/schema";
-import { ROLES, type Role } from "../../data/schema";
+import type { Coach, Dataset } from "../../data/schema";
+import { isLegendaryCoach, ROLES, type Role } from "../../data/schema";
 import { revealTraits } from "../bonuses";
-import { createRng, pickWeighted, shuffle } from "../rng";
+import { createRng, type IntRng, pickWeighted, shuffle } from "../rng";
 import { DraftError, type DraftResult, fail, ok } from "./error";
 import { roleFit } from "./fit";
 import type {
@@ -123,6 +123,22 @@ export function canRerollMajor(state: DraftState, dataset: Dataset): boolean {
 	return state.rerolls.majorRemaining > 0 && otherMajorAppearances(state, dataset).length > 0;
 }
 
+export function sampleCoachIds(
+	coaches: readonly Coach[],
+	rng: IntRng,
+	count = COACH_CANDIDATE_COUNT,
+): string[] {
+	const legendary = coaches
+		.filter((coach) => isLegendaryCoach(coach))
+		.map((coach) => coach.id)
+		.sort((left, right) => left.localeCompare(right));
+	const rest = shuffle(
+		coaches.filter((coach) => !isLegendaryCoach(coach)).map((coach) => coach.id),
+		rng,
+	);
+	return [...legendary, ...rest].slice(0, count);
+}
+
 export function startDraft(dataset: Dataset, seed: number | string): DraftState {
 	if (dataset.coaches.length < COACH_CANDIDATE_COUNT) {
 		throw new DraftError(
@@ -135,10 +151,7 @@ export function startDraft(dataset: Dataset, seed: number | string): DraftState 
 	const cards = initialRosters(dataset, rng).map((orgYear, round) =>
 		snapshotCard(orgYear, seasons, rng.seed, round, 0),
 	);
-	const coachIds = shuffle(
-		dataset.coaches.map((coach) => coach.id),
-		rng,
-	).slice(0, COACH_CANDIDATE_COUNT);
+	const coachIds = sampleCoachIds(dataset.coaches, rng);
 	return {
 		seed: rng.seed,
 		phase: { type: "player", round: 0 },

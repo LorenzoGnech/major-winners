@@ -1560,6 +1560,20 @@
 		}
 	},
 	{
+		"id": "jabich",
+		"nick": "jab jabich",
+		"realName": "Jab Jabich",
+		"nationality": "ZZ",
+		"year": 2026,
+		"orgId": "team-spirit",
+		"tier": "legendary",
+		"modifiers": {
+			"comeback": 2,
+			"economy": 2,
+			"antistrat": 2
+		}
+	},
+	{
 		"id": "jnt-2025-mibr",
 		"nick": "jnt",
 		"realName": "jnt",

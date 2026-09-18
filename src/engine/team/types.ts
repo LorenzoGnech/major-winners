@@ -76,6 +76,7 @@ export type TeamProfile = {
 	coach: {
 		id: string;
 		nick: string;
+		legendary?: boolean;
 	};
 	strengths: readonly string[];
 	weaknesses: readonly string[];

@@ -82,7 +82,6 @@ export function TournamentRun({
 	onAbandon,
 	terminalExtras,
 }: TournamentRunProps) {
-	const [playbackComplete, setPlaybackComplete] = useState(false);
 	const [confirmAbandon, setConfirmAbandon] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const liveSeries = state.liveSeries ?? null;
@@ -102,7 +101,6 @@ export function TournamentRun({
 			return;
 		}
 		onChange(result.value);
-		setPlaybackComplete(false);
 		setError(null);
 	}
 
@@ -114,7 +112,6 @@ export function TournamentRun({
 			return;
 		}
 		onChange(setLiveSeries(state, started.value));
-		setPlaybackComplete(false);
 		setError(null);
 	}
 
@@ -131,7 +128,6 @@ export function TournamentRun({
 			}
 			onChange(result.value);
 		}
-		setPlaybackComplete(false);
 	}
 
 	function abandon() {
@@ -153,7 +149,7 @@ export function TournamentRun({
 				<button
 					type="button"
 					onClick={onAbandon}
-					className="fixed top-4 right-4 z-100 border border-white/20 bg-black/55 px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-xl transition hover:border-white/50 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+					className="fixed top-[max(1rem,var(--safe-top))] right-[max(1rem,var(--safe-right))] z-100 rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 				>
 					Back to Home
 				</button>
@@ -167,7 +163,7 @@ export function TournamentRun({
 				/>
 			) : null}
 			<div
-				className={`${terminal ? "mt-5 " : ""}rounded-2xl border border-emerald-300/25 bg-zinc-900/65 p-4 sm:p-6`}
+				className={`${terminal ? "mt-5 " : ""}rounded-2xl border border-emerald-300/25 bg-zinc-900/65 p-4 sm:p-6 ${liveSeries ? "max-lg:hidden" : ""}`}
 			>
 				{terminal ? null : (
 					<div className="flex flex-wrap items-start justify-between gap-4">
@@ -271,38 +267,25 @@ export function TournamentRun({
 				)}
 			</div>
 
-			{liveSeries && (
-				<>
-					<MatchPlayback
-						key={`${state.nextMatch?.matchNumber ?? "live"}-${liveSeries.seed}`}
-						live={liveSeries}
-						onLiveChange={updateLive}
-						teamLabels={[playerTeamName, state.nextMatch?.opponent.label ?? "Opponent"]}
-						opponentOrg={nextOpponentOrg}
-						playersById={playersById}
-						eyebrow={`${STAGE_LABELS[state.nextMatch?.stage ?? state.stage]} · ${state.nextMatch?.format ?? ""}`}
-						onComplete={() => setPlaybackComplete(true)}
-						onAwaitingNextMap={continueToNextMap}
-						onContinueMatch={continueRun}
-					/>
-					{playbackComplete && liveSeries.complete && (
-						<div className="mt-3 flex justify-end">
-							<button
-								type="button"
-								onClick={continueRun}
-								className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-							>
-								{state.status === "active" ? "Continue Major" : "View run summary"}
-							</button>
-						</div>
-					)}
-				</>
-			)}
+			{liveSeries ? (
+				<MatchPlayback
+					key={`${state.nextMatch?.matchNumber ?? "live"}-${liveSeries.seed}`}
+					live={liveSeries}
+					onLiveChange={updateLive}
+					teamLabels={[playerTeamName, state.nextMatch?.opponent.label ?? "Opponent"]}
+					opponentOrg={nextOpponentOrg}
+					playersById={playersById}
+					eyebrow={`${STAGE_LABELS[state.nextMatch?.stage ?? state.stage]} · ${state.nextMatch?.format ?? ""}`}
+					onAwaitingNextMap={continueToNextMap}
+					onContinueMatch={continueRun}
+					continueLabel={state.status === "active" ? "Continue Major" : "View run summary"}
+				/>
+			) : null}
 
 			{board.history.length > 0 && (
 				<section
 					aria-labelledby="history-heading"
-					className="mt-5 rounded-2xl border border-white/10 p-4"
+					className={`mt-5 rounded-2xl border border-white/10 p-4 ${liveSeries ? "max-lg:hidden" : ""}`}
 				>
 					<h3
 						id="history-heading"

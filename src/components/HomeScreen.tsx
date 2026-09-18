@@ -1,5 +1,14 @@
 import type { ReactNode } from "react";
-import type { PublishedRunSnapshot, SavedTeamSnapshot } from "../community";
+import {
+	DISPLAY_NAME_MAX,
+	type DuelKind,
+	type DuelResultSnapshot,
+	ELO_START,
+	type PublishedRunSnapshot,
+	type RankedProfile,
+	type SavedTeamSnapshot,
+	summarizeDuelStats,
+} from "../community";
 import type { Dataset } from "../data";
 import type { DailyStats, RatedPlayer } from "../engine";
 import { summarizeDailyStats } from "../engine";
@@ -16,13 +25,16 @@ export type HomeView =
 	| "leaderboards"
 	| "community"
 	| "private"
-	| "duel-join";
+	| "duel-join"
+	| "ranked-handle"
+	| "ranked";
 export type HomeAction = "daily" | "free" | "custom" | "community" | "duel";
 
 export type HomeCommunityProps = {
 	enabled: boolean;
 	hasSave: boolean;
 	hasDuelSave: boolean;
+	duelSaveKind: DuelKind | null;
 	joinCode: string;
 	joinError: string | null;
 	onJoinCode: (value: string) => void;
@@ -34,13 +46,23 @@ export type HomeCommunityProps = {
 	emailDraft: string;
 	runs: readonly PublishedRunSnapshot[];
 	teams: readonly SavedTeamSnapshot[];
-	myTeams: readonly SavedTeamSnapshot[];
 	dataset: Dataset;
 	ratedPlayers: readonly RatedPlayer[];
 	onEmailDraft: (value: string) => void;
 	onSignIn: () => void;
 	onSignOut: () => void;
-	onPlayTeam: (team: SavedTeamSnapshot, mode: "free" | "community") => void;
+	duelResults: readonly DuelResultSnapshot[];
+	profile: RankedProfile | null;
+	eloBoard: readonly RankedProfile[];
+	handleDraft: string;
+	handleError: string | null;
+	rankedError: string | null;
+	rankedElo: number | null;
+	rankedWindow: number | null;
+	onHandleDraft: (value: string) => void;
+	onRanked: () => void;
+	onSubmitHandle: () => void;
+	onLeaveQueue: () => void;
 };
 
 type HomeScreenProps = {
@@ -64,7 +86,7 @@ const SECONDARY_BUTTON = `${MENU_BUTTON} border-white/20 bg-transparent text-whi
 const FIELD_CLASS =
 	"mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-center text-sm uppercase tracking-[0.18em] text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e53935]";
 const AUTH_BUTTON =
-	"border border-white/20 bg-black/55 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-xl transition hover:border-white/50 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e53935]";
+	"min-h-11 border border-white/20 bg-black/55 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-xl transition hover:border-white/50 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e53935]";
 
 function BrandMark({ size }: { size: "lg" | "sm" }) {
 	return (
@@ -165,6 +187,76 @@ function SetupForm({
 	);
 }
 
+export function RankedStatsPanel({ profile }: { profile: RankedProfile | null }) {
+	const rows = profile
+		? ([
+				["Handle", profile.displayName],
+				["Elo", profile.elo],
+				["Wins", profile.wins],
+				["Losses", profile.losses],
+			] as const)
+		: ([
+				["Handle", "—"],
+				["Elo", ELO_START],
+				["Wins", 0],
+				["Losses", 0],
+			] as const);
+	return (
+		<section aria-labelledby="ranked-stats-heading" className="w-full">
+			<h2
+				id="ranked-stats-heading"
+				className="text-sm font-semibold uppercase tracking-[0.2em] text-white"
+			>
+				Ranked match
+			</h2>
+			<p className="mt-1 text-xs text-zinc-500">
+				{profile
+					? "Elo moves after both players report the same BO5."
+					: "Sign in, pick a handle, and queue for a nearby opponent."}
+			</p>
+			<dl className="mt-5 grid grid-cols-2 gap-2">
+				{rows.map(([label, value]) => (
+					<div key={label} className="border border-white/10 px-3 py-3">
+						<dt className="text-[10px] uppercase tracking-[0.14em] text-zinc-500">{label}</dt>
+						<dd className="mt-1 font-bold tabular-nums text-white">{value}</dd>
+					</div>
+				))}
+			</dl>
+		</section>
+	);
+}
+
+export function DuelStatsPanel({ results }: { results: readonly DuelResultSnapshot[] }) {
+	const summary = summarizeDuelStats(results);
+	const rows = [
+		["Played", summary.played],
+		["Wins", summary.wins],
+		["Losses", summary.losses],
+		["Win rate", `${summary.winRate}%`],
+		["Maps", `${summary.mapsWon}–${summary.mapsLost}`],
+		["Rounds", `${summary.roundsWon}–${summary.roundsLost}`],
+	] as const;
+	return (
+		<section aria-labelledby="duel-stats-heading" className="w-full">
+			<h2
+				id="duel-stats-heading"
+				className="text-sm font-semibold uppercase tracking-[0.2em] text-white"
+			>
+				Private match stats
+			</h2>
+			<p className="mt-1 text-xs text-zinc-500">Saved to your account after a finished 1v1.</p>
+			<dl className="mt-5 grid grid-cols-2 gap-2">
+				{rows.map(([label, value]) => (
+					<div key={label} className="border border-white/10 px-3 py-3">
+						<dt className="text-[10px] uppercase tracking-[0.14em] text-zinc-500">{label}</dt>
+						<dd className="mt-1 font-bold tabular-nums text-white">{value}</dd>
+					</div>
+				))}
+			</dl>
+		</section>
+	);
+}
+
 export function DailyStatsPanel({ stats }: { stats: DailyStats }) {
 	const summary = summarizeDailyStats(stats);
 	const rows = [
@@ -223,14 +315,16 @@ export function HomeScreen({
 				<button
 					type="button"
 					onClick={() => onView(community.enabled && !community.userEmail ? "signin" : "profile")}
-					className={`fixed top-4 right-4 z-20 ${AUTH_BUTTON}`}
+					className={`fixed top-[max(1rem,var(--safe-top))] right-[max(1rem,var(--safe-right))] z-20 ${AUTH_BUTTON}`}
 				>
 					{community.enabled && !community.userEmail ? "Sign in" : "My profile"}
 				</button>
 			) : null}
 			<div
-				className={`relative z-10 flex w-full flex-col items-center border border-white/10 bg-black/55 px-6 py-8 text-center backdrop-blur-xl ${
-					view === "leaderboards" || view === "profile" ? "max-w-6xl" : "max-w-md"
+				className={`relative z-10 flex w-full flex-col items-center border border-white/10 bg-black/55 px-4 py-6 text-center backdrop-blur-xl sm:px-6 sm:py-8 ${
+					view === "leaderboards" || view === "profile"
+						? "max-h-[calc(100dvh-2rem)] max-w-6xl overflow-y-auto overscroll-contain"
+						: "max-w-md"
 				}`}
 			>
 				<BrandMark size={view === "menu" ? "lg" : "sm"} />
@@ -280,18 +374,27 @@ export function HomeScreen({
 								Community
 							</h2>
 							<p className="mt-2 text-sm text-zinc-400">
-								Play a Major against published teams, or host a private BO5.
+								Queue a ranked 1v1, host a private BO5, or play a Major against published teams.
 							</p>
 						</div>
-						<button type="button" onClick={() => onChoose("community")} className={PRIMARY_BUTTON}>
-							{community.hasSave ? "Continue versus community" : "Versus community"}
+						<button type="button" onClick={community.onRanked} className={PRIMARY_BUTTON}>
+							{community.hasDuelSave && community.duelSaveKind === "ranked"
+								? "Continue ranked match"
+								: "Ranked match"}
 						</button>
 						<button
 							type="button"
 							onClick={() => (community.hasDuelSave ? onChoose("duel") : onView("private"))}
 							className={SECONDARY_BUTTON}
 						>
-							{community.hasDuelSave ? "Continue private match" : "Private match"}
+							{community.hasDuelSave && community.duelSaveKind !== "ranked"
+								? "Continue private match"
+								: "Private match"}
+						</button>
+						<button type="button" onClick={() => onChoose("community")} className={SECONDARY_BUTTON}>
+							{community.hasSave
+								? "Continue free play with community teams"
+								: "Free play with community teams"}
 						</button>
 						<button type="button" onClick={() => onView("menu")} className={SECONDARY_BUTTON}>
 							Back
@@ -317,6 +420,48 @@ export function HomeScreen({
 						</button>
 						<button type="button" onClick={() => onView("community")} className={SECONDARY_BUTTON}>
 							Back
+						</button>
+					</div>
+				) : null}
+
+				{view === "ranked-handle" ? (
+					<SetupForm
+						title="Ranked handle"
+						detail="This name appears on the Elo board. Letters, numbers, and underscore."
+						onBack={() => onView("community")}
+						onSubmit={community.onSubmitHandle}
+						submitLabel="Find match"
+					>
+						<HomeField
+							id="home-ranked-handle"
+							label="Handle"
+							value={community.handleDraft}
+							onChange={community.onHandleDraft}
+							error={community.handleError}
+							placeholder="e.g. lore"
+							maxLength={DISPLAY_NAME_MAX}
+						/>
+					</SetupForm>
+				) : null}
+
+				{view === "ranked" ? (
+					<div className="mt-8 flex w-full flex-col items-center gap-4">
+						<div>
+							<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
+								Finding opponent
+							</h2>
+							<p className="mt-2 text-sm text-zinc-400">
+								Searching within ±{community.rankedWindow ?? 100} Elo
+								{community.rankedElo !== null ? ` · you are ${community.rankedElo}` : ""}.
+							</p>
+						</div>
+						{community.rankedError ? (
+							<p role="alert" className="text-xs text-red-300">
+								{community.rankedError}
+							</p>
+						) : null}
+						<button type="button" onClick={community.onLeaveQueue} className={SECONDARY_BUTTON}>
+							Cancel
 						</button>
 					</div>
 				) : null}
@@ -363,7 +508,7 @@ export function HomeScreen({
 				{view === "signin" ? (
 					<SetupForm
 						title="Sign in"
-						detail="Optional. A magic link lets you reuse teams you save while signed in."
+						detail="Optional. Publishing still works without an account."
 						onBack={() => onView("menu")}
 						onSubmit={community.onSignIn}
 						submitLabel={community.authBusy ? "Sending…" : "Send magic link"}
@@ -397,53 +542,16 @@ export function HomeScreen({
 						<div
 							className={
 								community.enabled && community.userEmail
-									? "grid w-full gap-8 md:grid-cols-2 md:items-start"
+									? "grid w-full gap-8 md:grid-cols-2 md:items-start lg:grid-cols-3"
 									: "w-full max-w-lg"
 							}
 						>
 							<DailyStatsPanel stats={stats} />
 							{community.enabled && community.userEmail ? (
-								<section aria-labelledby="profile-teams-heading" className="w-full">
-									<h3
-										id="profile-teams-heading"
-										className="text-sm font-semibold uppercase tracking-[0.2em] text-white"
-									>
-										My teams
-									</h3>
-									<p className="mt-1 text-xs text-zinc-500">
-										Reuse a saved roster and skip the draft.
-									</p>
-									{community.myTeams.length === 0 ? (
-										<p className="mt-4 text-sm text-zinc-500">
-											Save a finished run while signed in.
-										</p>
-									) : (
-										<ul className="mt-4 flex max-h-[28rem] w-full flex-col gap-3 overflow-y-auto">
-											{community.myTeams.map((team) => (
-												<li key={team.id} className="border border-white/10 px-3 py-3">
-													<p className="font-semibold text-white">{team.teamName}</p>
-													<p className="text-xs text-zinc-500">{team.authorName}</p>
-													<div className="mt-3 grid grid-cols-2 gap-2">
-														<button
-															type="button"
-															className={SECONDARY_BUTTON}
-															onClick={() => community.onPlayTeam(team, "free")}
-														>
-															Classic Major
-														</button>
-														<button
-															type="button"
-															className={SECONDARY_BUTTON}
-															onClick={() => community.onPlayTeam(team, "community")}
-														>
-															Versus
-														</button>
-													</div>
-												</li>
-											))}
-										</ul>
-									)}
-								</section>
+								<RankedStatsPanel profile={community.profile} />
+							) : null}
+							{community.enabled && community.userEmail ? (
+								<DuelStatsPanel results={community.duelResults} />
 							) : null}
 						</div>
 						<div className="flex w-full max-w-md flex-col gap-3">
@@ -463,6 +571,7 @@ export function HomeScreen({
 						<HomeLeaderboards
 							runs={community.runs}
 							teams={community.teams}
+							eloBoard={community.eloBoard}
 							dataset={community.dataset}
 							ratedPlayers={community.ratedPlayers}
 						/>

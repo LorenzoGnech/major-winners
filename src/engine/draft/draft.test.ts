@@ -103,6 +103,15 @@ describe("startDraft", () => {
 		);
 	});
 
+	it("always offers legendary coaches in the sixth-round slate", () => {
+		for (const seed of [1, 42, "share-code", "daily"]) {
+			const state = startDraft(dataset, seed);
+			expect(state.coachIds[0]).toBe("jabich");
+			expect(state.coachIds).toContain("jabich");
+			expect(new Set(state.coachIds).size).toBe(COACH_CANDIDATE_COUNT);
+		}
+	});
+
 	it("changes the rolled sequence when the seed changes", () => {
 		const a = startDraft(dataset, 1);
 		const b = startDraft(dataset, 2);

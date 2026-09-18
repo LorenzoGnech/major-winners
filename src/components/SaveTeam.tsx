@@ -12,7 +12,6 @@ const FIELD_CLASS =
 
 export function SaveTeamPanel({
 	teamName,
-	signedIn,
 	alreadySaved,
 	busy,
 	message,
@@ -20,7 +19,6 @@ export function SaveTeamPanel({
 	onSave,
 }: {
 	teamName: string;
-	signedIn: boolean;
 	alreadySaved: boolean;
 	busy: boolean;
 	message: string | null;
@@ -34,10 +32,7 @@ export function SaveTeamPanel({
 		return (
 			<div className="rounded-2xl border border-emerald-300/25 bg-emerald-300/8 p-4">
 				<p className="text-sm font-semibold text-emerald-100">Team saved</p>
-				<p className="mt-1 text-sm text-zinc-400">
-					{savedName} is on the public boards
-					{signedIn ? " and in My profile." : "."}
-				</p>
+				<p className="mt-1 text-sm text-zinc-400">{savedName} is on the public boards.</p>
 			</div>
 		);
 	}
@@ -52,8 +47,7 @@ export function SaveTeamPanel({
 		>
 			<p className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">Save team</p>
 			<p className="mt-1 text-sm text-zinc-400">
-				Publish {savedName} to the home leaderboards and the Versus community pool. Sign-in is
-				optional; it only lets you reuse this roster later.
+				Publish {savedName} to the home leaderboards and the Versus community pool.
 			</p>
 			<label
 				htmlFor="save-author"

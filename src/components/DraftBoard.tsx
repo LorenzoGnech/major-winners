@@ -27,7 +27,8 @@ export type PlayerDrag = {
 	overRole: Role | null;
 };
 
-const DRAG_THRESHOLD_PX = 6;
+const MOUSE_DRAG_THRESHOLD_PX = 6;
+const TOUCH_DRAG_THRESHOLD_PX = 14;
 
 function roleAtPoint(x: number, y: number): Role | null {
 	const node = document.elementFromPoint(x, y);
@@ -36,16 +37,23 @@ function roleAtPoint(x: number, y: number): Role | null {
 	return ROLES.includes(role as Role) ? (role as Role) : null;
 }
 
-export function usePlayerDrag(onDrop: (playerSeasonId: string, role: Role) => void) {
+export function usePlayerDrag(
+	onDrop: (playerSeasonId: string, role: Role) => void,
+	onTap?: (playerSeasonId: string) => void,
+) {
 	const sessionRef = useRef<{
 		playerId: string;
 		pointerId: number;
 		startX: number;
 		startY: number;
 		armed: boolean;
+		threshold: number;
+		target: HTMLElement | null;
 	} | null>(null);
 	const onDropRef = useRef(onDrop);
 	onDropRef.current = onDrop;
+	const onTapRef = useRef(onTap);
+	onTapRef.current = onTap;
 	const [drag, setDrag] = useState<PlayerDrag | null>(null);
 
 	useEffect(() => {
@@ -57,11 +65,18 @@ export function usePlayerDrag(onDrop: (playerSeasonId: string, role: Role) => vo
 			const dx = event.clientX - session.startX;
 			const dy = event.clientY - session.startY;
 			if (!session.armed) {
-				if (dx * dx + dy * dy < DRAG_THRESHOLD_PX * DRAG_THRESHOLD_PX) {
+				if (dx * dx + dy * dy < session.threshold * session.threshold) {
 					return;
 				}
 				session.armed = true;
 				document.body.classList.add("draft-dragging");
+				if (session.target) {
+					try {
+						session.target.setPointerCapture(session.pointerId);
+					} catch {
+						// Capture is best-effort; hit-testing still uses client coordinates.
+					}
+				}
 			}
 			event.preventDefault();
 			setDrag({
@@ -79,11 +94,16 @@ export function usePlayerDrag(onDrop: (playerSeasonId: string, role: Role) => vo
 			}
 			const overRole = session.armed ? roleAtPoint(event.clientX, event.clientY) : null;
 			const playerId = session.playerId;
+			const armed = session.armed;
 			sessionRef.current = null;
 			setDrag(null);
 			document.body.classList.remove("draft-dragging");
 			if (overRole) {
 				onDropRef.current(playerId, overRole);
+				return;
+			}
+			if (!armed) {
+				onTapRef.current?.(playerId);
 			}
 		}
 
@@ -102,10 +122,13 @@ export function usePlayerDrag(onDrop: (playerSeasonId: string, role: Role) => vo
 		if (event.button !== 0) {
 			return;
 		}
-		try {
-			event.currentTarget.setPointerCapture(event.pointerId);
-		} catch {
-			// Untrusted or unsupported capture must not block the drag session.
+		const touch = event.pointerType === "touch";
+		if (!touch) {
+			try {
+				event.currentTarget.setPointerCapture(event.pointerId);
+			} catch {
+				// Untrusted or unsupported capture must not block the drag session.
+			}
 		}
 		sessionRef.current = {
 			playerId,
@@ -113,6 +136,8 @@ export function usePlayerDrag(onDrop: (playerSeasonId: string, role: Role) => vo
 			startX: event.clientX,
 			startY: event.clientY,
 			armed: false,
+			threshold: touch ? TOUCH_DRAG_THRESHOLD_PX : MOUSE_DRAG_THRESHOLD_PX,
+			target: event.currentTarget,
 		};
 	}, []);
 
@@ -139,12 +164,14 @@ export function PlayerDraftCard({
 	player,
 	traits,
 	dragging,
+	selected,
 	onPointerDown,
 	onAssign,
 }: {
 	player: PlayerSeason;
 	traits?: readonly BonusId[];
 	dragging: boolean;
+	selected?: boolean;
 	onPointerDown: (event: ReactPointerEvent<HTMLElement>) => void;
 	onAssign: (role: Role) => void;
 }) {
@@ -170,88 +197,174 @@ export function PlayerDraftCard({
 	}
 
 	return (
-		<button
-			type="button"
-			aria-grabbed={dragging}
-			aria-label={`${player.nick}, ${player.year}, ${ROLE_LABELS[player.primaryRole]}${traitNames}. Drag onto a role slot, or press 1 through 5.`}
-			onPointerDown={onPointerDown}
-			onKeyDown={onKeyDown}
-			onDragStart={(event) => event.preventDefault()}
-			className={`flex min-h-[8.25rem] w-full touch-none rounded-2xl bg-zinc-900 text-left outline-offset-2 focus-visible:outline-2 focus-visible:outline-emerald-300 ${
-				dragging ? "opacity-40" : "cursor-grab"
+		<div
+			className={`overflow-hidden rounded-2xl bg-zinc-900 ${
+				selected ? "ring-2 ring-emerald-300" : ""
 			}`}
 		>
-			<div
-				aria-hidden
-				className="relative w-[5.75rem] min-h-[8.25rem] shrink-0 self-stretch overflow-hidden rounded-l-2xl sm:w-[7.25rem]"
-				style={photo ? undefined : tone}
+			<button
+				type="button"
+				aria-grabbed={dragging}
+				aria-pressed={selected}
+				aria-label={`${player.nick}, ${player.year}, ${ROLE_LABELS[player.primaryRole]}${traitNames}. Tap to select a role, drag onto a slot, or press 1 through 5.`}
+				onPointerDown={onPointerDown}
+				onKeyDown={onKeyDown}
+				onDragStart={(event) => event.preventDefault()}
+				className={`flex min-h-[8.25rem] w-full touch-pan-y text-left outline-offset-2 focus-visible:outline-2 focus-visible:outline-emerald-300 ${
+					dragging ? "opacity-40" : "cursor-grab"
+				}`}
 			>
-				{photo ? (
-					<img
-						src={photo}
-						alt=""
-						draggable={false}
-						loading="lazy"
-						decoding="async"
-						className="absolute inset-0 size-full object-cover object-top"
-					/>
-				) : (
-					<div className="flex h-full items-center justify-center text-3xl font-bold tracking-wide sm:text-4xl">
-						{playerInitials(player.nick)}
-					</div>
-				)}
-			</div>
-			<div className="flex min-w-0 flex-1 flex-col justify-between gap-3 px-4 py-3 sm:px-5 sm:py-3.5">
-				<div className="flex items-start justify-between gap-3">
-					<div className="min-w-0">
-						<div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-							<p className="text-lg font-semibold tracking-tight text-white">{player.nick}</p>
-							{traits?.map((id) => (
-								<TraitBadge key={id} id={id} />
+				<div
+					aria-hidden
+					className="relative w-[4.5rem] min-h-[8.25rem] shrink-0 self-stretch overflow-hidden rounded-l-2xl sm:w-[7.25rem]"
+					style={photo ? undefined : tone}
+				>
+					{photo ? (
+						<img
+							src={photo}
+							alt=""
+							draggable={false}
+							loading="lazy"
+							decoding="async"
+							className="absolute inset-0 size-full object-cover object-top"
+						/>
+					) : (
+						<div className="flex h-full items-center justify-center text-3xl font-bold tracking-wide sm:text-4xl">
+							{playerInitials(player.nick)}
+						</div>
+					)}
+				</div>
+				<div className="flex min-w-0 flex-1 flex-col justify-between gap-3 px-3 py-3 sm:px-5 sm:py-3.5">
+					<div className="flex items-start justify-between gap-3">
+						<div className="min-w-0">
+							<div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+								<p className="text-lg font-semibold tracking-tight text-white">{player.nick}</p>
+								{traits?.map((id) => (
+									<TraitBadge key={id} id={id} />
+								))}
+							</div>
+							<p className="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-500">
+								<span aria-hidden>{flagEmoji(player.nationality)}</span>
+								<span>{player.year}</span>
+							</p>
+						</div>
+						<div className="flex min-w-0 flex-wrap justify-end gap-1.5">
+							<span className="rounded-full bg-emerald-400/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
+								{ROLE_LABELS[player.primaryRole]} · primary
+							</span>
+							{secondaries.map((role) => (
+								<span
+									key={role}
+									className="rounded-full border border-white/12 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400"
+								>
+									{ROLE_LABELS[role]} · secondary
+								</span>
 							))}
 						</div>
-						<p className="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-500">
-							<span aria-hidden>{flagEmoji(player.nationality)}</span>
-							<span>{player.year}</span>
-						</p>
 					</div>
-					<div className="flex min-w-0 flex-wrap justify-end gap-1.5">
-						<span className="rounded-full bg-emerald-400/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
-							{ROLE_LABELS[player.primaryRole]} · primary
-						</span>
-						{secondaries.map((role) => (
-							<span
-								key={role}
-								className="rounded-full border border-white/12 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400"
+					<div className="flex items-end justify-between gap-4">
+						<dl className="flex min-w-0 flex-1 flex-wrap content-end gap-x-5 gap-y-2">
+							{stats.map(({ label, value, color }) => (
+								<div key={label}>
+									<dt className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+										{label}
+									</dt>
+									<dd
+										className="mt-0.5 text-lg font-bold tabular-nums sm:text-xl"
+										style={{ color }}
+									>
+										{value}
+									</dd>
+								</div>
+							))}
+						</dl>
+						<div className="shrink-0 text-right">
+							<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+								OVR
+							</p>
+							<p
+								className="text-3xl font-bold leading-none tabular-nums lg:text-5xl"
+								style={{ color: ovrColor }}
 							>
-								{ROLE_LABELS[role]} · secondary
-							</span>
-						))}
+								{rated.ovr}
+							</p>
+						</div>
 					</div>
 				</div>
-				<div className="flex items-end justify-between gap-4">
-					<dl className="flex min-w-0 flex-1 flex-wrap content-end gap-x-5 gap-y-2">
-						{stats.map(({ label, value, color }) => (
-							<div key={label}>
-								<dt className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-									{label}
-								</dt>
-								<dd className="mt-0.5 text-lg font-bold tabular-nums sm:text-xl" style={{ color }}>
-									{value}
-								</dd>
-							</div>
-						))}
-					</dl>
-					<div className="shrink-0 text-right">
-						<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">OVR</p>
-						<p className="text-5xl font-bold leading-none tabular-nums" style={{ color: ovrColor }}>
-							{rated.ovr}
-						</p>
-					</div>
+			</button>
+			{selected ? (
+				<div className="grid grid-cols-5 gap-1 border-t border-white/8 bg-black/30 p-2">
+					{ROLES.map((role) => {
+						const fit = fitInfo(player, role);
+						return (
+							<button
+								key={role}
+								type="button"
+								onClick={() => onAssign(role)}
+								className="min-h-11 rounded-lg border border-white/12 bg-white/5 px-1 text-center text-[10px] font-semibold uppercase tracking-wider text-zinc-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+							>
+								{ROLE_LABELS[role]}
+								<span className="mt-0.5 block text-[9px] font-medium normal-case tracking-normal text-zinc-500">
+									{fit.label}
+								</span>
+							</button>
+						);
+					})}
 				</div>
-			</div>
-		</button>
+			) : null}
+		</div>
 	);
+}
+
+type RosterSharedProps = {
+	state: { roster: Partial<Record<Role, { playerSeasonId: string; fit: number }>> };
+	playersById: ReadonlyMap<string, PlayerSeason>;
+	traitsFor?: (playerSeasonId: string) => readonly BonusId[];
+	previewOvr: number | null;
+	teamName: string;
+	seedLabel: string;
+	drag?: PlayerDrag | null;
+	draggingPlayer?: PlayerSeason;
+	selectedPlayerId?: string | null;
+	onPointerDown?: (playerSeasonId: string, event: ReactPointerEvent<HTMLElement>) => void;
+	onAssign?: (playerSeasonId: string, role: Role) => void;
+};
+
+function slotTone({
+	occupied,
+	hovered,
+	droppable,
+	draggingHere,
+	selectedHere,
+	placeReady,
+}: {
+	occupied: boolean;
+	hovered: boolean;
+	droppable: boolean;
+	draggingHere: boolean;
+	selectedHere: boolean;
+	placeReady: boolean;
+}): string {
+	if (draggingHere) {
+		return "border border-white/20 bg-zinc-950/40 opacity-40";
+	}
+	if (hovered && droppable) {
+		return occupied
+			? "border border-amber-300 bg-amber-300/10"
+			: "border border-emerald-300 bg-emerald-300/10";
+	}
+	if (placeReady) {
+		return occupied
+			? "border border-amber-300/50 bg-amber-300/8"
+			: "border border-emerald-300/50 bg-emerald-300/8";
+	}
+	if (selectedHere) {
+		return "border border-emerald-300 bg-emerald-300/10";
+	}
+	if (occupied) {
+		return "border border-white/12 bg-zinc-950/60";
+	}
+	return "border border-dashed border-white/12 bg-transparent";
 }
 
 export function LiveRoster({
@@ -262,21 +375,11 @@ export function LiveRoster({
 	seedLabel,
 	drag,
 	draggingPlayer,
+	selectedPlayerId,
 	onPointerDown,
 	onAssign,
 	traitsFor,
-}: {
-	state: { roster: Partial<Record<Role, { playerSeasonId: string; fit: number }>> };
-	playersById: ReadonlyMap<string, PlayerSeason>;
-	traitsFor?: (playerSeasonId: string) => readonly BonusId[];
-	previewOvr: number | null;
-	teamName: string;
-	seedLabel: string;
-	drag?: PlayerDrag | null;
-	draggingPlayer?: PlayerSeason;
-	onPointerDown?: (playerSeasonId: string, event: ReactPointerEvent<HTMLElement>) => void;
-	onAssign?: (playerSeasonId: string, role: Role) => void;
-}) {
+}: RosterSharedProps) {
 	return (
 		<section
 			aria-labelledby="roster-title"
@@ -312,23 +415,30 @@ export function LiveRoster({
 						drag && ROLES.some((slot) => state.roster[slot]?.playerSeasonId === drag.playerId),
 					);
 					const droppable = Boolean(drag && !draggingHere && (draggedIsPlaced || !occupied));
-					const fit = draggingPlayer && droppable ? fitInfo(draggingPlayer, role) : null;
+					const selectedHere = Boolean(pick && selectedPlayerId === pick.playerSeasonId);
+					const placeReady = Boolean(selectedPlayerId && selectedPlayerId !== pick?.playerSeasonId);
+					const fit =
+						draggingPlayer && droppable
+							? fitInfo(draggingPlayer, role)
+							: placeReady
+								? (() => {
+										const selected = playersById.get(selectedPlayerId ?? "");
+										return selected ? fitInfo(selected, role) : null;
+									})()
+								: null;
 					return (
 						<div
 							key={role}
 							data-roster-slot={role}
 							aria-dropeffect={drag ? (droppable ? "execute" : "none") : undefined}
-							className={`min-h-16 rounded-xl px-3 py-2.5 transition ${
-								draggingHere
-									? "border border-white/20 bg-zinc-950/40 opacity-40"
-									: hovered && droppable
-										? occupied
-											? "border border-amber-300 bg-amber-300/10"
-											: "border border-emerald-300 bg-emerald-300/10"
-										: occupied
-											? "border border-white/12 bg-zinc-950/60"
-											: "border border-dashed border-white/12 bg-transparent"
-							}`}
+							className={`min-h-16 rounded-xl px-3 py-2.5 transition ${slotTone({
+								occupied,
+								hovered,
+								droppable,
+								draggingHere,
+								selectedHere,
+								placeReady,
+							})}`}
 						>
 							<div className="flex items-center justify-between gap-2">
 								<span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
@@ -349,7 +459,8 @@ export function LiveRoster({
 								<button
 									type="button"
 									aria-grabbed={draggingHere}
-									aria-label={`${player.nick}, ${ROLE_LABELS[role]}. Drag to another role, or press 1 through 5.`}
+									aria-pressed={selectedHere}
+									aria-label={`${player.nick}, ${ROLE_LABELS[role]}. Tap a role to move, drag to another slot, or press 1 through 5.`}
 									onPointerDown={
 										onPointerDown ? (event) => onPointerDown(pick.playerSeasonId, event) : undefined
 									}
@@ -365,7 +476,7 @@ export function LiveRoster({
 										}
 									}}
 									onDragStart={(event) => event.preventDefault()}
-									className={`mt-1.5 flex w-full touch-none items-center justify-between gap-2 rounded-lg text-left outline-offset-2 focus-visible:outline-2 focus-visible:outline-emerald-300 ${
+									className={`mt-1.5 flex w-full touch-pan-y items-center justify-between gap-2 rounded-lg text-left outline-offset-2 focus-visible:outline-2 focus-visible:outline-emerald-300 ${
 										onPointerDown ? "cursor-grab" : ""
 									}`}
 								>
@@ -383,8 +494,16 @@ export function LiveRoster({
 										{ovr}
 									</span>
 								</button>
+							) : placeReady && selectedPlayerId && onAssign ? (
+								<button
+									type="button"
+									onClick={() => onAssign(selectedPlayerId, role)}
+									className="mt-1 flex min-h-11 w-full items-center text-left text-xs text-emerald-200"
+								>
+									Tap to place
+								</button>
 							) : (
-								<p className="mt-1 text-xs text-zinc-600">
+								<p className="mt-1 flex min-h-11 items-center text-xs text-zinc-600">
 									{droppable && hovered ? `Drop ${draggingPlayer?.nick ?? "player"}` : "Empty slot"}
 								</p>
 							)}
@@ -397,6 +516,92 @@ export function LiveRoster({
 			</p>
 			<p className="mt-1 text-[10px] tabular-nums text-zinc-600">{seedLabel}</p>
 		</section>
+	);
+}
+
+export function CompactRosterBar({
+	state,
+	playersById,
+	previewOvr,
+	drag,
+	selectedPlayerId,
+	onAssign,
+	onSelectPlayer,
+}: Pick<
+	RosterSharedProps,
+	"state" | "playersById" | "previewOvr" | "drag" | "selectedPlayerId" | "onAssign"
+> & { onSelectPlayer?: (playerSeasonId: string) => void }) {
+	return (
+		<nav
+			aria-label="Live roster"
+			className="fixed inset-x-0 bottom-0 z-40 border-t border-white/12 bg-zinc-950/95 px-2 pt-2 pb-[max(0.5rem,var(--safe-bottom))] backdrop-blur-xl lg:hidden"
+		>
+			<div className="mb-1 flex items-center justify-between px-1">
+				<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+					Roster
+				</p>
+				<p className="text-[10px] font-semibold tabular-nums text-zinc-400">
+					OVR {previewOvr === null ? "—" : previewOvr.toFixed(1)}
+				</p>
+			</div>
+			<ol className="grid grid-cols-5 gap-1">
+				{ROLES.map((role) => {
+					const pick = state.roster[role];
+					const player = pick ? playersById.get(pick.playerSeasonId) : undefined;
+					const occupied = Boolean(player);
+					const hovered = drag?.overRole === role;
+					const draggingHere = Boolean(drag && pick && drag.playerId === pick.playerSeasonId);
+					const draggedIsPlaced = Boolean(
+						drag && ROLES.some((slot) => state.roster[slot]?.playerSeasonId === drag.playerId),
+					);
+					const droppable = Boolean(drag && !draggingHere && (draggedIsPlaced || !occupied));
+					const selectedHere = Boolean(pick && selectedPlayerId === pick.playerSeasonId);
+					const placeReady = Boolean(selectedPlayerId && selectedPlayerId !== pick?.playerSeasonId);
+					const selected = selectedPlayerId ? playersById.get(selectedPlayerId) : undefined;
+					const fit = selected && placeReady ? fitInfo(selected, role) : null;
+					return (
+						<li key={role}>
+							<button
+								type="button"
+								data-roster-slot={role}
+								disabled={!placeReady && !occupied}
+								onClick={() => {
+									if (selectedPlayerId && onAssign && selectedPlayerId !== pick?.playerSeasonId) {
+										onAssign(selectedPlayerId, role);
+										return;
+									}
+									if (pick) {
+										onSelectPlayer?.(pick.playerSeasonId);
+									}
+								}}
+								className={`flex min-h-16 w-full flex-col items-center justify-center rounded-lg px-0.5 py-1 text-center ${slotTone(
+									{
+										occupied,
+										hovered,
+										droppable,
+										draggingHere,
+										selectedHere,
+										placeReady,
+									},
+								)}`}
+							>
+								<span className="text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
+									{ROLE_LABELS[role]}
+								</span>
+								<span className="mt-0.5 w-full truncate text-[11px] font-semibold text-zinc-100">
+									{player?.nick ?? "—"}
+								</span>
+								{fit ? (
+									<span className="text-[9px] text-emerald-200">
+										{occupied ? "Swap" : fit.label}
+									</span>
+								) : null}
+							</button>
+						</li>
+					);
+				})}
+			</ol>
+		</nav>
 	);
 }
 

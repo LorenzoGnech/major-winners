@@ -1,4 +1,4 @@
-import type { Game, OrgTier, PlayerSeason, Role } from "../data";
+import type { Game, PlayerSeason, Role } from "../data";
 
 export const ROLE_LABELS: Record<Role, string> = {
 	awp: "AWP",
@@ -13,18 +13,6 @@ export const GAME_LABELS: Record<Game, string> = {
 	css: "Counter-Strike: Source",
 	csgo: "CS:GO",
 	cs2: "Counter-Strike 2",
-};
-
-export const TIER_LABELS: Record<OrgTier, string> = {
-	legendary: "Legendary",
-	strong: "Strong",
-	cult: "Cult",
-};
-
-export const TIER_STYLES: Record<OrgTier, string> = {
-	legendary: "border-amber-300/40 bg-amber-300/10 text-amber-200",
-	strong: "border-sky-300/40 bg-sky-300/10 text-sky-200",
-	cult: "border-fuchsia-300/40 bg-fuchsia-300/10 text-fuchsia-200",
 };
 
 const PANEL_HUES = [210, 168, 142, 272, 38, 16] as const;

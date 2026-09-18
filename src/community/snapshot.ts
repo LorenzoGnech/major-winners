@@ -41,6 +41,13 @@ export function snapshotDraftFields(draft: CompletedDraft): {
 	};
 }
 
+export type PublishTeamInput = {
+	authorName: string;
+	teamName: string;
+	draft: CompletedDraft;
+	userId: string | null;
+};
+
 export type PublishRunInput = {
 	authorName: string;
 	teamName: string;

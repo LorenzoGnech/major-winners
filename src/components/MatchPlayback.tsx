@@ -1,7 +1,8 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Org, PlayerSeason, Role } from "../data";
 import {
 	applyGamePlan,
+	type BonusId,
 	equipmentValue,
 	getMap,
 	type HighlightEvent,
@@ -40,6 +41,7 @@ import { OrgCrest } from "./OrgCrest";
 import { PlayerCrest } from "./PlayerCrest";
 import { lineupDeadIds, liveCastLines } from "./roundCast";
 import { TimeoutMoment } from "./TimeoutMoment";
+import { TraitIcons } from "./TraitBadge";
 import { WeaponIcon } from "./WeaponIcon";
 
 type MatchPlaybackProps = {
@@ -54,6 +56,7 @@ type MatchPlaybackProps = {
 	onComplete?: () => void;
 	onAwaitingNextMap?: () => void;
 	onContinueMatch?: () => void;
+	continueLabel?: string;
 };
 
 type LiveLine = {
@@ -63,7 +66,9 @@ type LiveLine = {
 };
 
 const CONTROL_CLASS =
-	"rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-white/30 enabled:hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-40";
+	"min-h-11 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-white/30 enabled:hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-40";
+const CONTINUE_MATCH_CLASS =
+	"rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300";
 const SPEED_BUTTON_CLASS =
 	"min-w-11 flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300";
 
@@ -92,7 +97,7 @@ function mapPickCaption(
 	if (context.homePick) return viewer === 0 ? " · your pick" : ` · ${labels[0]} pick`;
 	return "";
 }
-const FEED_BOX_CLASS = "flex h-44 flex-col overflow-hidden";
+const FEED_BOX_CLASS = "flex h-32 flex-col overflow-hidden sm:h-40 lg:h-44";
 
 const ROLE_LABELS: Record<Role, string> = {
 	awp: "AWP",
@@ -549,6 +554,23 @@ function crestFor(
 	};
 }
 
+function traitsByPlayerId(
+	teams: readonly [
+		{ members: readonly TeamMemberProfile[] },
+		{ members: readonly TeamMemberProfile[] },
+	],
+): ReadonlyMap<string, readonly BonusId[]> {
+	const map = new Map<string, readonly BonusId[]>();
+	for (const team of teams) {
+		for (const member of team.members) {
+			if (member.bonusIds && member.bonusIds.length > 0) {
+				map.set(member.id, member.bonusIds);
+			}
+		}
+	}
+	return map;
+}
+
 function SideMark({ side }: { side: Side }) {
 	return (
 		<span
@@ -572,7 +594,7 @@ function RoundTimeline({
 }) {
 	return (
 		<section
-			className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-3"
+			className="mt-4 hidden flex-wrap justify-center gap-x-4 gap-y-3 lg:flex"
 			aria-label={`${map.label} round timeline`}
 		>
 			{groupedRounds(map.rounds).map(([label, rounds]) => (
@@ -618,10 +640,12 @@ function Scoreboard({
 	teams,
 	teamLabels,
 	roundsWon,
+	traitsByPlayer,
 }: {
 	teams: readonly [readonly PlayerMapStats[], readonly PlayerMapStats[]];
 	teamLabels: readonly [string, string];
 	roundsWon: readonly [number, number];
+	traitsByPlayer: ReadonlyMap<string, readonly BonusId[]>;
 }) {
 	return (
 		<div className="space-y-4">
@@ -634,13 +658,13 @@ function Scoreboard({
 						</span>
 					</div>
 					<div className="overflow-x-auto rounded-xl border border-white/10">
-						<table className="w-full min-w-lg text-left text-xs">
+						<table className="w-full min-w-0 text-left text-xs lg:min-w-lg">
 							<thead className="bg-white/5 text-[10px] uppercase tracking-wider text-zinc-500">
 								<tr>
 									<th className="px-3 py-2 font-semibold">Player</th>
 									<th className="px-2 py-2 text-right font-semibold">K-D-A</th>
-									<th className="px-2 py-2 text-right font-semibold">ADR</th>
-									<th className="px-2 py-2 text-right font-semibold">KAST</th>
+									<th className="hidden px-2 py-2 text-right font-semibold lg:table-cell">ADR</th>
+									<th className="hidden px-2 py-2 text-right font-semibold lg:table-cell">KAST</th>
 									<th className="px-3 py-2 text-right font-semibold">Rating</th>
 								</tr>
 							</thead>
@@ -650,13 +674,20 @@ function Scoreboard({
 									.map((player) => (
 										<tr key={player.playerId} className="bg-black/15 text-zinc-300">
 											<th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-100">
-												{player.nick}
+												<span className="inline-flex items-center gap-1.5">
+													{player.nick}
+													<TraitIcons ids={traitsByPlayer.get(player.playerId) ?? []} size="xs" />
+												</span>
 											</th>
 											<td className="px-2 py-2 text-right tabular-nums">
 												{player.kills}-{player.deaths}-{player.assists}
 											</td>
-											<td className="px-2 py-2 text-right tabular-nums">{player.adr}</td>
-											<td className="px-2 py-2 text-right tabular-nums">{player.kast}%</td>
+											<td className="hidden px-2 py-2 text-right tabular-nums lg:table-cell">
+												{player.adr}
+											</td>
+											<td className="hidden px-2 py-2 text-right tabular-nums lg:table-cell">
+												{player.kast}%
+											</td>
 											<td className="px-3 py-2 text-right font-bold tabular-nums text-white">
 												{player.rating.toFixed(2)}
 											</td>
@@ -741,17 +772,36 @@ function TeamLineup({
 							aria-label={dead ? `${member.nick}, eliminated this round` : undefined}
 							className={`flex items-center gap-2 rounded-xl px-1.5 py-1.5 motion-safe:transition-[opacity,filter,background-color] ${
 								isRight ? "flex-row-reverse" : ""
-							} ${dead ? "opacity-40 grayscale" : hot ? "bg-white/8 ring-1 ring-white/15" : ""}`}
+							} ${dead ? "" : hot ? "bg-white/8 ring-1 ring-white/15" : ""}`}
 						>
-							<PlayerCrest player={crestFor(member, playersById)} size="md" />
-							<div className={`min-w-0 flex-1 ${isRight ? "text-right" : ""}`}>
+							<div className={`shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
+								<PlayerCrest player={crestFor(member, playersById)} size="md" />
+							</div>
+							<div
+								className={`min-w-0 flex-1 ${isRight ? "text-right" : ""} ${
+									dead ? "opacity-40 grayscale" : ""
+								}`}
+							>
 								<p className="truncate text-sm font-semibold text-zinc-100">{member.nick}</p>
 								<p className="text-[10px] uppercase tracking-wider text-zinc-500">
 									{ROLE_LABELS[member.slot]}
 								</p>
 							</div>
-							<span className="shrink-0 text-xs font-semibold tabular-nums text-zinc-300">
-								{line.kills}-{line.deaths}
+							<span
+								className={`flex shrink-0 items-center gap-1 ${isRight ? "flex-row-reverse" : ""}`}
+							>
+								<TraitIcons
+									ids={member.bonusIds ?? []}
+									size="xs"
+									tip={isRight ? "center" : "start"}
+								/>
+								<span
+									className={`text-xs font-semibold tabular-nums text-zinc-300 ${
+										dead ? "opacity-40 grayscale" : ""
+									}`}
+								>
+									{line.kills}-{line.deaths}
+								</span>
 							</span>
 						</li>
 					);
@@ -764,6 +814,82 @@ function TeamLineup({
 	);
 }
 
+function CompactMatchLineups({
+	leftLabel,
+	rightLabel,
+	leftMembers,
+	rightMembers,
+	stats,
+	deadIds,
+	involvedIds,
+	playersById,
+}: {
+	leftLabel: string;
+	rightLabel: string;
+	leftMembers: readonly TeamMemberProfile[];
+	rightMembers: readonly TeamMemberProfile[];
+	stats: ReadonlyMap<string, LiveLine>;
+	deadIds: ReadonlySet<string>;
+	involvedIds: ReadonlySet<string>;
+	playersById?: ReadonlyMap<string, PlayerSeason>;
+}) {
+	function column(
+		label: string,
+		members: readonly TeamMemberProfile[],
+		tone: "player" | "opponent",
+	) {
+		return (
+			<div>
+				<p
+					className={`truncate text-[10px] font-semibold uppercase tracking-wider ${
+						tone === "player" ? "text-emerald-300" : "text-amber-300"
+					}`}
+				>
+					{label}
+				</p>
+				<ul className="mt-1.5 space-y-1">
+					{members.map((member) => {
+						const line = stats.get(member.id) ?? { kills: 0, deaths: 0, assists: 0 };
+						const dead = deadIds.has(member.id);
+						const hot = !dead && involvedIds.has(member.id);
+						return (
+							<li
+								key={member.id}
+								className={`flex items-center gap-1.5 rounded-lg px-1 py-0.5 ${hot ? "bg-white/8" : ""}`}
+							>
+								<div className={`shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
+									<PlayerCrest player={crestFor(member, playersById)} size="sm" />
+								</div>
+								<p
+									className={`min-w-0 flex-1 truncate text-xs font-semibold text-zinc-100 ${
+										dead ? "opacity-40 grayscale" : ""
+									}`}
+								>
+									{member.nick}
+								</p>
+								<TraitIcons ids={member.bonusIds ?? []} size="xs" />
+								<span
+									className={`shrink-0 text-[11px] font-semibold tabular-nums text-zinc-300 ${
+										dead ? "opacity-40 grayscale" : ""
+									}`}
+								>
+									{line.kills}-{line.deaths}
+								</span>
+							</li>
+						);
+					})}
+				</ul>
+			</div>
+		);
+	}
+	return (
+		<section aria-label="Lineups" className="mt-4 grid grid-cols-2 gap-2 lg:hidden">
+			{column(leftLabel, leftMembers, "player")}
+			{column(rightLabel, rightMembers, "opponent")}
+		</section>
+	);
+}
+
 function RoundFeedItem({
 	round,
 	kills,
@@ -771,6 +897,7 @@ function RoundFeedItem({
 	result,
 	shortLabels,
 	viewerSide,
+	castLine,
 }: {
 	round: RoundResult;
 	kills: readonly KillEvent[];
@@ -778,6 +905,7 @@ function RoundFeedItem({
 	result: SeriesResult;
 	shortLabels: readonly [string, string];
 	viewerSide: 0 | 1;
+	castLine?: string;
 }) {
 	return (
 		<li
@@ -795,6 +923,9 @@ function RoundFeedItem({
 					<>R{round.round}</>
 				)}
 			</span>
+			{castLine ? (
+				<p className="mt-1 shrink-0 text-[11px] leading-snug text-zinc-300 lg:hidden">{castLine}</p>
+			) : null}
 			<ul className="feed-stack-fade mt-1.5 min-h-0 flex-1 space-y-0.5 overflow-hidden">
 				{[...kills].toReversed().map((kill) => (
 					<li
@@ -853,6 +984,14 @@ function RoundCast({ lines }: { lines: readonly string[] }) {
 	);
 }
 
+function formatCash(value: number): string {
+	if (value >= 1000) {
+		const thousands = value / 1000;
+		return `$${Number.isInteger(thousands) ? thousands.toFixed(0) : thousands.toFixed(1)}k`;
+	}
+	return `$${value}`;
+}
+
 function buyLabel(buy: string): string {
 	if (buy === "full-buy") return "full buy";
 	if (buy === "force") return "force";
@@ -870,8 +1009,8 @@ function CompareBar({
 }: {
 	left: number;
 	right: number;
-	leftCaption: string;
-	rightCaption: string;
+	leftCaption: ReactNode;
+	rightCaption: ReactNode;
 	label: string;
 }) {
 	const total = left + right;
@@ -912,15 +1051,47 @@ function EconomyBars({
 				label="This round"
 				left={roundValues[0]}
 				right={roundValues[1]}
-				leftCaption={`${labels[0]} · ${buyLabel(buys[0])} · $${roundValues[0].toLocaleString()}`}
-				rightCaption={`$${roundValues[1].toLocaleString()} · ${buyLabel(buys[1])} · ${labels[1]}`}
+				leftCaption={
+					<>
+						<span className="lg:hidden">
+							You · {buyLabel(buys[0])} · {formatCash(roundValues[0])}
+						</span>
+						<span className="hidden lg:inline">
+							{labels[0]} · {buyLabel(buys[0])} · ${roundValues[0].toLocaleString()}
+						</span>
+					</>
+				}
+				rightCaption={
+					<>
+						<span className="lg:hidden">
+							{formatCash(roundValues[1])} · {buyLabel(buys[1])} · Opp
+						</span>
+						<span className="hidden lg:inline">
+							${roundValues[1].toLocaleString()} · {buyLabel(buys[1])} · {labels[1]}
+						</span>
+					</>
+				}
 			/>
 			<CompareBar
 				label="Bank"
 				left={totals[0]}
 				right={totals[1]}
-				leftCaption={`${labels[0]} · $${totals[0].toLocaleString()}`}
-				rightCaption={`$${totals[1].toLocaleString()} · ${labels[1]}`}
+				leftCaption={
+					<>
+						<span className="lg:hidden">You · {formatCash(totals[0])}</span>
+						<span className="hidden lg:inline">
+							{labels[0]} · ${totals[0].toLocaleString()}
+						</span>
+					</>
+				}
+				rightCaption={
+					<>
+						<span className="lg:hidden">{formatCash(totals[1])} · Opp</span>
+						<span className="hidden lg:inline">
+							${totals[1].toLocaleString()} · {labels[1]}
+						</span>
+					</>
+				}
 			/>
 		</section>
 	);
@@ -942,7 +1113,8 @@ function MoraleMeter({
 		<div>
 			<div className="mb-1 flex justify-between gap-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
 				<span className={tone === "player" ? "text-emerald-200/90" : "text-amber-200/90"}>
-					{label}
+					<span className="lg:hidden">{tone === "player" ? "You" : "Opp"}</span>
+					<span className="hidden lg:inline">{label}</span>
 				</span>
 				<span
 					className={`tabular-nums ${tone === "player" ? "text-emerald-200" : "text-amber-200"}`}
@@ -994,6 +1166,7 @@ export function MatchPlayback({
 	onComplete,
 	onAwaitingNextMap,
 	onContinueMatch,
+	continueLabel = "Continue",
 }: MatchPlaybackProps) {
 	const result = live ? seriesFromLive(live) : completedResult;
 	const opponent = otherSideIndex(viewerSide);
@@ -1001,6 +1174,10 @@ export function MatchPlayback({
 	const viewLabels = pairFromViewer(simLabels, viewerSide);
 	const shortLabels = simLabels;
 	const maps = result?.maps ?? [];
+	const playerTraits = useMemo(
+		() => (result ? traitsByPlayerId(result.teams) : new Map<string, readonly BonusId[]>()),
+		[result],
+	);
 	const playbackTicks = useMemo(() => buildPlaybackTicks(maps), [maps]);
 	const mapArt = useMemo(() => {
 		const queued = live?.mapQueue.map((map) => map.background) ?? [];
@@ -1451,12 +1628,14 @@ export function MatchPlayback({
 					}
 				: null
 		: null;
+	const mapWinKind = mapWinContinueKind(live);
+	const showContinueMatch = Boolean(complete && !mapWinMoment && onContinueMatch);
 
 	return (
 		<div className="mt-5 space-y-4">
 			<section
 				aria-labelledby="match-heading"
-				className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6"
+				className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 p-4 max-lg:pb-32 sm:p-6 sm:max-lg:pb-32"
 				style={
 					background
 						? {
@@ -1467,6 +1646,13 @@ export function MatchPlayback({
 						: undefined
 				}
 			>
+				{showContinueMatch ? (
+					<div className="absolute top-4 right-4 z-30 sm:top-6 sm:right-6">
+						<button type="button" onClick={onContinueMatch} className={CONTINUE_MATCH_CLASS}>
+							{continueLabel}
+						</button>
+					</div>
+				) : null}
 				{mapWinMoment ? (
 					<MapWinMoment
 						playerWon={mapWinMoment.winner === viewerSide}
@@ -1480,16 +1666,13 @@ export function MatchPlayback({
 									teams={mapWinBoard.teams}
 									teamLabels={viewLabels}
 									roundsWon={mapWinBoard.roundsWon}
+									traitsByPlayer={playerTraits}
 								/>
 							) : null
 						}
 						footer={
-							<button
-								type="button"
-								onClick={dismissMapWinMoment}
-								className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-							>
-								Continue
+							<button type="button" onClick={dismissMapWinMoment} className={CONTINUE_MATCH_CLASS}>
+								{mapWinKind === "next-match" ? continueLabel : "Continue"}
 							</button>
 						}
 					/>
@@ -1535,7 +1718,7 @@ export function MatchPlayback({
 						lines={momentLines}
 						speed={speed}
 						footer={
-							<fieldset className="flex flex-wrap justify-center gap-2">
+							<fieldset className="hidden flex-wrap justify-center gap-2 lg:flex">
 								<legend className="sr-only">Clutch replay controls</legend>
 								<button
 									type="button"
@@ -1553,7 +1736,9 @@ export function MatchPlayback({
 					/>
 				) : null}
 
-				<div className="relative z-20 text-center">
+				<div
+					className={`relative z-20 text-center ${showContinueMatch ? "max-sm:pt-14 sm:px-28" : ""}`}
+				>
 					<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
 						{headingEyebrow}
 					</p>
@@ -1568,7 +1753,7 @@ export function MatchPlayback({
 				</div>
 
 				<div className="mt-5 grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)_minmax(15rem,18rem)]">
-					<div className="max-lg:order-2">
+					<div className="hidden lg:block">
 						<TeamLineup
 							align="left"
 							label={viewLabels[0]}
@@ -1583,7 +1768,7 @@ export function MatchPlayback({
 						/>
 					</div>
 
-					<div className="relative min-w-0 max-lg:order-1 max-lg:col-span-full">
+					<div className="relative min-w-0 max-lg:col-span-full">
 						<section
 							className="flex items-center justify-center gap-4"
 							aria-label="Current map score"
@@ -1601,7 +1786,7 @@ export function MatchPlayback({
 										className="round-score-pulse-ring round-score-pulse-ring-player"
 									/>
 								) : null}
-								<strong className="relative text-5xl tabular-nums text-emerald-300 sm:text-6xl">
+								<strong className="relative text-4xl tabular-nums text-emerald-300 sm:text-6xl">
 									{displayScore[0]}
 								</strong>
 							</span>
@@ -1618,11 +1803,26 @@ export function MatchPlayback({
 										className="round-score-pulse-ring round-score-pulse-ring-opponent"
 									/>
 								) : null}
-								<strong className="relative text-5xl tabular-nums text-amber-300 sm:text-6xl">
+								<strong className="relative text-4xl tabular-nums text-amber-300 sm:text-6xl">
 									{displayScore[1]}
 								</strong>
 							</span>
 						</section>
+						<p className="mt-2 text-center text-xs text-zinc-500 lg:hidden">
+							Round {Math.max(1, cursor.settledRoundCount)}
+							{feed ? ` · ${feed.round.scoreAfter[0]}–${feed.round.scoreAfter[1]}` : ""}
+						</p>
+
+						<CompactMatchLineups
+							leftLabel={viewLabels[0]}
+							rightLabel={viewLabels[1]}
+							leftMembers={result.teams[viewerSide].members}
+							rightMembers={result.teams[opponent].members}
+							stats={stats}
+							deadIds={boardDeadIds}
+							involvedIds={involvedIds}
+							playersById={playersById}
+						/>
 
 						<RoundTimeline
 							map={activeMap}
@@ -1646,7 +1846,7 @@ export function MatchPlayback({
 							)}
 						/>
 
-						<fieldset className="mt-5 flex flex-wrap items-start justify-center gap-2">
+						<fieldset className="mt-5 hidden flex-wrap items-start justify-center gap-2 lg:flex">
 							<legend className="sr-only">Replay controls</legend>
 							<button
 								type="button"
@@ -1715,7 +1915,7 @@ export function MatchPlayback({
 							<h4 className="text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
 								Play-by-play
 							</h4>
-							<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
+							<div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
 								{feed ? (
 									<ol>
 										<RoundFeedItem
@@ -1726,6 +1926,7 @@ export function MatchPlayback({
 											result={result}
 											shortLabels={shortLabels}
 											viewerSide={viewerSide}
+											castLine={castLines.at(-1)}
 										/>
 									</ol>
 								) : (
@@ -1735,12 +1936,14 @@ export function MatchPlayback({
 										<p className="text-center text-sm text-zinc-600">Replay starting.</p>
 									</div>
 								)}
-								<RoundCast lines={castLines} />
+								<div className="hidden lg:block">
+									<RoundCast lines={castLines} />
+								</div>
 							</div>
 						</div>
 					</div>
 
-					<div className="max-lg:order-3">
+					<div className="hidden lg:block">
 						<TeamLineup
 							align="right"
 							label={viewLabels[1]}
@@ -1756,6 +1959,72 @@ export function MatchPlayback({
 						/>
 					</div>
 				</div>
+				<fieldset className="fixed inset-x-0 bottom-0 z-50 flex gap-2 border-t border-white/12 bg-zinc-950/95 px-3 py-2 pb-[max(0.5rem,var(--safe-bottom))] backdrop-blur-xl lg:hidden">
+					<legend className="sr-only">Replay controls</legend>
+					<button
+						type="button"
+						onClick={playPause}
+						disabled={complete || waitingForPlan || holdPlayback}
+						className={`${CONTROL_CLASS} flex-1`}
+					>
+						{playing ? "Pause" : "Play"}
+					</button>
+					<button
+						type="button"
+						onClick={skip}
+						disabled={complete}
+						className={`${CONTROL_CLASS} flex-1`}
+					>
+						Skip to end
+					</button>
+					<div className="relative">
+						<button
+							type="button"
+							aria-expanded={settingsOpen}
+							aria-controls="playback-settings-mobile"
+							onClick={() => setSettingsOpen((open) => !open)}
+							className={CONTROL_CLASS}
+						>
+							{speed}×
+						</button>
+						{settingsOpen ? (
+							<div
+								id="playback-settings-mobile"
+								className="absolute right-0 bottom-full z-20 mb-2 w-52 rounded-xl border border-white/15 bg-zinc-950/95 p-2 shadow-xl"
+							>
+								<button
+									type="button"
+									onClick={restart}
+									disabled={revealedCount === 0}
+									className={`${CONTROL_CLASS} w-full`}
+								>
+									Restart replay
+								</button>
+								<fieldset className="mt-2 flex gap-1.5">
+									<legend className="sr-only">Replay speed</legend>
+									{PLAYBACK_SPEEDS.map((option) => {
+										const selected = option === speed;
+										return (
+											<button
+												key={option}
+												type="button"
+												aria-pressed={selected}
+												onClick={() => chooseSpeed(option)}
+												className={`${SPEED_BUTTON_CLASS} ${
+													selected
+														? "border-emerald-300 bg-emerald-300 text-zinc-950"
+														: "border-white/15 bg-white/5 text-zinc-200 hover:border-white/30 hover:bg-white/10"
+												}`}
+											>
+												{option}×
+											</button>
+										);
+									})}
+								</fieldset>
+							</div>
+						) : null}
+					</div>
+				</fieldset>
 			</section>
 			{complete && !mapWinMoment ? (
 				<section
@@ -1781,6 +2050,7 @@ export function MatchPlayback({
 							teams={pairFromViewer(aggregateSeriesScoreboard(result.maps), viewerSide)}
 							teamLabels={viewLabels}
 							roundsWon={pairFromViewer(seriesRoundsWon(result.maps), viewerSide)}
+							traitsByPlayer={playerTraits}
 						/>
 					</div>
 				</section>

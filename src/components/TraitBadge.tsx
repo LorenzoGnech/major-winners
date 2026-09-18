@@ -3,11 +3,13 @@ import { createPortal } from "react-dom";
 import { type BonusId, bonusById, traitDraftHint } from "../engine/bonuses";
 
 const ICON_CLASS = {
+	xs: "size-3.5",
 	sm: "size-6",
 	md: "size-8",
 } as const;
 
 const BOX_CLASS = {
+	xs: "size-5 rounded-md",
 	sm: "size-8 rounded-lg",
 	md: "size-10 rounded-xl",
 } as const;
@@ -157,12 +159,20 @@ export function TraitBadge({
 	);
 }
 
-export function TraitIcons({ ids }: { ids: readonly BonusId[] }) {
+export function TraitIcons({
+	ids,
+	size = "sm",
+	tip = "start",
+}: {
+	ids: readonly BonusId[];
+	size?: keyof typeof ICON_CLASS;
+	tip?: "center" | "start";
+}) {
 	if (ids.length === 0) return null;
 	return (
-		<span className="flex items-center gap-1">
+		<span className="flex items-center gap-0.5">
 			{ids.map((id) => (
-				<TraitBadge key={id} id={id} size="sm" tip="start" />
+				<TraitBadge key={id} id={id} size={size} tip={tip} />
 			))}
 		</span>
 	);
