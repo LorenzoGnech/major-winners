@@ -42,7 +42,7 @@ export const publishedRunSnapshotSchema = z.object({
 	team: savedTeamSnapshotSchema,
 	mode: communityModeSchema,
 	wins: z.number().int().min(0).max(9),
-	losses: z.number().int().min(0).max(3),
+	losses: z.number().int().min(0).max(5),
 	mapsWon: z.number().int().min(0),
 	mapsLost: z.number().int().min(0),
 	roundsWon: z.number().int().min(0),

@@ -5,6 +5,7 @@ import {
 	collectTraitHolders,
 	combatWinProb,
 	eligibleTraits,
+	type LingeringBonus,
 	pickTraitHits,
 	resolveTraitRound,
 	revealTraits,
@@ -149,11 +150,11 @@ describe("resolveTraitRound", () => {
 	const member = profile("alpha", ["mastermind"]).members[0];
 
 	it("expires round-limited lingering after the remaining ticks", () => {
-		let lingering = [
+		let lingering: LingeringBonus[] = [
 			{
-				bonusId: "jacked" as const,
+				bonusId: "jacked",
 				seasonId: member.id,
-				until: { type: "rounds" as const, remaining: 3 },
+				until: { type: "rounds", remaining: 3 },
 			},
 		];
 		lingering = tickLingering(lingering);
@@ -269,6 +270,15 @@ describe("resolveTraitRound", () => {
 		});
 		expect(brother.winProb).toBeCloseTo(0.04);
 		expect(brother.moraleSelf).toBe(30);
+		const guest = resolveTraitRound({
+			lingering: [],
+			hits: [{ member, bonusId: "brother", team: 1 }],
+			buy: "full-buy",
+			pistol: false,
+		});
+		expect(guest.winProb).toBeCloseTo(-0.04);
+		expect(guest.moraleSelf).toBe(0);
+		expect(guest.moraleOpponent).toBe(30);
 	});
 });
 
@@ -309,6 +319,25 @@ describe("in-match procs", () => {
 		}
 		const rounds = live.maps[0]?.rounds ?? live.current?.rounds ?? [];
 		expect(rounds.filter((round) => round.bonus).length).toBeGreaterThanOrEqual(0);
+	});
+
+	it("lets the guest side proc when bothSidesPlayer is set", () => {
+		const player = profile("alpha");
+		const opponent = profile("bravo", ["trashtalk"]);
+		let seenGuest = false;
+		for (let seed = 0; seed < 80 && !seenGuest; seed += 1) {
+			const result = simulateSeries({
+				teams: [player, opponent],
+				seed,
+				format: "BO1",
+				playerMapId: "mirage",
+				bothSidesPlayer: true,
+			});
+			seenGuest = result.maps.some((map) =>
+				map.rounds.some((round) => round.bonus?.seasonId.startsWith("bravo-")),
+			);
+		}
+		expect(seenGuest).toBe(true);
 	});
 
 	it("rolls near 2% over many maps for a single holder", () => {

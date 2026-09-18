@@ -3,7 +3,7 @@ import type { TeamProfile } from "../team";
 import type { GamePlanId } from "./gamePlan";
 import type { MapStyle } from "./maps";
 
-export type SeriesFormat = "BO1" | "BO3";
+export type SeriesFormat = "BO1" | "BO3" | "BO5";
 export type Side = "CT" | "T";
 export type RoundPhase = "regulation" | "overtime";
 export type BuyType = "pistol" | "full-buy" | "force" | "eco";
@@ -41,6 +41,7 @@ export type MapContext = {
 	mapId: string;
 	label: string;
 	homePick: boolean;
+	pickedBy?: 0 | 1;
 	style: MapStyle;
 	background: string;
 };
@@ -179,11 +180,13 @@ export type SimulateSeriesInput = {
 	playerMapId?: string;
 	mapContext?: MapContext | readonly MapContext[];
 	gamePlan?: GamePlanId;
+	bothSidesPlayer?: boolean;
 };
 
 export type RoundWinContext = {
 	mapStyle?: MapStyle;
 	homePick?: boolean;
+	pickedBy?: 0 | 1;
 	morale?: readonly [number, number];
 	timeoutTeam?: 0 | 1;
 	pistolBias?: number;
@@ -209,7 +212,9 @@ export type LiveMapState = {
 	maxDeficit: [number, number];
 	comebackEmitted: [boolean, boolean];
 	timeoutsRemaining: number;
+	awayTimeoutsRemaining?: number;
 	pendingTimeout: boolean;
+	pendingTimeoutTeam?: 0 | 1;
 	lingeringBonuses: LingeringBonus[];
 	gamePlan: GamePlanId;
 	complete: boolean;
@@ -223,6 +228,7 @@ export type LiveSeriesState = {
 	format: SeriesFormat;
 	teams: readonly [TeamProfile, TeamProfile];
 	playerMapId?: string;
+	bothSidesPlayer?: boolean;
 	mapQueue: MapContext[];
 	maps: MapResult[];
 	seriesScore: [number, number];

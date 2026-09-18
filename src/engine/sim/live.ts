@@ -12,7 +12,7 @@ import {
 	resolveGamePlan,
 } from "./gamePlan";
 import { makeKills } from "./kills";
-import { chooseSeriesMaps } from "./maps";
+import { chooseSeriesMaps, winsNeeded } from "./maps";
 import { applyTimeoutMorale, bumpMorale, initialMorale, resolveRoundMorale } from "./morale";
 import { chooseRoundSummary } from "./roundSummary";
 import { playbackMaps, roundWinProbability, scoreboard } from "./simulate";
@@ -51,10 +51,6 @@ function initialSides(rng: Rng): [Side, Side] {
 	return rng.nextInt(2) === 0 ? ["CT", "T"] : ["T", "CT"];
 }
 
-function winsNeeded(format: SeriesFormat): number {
-	return format === "BO1" ? 1 : 2;
-}
-
 function failCode(code: import("./types").SimErrorCode, message: string): LiveSeriesResult {
 	return { ok: false, error: { code, message } };
 }
@@ -65,6 +61,7 @@ function initMap(
 	mapIndex: number,
 	mapContext: MapContext,
 	gamePlan: GamePlanId,
+	bothSidesPlayer = false,
 ): LiveMapState {
 	const planned = applyGamePlan(teams[0], gamePlan);
 	return {
@@ -85,6 +82,7 @@ function initMap(
 		maxDeficit: [0, 0],
 		comebackEmitted: [false, false],
 		timeoutsRemaining: TIMEOUTS_PER_MAP,
+		...(bothSidesPlayer ? { awayTimeoutsRemaining: TIMEOUTS_PER_MAP } : {}),
 		pendingTimeout: false,
 		lingeringBonuses: [],
 		gamePlan,
@@ -174,8 +172,12 @@ function playMapRound(
 	current: LiveMapState,
 	teams: readonly [TeamProfile, TeamProfile],
 	rng: Rng,
+	bothSidesPlayer = false,
 ): LiveMapState {
 	const usedTimeout = current.pendingTimeout;
+	const timeoutTeam: 0 | 1 | undefined = usedTimeout
+		? (current.pendingTimeoutTeam ?? 0)
+		: undefined;
 	const roundNumber = current.rounds.length + 1;
 	const gamePlan = resolveGamePlan(current.gamePlan);
 	const plan = gamePlanById(gamePlan);
@@ -200,13 +202,18 @@ function playMapRound(
 			economyDiscipline: simTeams[1].details.coaching.economyDiscipline,
 		}),
 	];
-	const timeoutTeam: 0 | 1 | undefined = usedTimeout ? 0 : undefined;
-	const holders = collectTraitHolders(simTeams[0].members);
+	const holders = [
+		...collectTraitHolders(simTeams[0].members).map((row) => ({ ...row, team: 0 as const })),
+		...(bothSidesPlayer
+			? collectTraitHolders(simTeams[1].members).map((row) => ({ ...row, team: 1 as const }))
+			: []),
+	];
 	const hits = pickTraitHits(holders, rng);
+	const procTeam = hits[0]?.team ?? 0;
 	const resolved = resolveTraitRound({
 		lingering: current.lingeringBonuses,
 		hits,
-		buy: buys[0],
+		buy: buys[procTeam],
 		pistol,
 	});
 	const morale: [number, number] = [
@@ -216,6 +223,7 @@ function playMapRound(
 	const probability = roundWinProbability(simTeams, current.sides, buys, current.score, pistol, {
 		mapStyle: current.mapContext.style,
 		homePick: current.mapContext.homePick,
+		pickedBy: current.mapContext.pickedBy,
 		morale,
 		timeoutTeam,
 		pistolBias: plan.pistolBias,
@@ -228,10 +236,7 @@ function playMapRound(
 	for (const teamIndex of [0, 1] as const) {
 		for (const member of simTeams[teamIndex].members) {
 			const rolled = assignWeapon(member, buys[teamIndex], current.sides[teamIndex], rng);
-			loadouts.set(
-				member.id,
-				teamIndex === 0 && resolved.modifiers.forceAwp.has(member.id) ? "awp" : rolled,
-			);
+			loadouts.set(member.id, resolved.modifiers.forceAwp.has(member.id) ? "awp" : rolled);
 		}
 	}
 	const featuredRounds = current.highlights
@@ -258,6 +263,7 @@ function playMapRound(
 		phase: current.phase,
 		mapId: current.mapContext.mapId,
 		rng,
+		timeoutTeam,
 	});
 	const economyA = resolveEconomyRound(economies[0], buys[0], winner === 0);
 	const economyB = resolveEconomyRound(economies[1], buys[1], winner === 1);
@@ -276,8 +282,8 @@ function playMapRound(
 	});
 
 	const highlights: HighlightEvent[] = [...current.highlights];
-	if (usedTimeout) {
-		highlights.push({ type: "player-timeout", round: roundNumber, team: 0 });
+	if (usedTimeout && timeoutTeam !== undefined) {
+		highlights.push({ type: "player-timeout", round: roundNumber, team: timeoutTeam });
 	}
 	const opening = kills[0];
 	if (opening && rng.next() < 0.22) {
@@ -401,6 +407,7 @@ export function startLiveSeries(input: {
 	playerMapId?: string;
 	mapQueue?: MapContext[];
 	gamePlan?: GamePlanId;
+	bothSidesPlayer?: boolean;
 }): LiveSeriesState {
 	const seed = normalizeSeed(input.seed);
 	const rng = createRng(seed);
@@ -409,13 +416,22 @@ export function startLiveSeries(input: {
 		throw new RangeError("a series requires at least one map");
 	}
 	const first = mapQueue[0] as MapContext;
-	const current = initMap(input.teams, rng, 0, first, resolveGamePlan(input.gamePlan));
+	const bothSidesPlayer = Boolean(input.bothSidesPlayer);
+	const current = initMap(
+		input.teams,
+		rng,
+		0,
+		first,
+		resolveGamePlan(input.gamePlan),
+		bothSidesPlayer,
+	);
 	return {
 		seed,
 		rngState: rng.state,
 		format: input.format,
 		teams: input.teams,
 		playerMapId: input.playerMapId,
+		...(bothSidesPlayer ? { bothSidesPlayer: true } : {}),
 		mapQueue,
 		maps: [],
 		seriesScore: [0, 0],
@@ -502,6 +518,7 @@ export function startNextMap(
 		closed.maps.length,
 		nextContext,
 		resolveGamePlan(gamePlan),
+		Boolean(closed.bothSidesPlayer),
 	);
 	return {
 		ok: true,
@@ -525,9 +542,11 @@ export function playRound(state: LiveSeriesState): LiveSeriesResult {
 	if (current.complete) {
 		return { ok: true, value: closeMap(state, rng) };
 	}
-	current = playMapRound(current, state.teams, rng);
+	current = playMapRound(current, state.teams, rng, Boolean(state.bothSidesPlayer));
 	if (!current.complete) {
-		current = maybeQueueAutoTimeout(current, state.teams);
+		current = maybeQueueAutoTimeout(current, state.teams, {
+			bothSides: Boolean(state.bothSidesPlayer),
+		});
 	}
 	const withCurrent = attachRng(state, rng, current);
 	if (current.complete) {
@@ -610,6 +629,7 @@ export function simulateSeries(input: SimulateSeriesInput): SeriesResult {
 				format: input.format,
 				playerMapId: input.playerMapId,
 				gamePlan: input.gamePlan,
+				bothSidesPlayer: input.bothSidesPlayer,
 				mapQueue: Array.isArray(input.mapContext)
 					? [...input.mapContext]
 					: input.mapContext

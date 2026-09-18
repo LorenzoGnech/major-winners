@@ -280,6 +280,7 @@ export type LingeringBonus = {
 	bonusId: BonusId;
 	seasonId: string;
 	until: BonusLinger;
+	team?: 0 | 1;
 };
 
 export type RoundBonus = {
@@ -353,9 +354,15 @@ function applyEffectsToModifiers(
 	}
 }
 
+export type TraitHit = {
+	member: TraitHolder;
+	bonusId: BonusId;
+	team?: 0 | 1;
+};
+
 export function resolveTraitRound(input: {
 	lingering: readonly LingeringBonus[];
-	hits: readonly { member: TraitHolder; bonusId: BonusId }[];
+	hits: readonly TraitHit[];
 	buy: "pistol" | "full-buy" | "force" | "eco";
 	pistol: boolean;
 }): {
@@ -383,17 +390,20 @@ export function resolveTraitRound(input: {
 	);
 	if (procHit) {
 		const linger = bonusById(procHit.bonusId).linger;
+		const teamField = procHit.team === 1 ? ({ team: 1 } as const) : {};
 		if (linger?.type === "map") {
 			lingering.push({
 				bonusId: procHit.bonusId,
 				seasonId: procHit.member.id,
 				until: { type: "map" },
+				...teamField,
 			});
 		} else if (linger?.type === "rounds") {
 			lingering.push({
 				bonusId: procHit.bonusId,
 				seasonId: procHit.member.id,
 				until: { type: "rounds", remaining: linger.count },
+				...teamField,
 			});
 		}
 	}
@@ -411,6 +421,7 @@ export function resolveTraitRound(input: {
 		definition: BonusDefinition,
 		seasonId: string,
 		includeInstant: boolean,
+		team: 0 | 1 = 0,
 	) => {
 		applyEffectsToModifiers(definition.effects, seasonId, {
 			combatScale,
@@ -419,9 +430,10 @@ export function resolveTraitRound(input: {
 			excludeKillers,
 			forceAwp,
 		});
+		const sign = team === 1 ? -1 : 1;
 		for (const effect of definition.effects) {
 			if (effect.kind === "combat") {
-				winProb += combatWinProb(effect.scale);
+				winProb += combatWinProb(effect.scale) * sign;
 			}
 			if (effect.kind === "win-prob") {
 				const when = effect.when ?? "always";
@@ -429,21 +441,26 @@ export function resolveTraitRound(input: {
 					when === "always" ||
 					(when === "pistol" && input.pistol) ||
 					(when === "eco-force" && (input.buy === "eco" || input.buy === "force"));
-				if (matches) winProb += effect.amount;
+				if (matches) winProb += effect.amount * sign;
 			}
 			if (includeInstant && effect.kind === "morale") {
-				moraleSelf += effect.self ?? 0;
-				moraleOpponent += effect.opponent ?? 0;
+				if (team === 1) {
+					moraleSelf += effect.opponent ?? 0;
+					moraleOpponent += effect.self ?? 0;
+				} else {
+					moraleSelf += effect.self ?? 0;
+					moraleOpponent += effect.opponent ?? 0;
+				}
 			}
 		}
 	};
 
 	for (const row of lingering) {
 		const includeInstant = proc?.bonusId === row.bonusId && proc.seasonId === row.seasonId;
-		applyDefinition(bonusById(row.bonusId), row.seasonId, includeInstant);
+		applyDefinition(bonusById(row.bonusId), row.seasonId, includeInstant, row.team ?? 0);
 	}
 	if (procHit && !bonusById(procHit.bonusId).linger) {
-		applyDefinition(bonusById(procHit.bonusId), procHit.member.id, true);
+		applyDefinition(bonusById(procHit.bonusId), procHit.member.id, true, procHit.team ?? 0);
 	}
 
 	return {
@@ -478,10 +495,10 @@ export function tickLingering(lingering: readonly LingeringBonus[]): LingeringBo
 	return next;
 }
 
-export function pickTraitHits(
-	holders: readonly { member: TraitHolder; bonusId: BonusId }[],
+export function pickTraitHits<T extends { member: TraitHolder; bonusId: BonusId }>(
+	holders: readonly T[],
 	rng: { next(): number; nextInt(maxExclusive: number): number },
-): { member: TraitHolder; bonusId: BonusId }[] {
+): T[] {
 	const hits = holders.filter(() => rng.next() < TRAIT_PROC_CHANCE);
 	if (hits.length <= 1) return hits;
 	const chosen = hits[rng.nextInt(hits.length)];

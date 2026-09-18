@@ -246,6 +246,18 @@ describe("simulateSeries", () => {
 		expect(result.maps.every((map) => map.mapContext?.homePick === false)).toBe(true);
 	});
 
+	it("plays a BO5 first to three without repeating maps", () => {
+		const result = simulateSeries({
+			teams: equalTeams,
+			seed: 22,
+			format: "BO5",
+		});
+		expect(Math.max(...result.score)).toBe(3);
+		expect(result.maps.length).toBeGreaterThanOrEqual(3);
+		expect(result.maps.length).toBeLessThanOrEqual(5);
+		expect(new Set(result.maps.map((map) => map.mapContext?.mapId)).size).toBe(result.maps.length);
+	});
+
 	it("fills remaining BO3 maps from the pool without repeating the pick", () => {
 		const result = simulateSeries({
 			teams: equalTeams,
@@ -393,6 +405,14 @@ describe("roundWinProbability", () => {
 		const home = roundWinProbability(equalTeams, sides, buys, score, false, { homePick: true });
 		expect(home).toBeGreaterThan(base);
 		expect(home - base).toBeCloseTo(0.03, 3);
+	});
+
+	it("applies the same pick edge to either side", () => {
+		const base = roundWinProbability(equalTeams, sides, buys, score, false);
+		const host = roundWinProbability(equalTeams, sides, buys, score, false, { pickedBy: 0 });
+		const guest = roundWinProbability(equalTeams, sides, buys, score, false, { pickedBy: 1 });
+		expect(host - base).toBeCloseTo(0.03, 3);
+		expect(base - guest).toBeCloseTo(0.03, 3);
 	});
 
 	it("favors aimers on aim maps and IGLs on tactical maps", () => {

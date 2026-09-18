@@ -150,6 +150,15 @@ export function TournamentRun({
 			aria-label={terminal ? "Major run" : undefined}
 		>
 			{terminal ? (
+				<button
+					type="button"
+					onClick={onAbandon}
+					className="fixed top-4 right-4 z-100 border border-white/20 bg-black/55 px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-xl transition hover:border-white/50 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+				>
+					Back to Home
+				</button>
+			) : null}
+			{terminal ? (
 				<RunSummary
 					state={state}
 					playerTeam={playerTeam}
@@ -322,16 +331,18 @@ export function TournamentRun({
 				</section>
 			)}
 
-			<div className="mt-5">
-				<button
-					type="button"
-					onClick={abandon}
-					onBlur={() => setConfirmAbandon(false)}
-					className="rounded-lg border border-red-300/20 px-3 py-2 text-xs font-semibold text-red-200 transition hover:border-red-300/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
-				>
-					{confirmAbandon ? "Confirm abandon" : "Abandon run"}
-				</button>
-			</div>
+			{terminal ? null : (
+				<div className="mt-5">
+					<button
+						type="button"
+						onClick={abandon}
+						onBlur={() => setConfirmAbandon(false)}
+						className="rounded-lg border border-red-300/20 px-3 py-2 text-xs font-semibold text-red-200 transition hover:border-red-300/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
+					>
+						{confirmAbandon ? "Confirm abandon" : "Abandon run"}
+					</button>
+				</div>
+			)}
 		</section>
 	);
 }

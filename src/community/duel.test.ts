@@ -1,0 +1,72 @@
+import { describe, expect, it } from "vitest";
+import { MAP_POOL } from "../engine";
+import type { DuelRoom } from "./duel";
+import {
+	applyRoomVeto,
+	mapContextsFromRows,
+	normalizeDuelCode,
+	parseDuelCode,
+	parsePersistedDuel,
+	sideIndex,
+	vetoStateFromRoom,
+} from "./duel";
+
+function room(overrides: Partial<DuelRoom> = {}): DuelRoom {
+	return {
+		code: "K7M2QX",
+		status: "veto",
+		seriesSeed: 11,
+		side: "host",
+		hostRoster: null,
+		guestRoster: null,
+		vetoLog: [],
+		mapQueue: null,
+		...overrides,
+	};
+}
+
+describe("duel helpers", () => {
+	it("normalizes room codes", () => {
+		expect(parseDuelCode("k7m2qx")).toBe("K7M2QX");
+		expect(normalizeDuelCode("ab i o")).toBe("AB");
+		expect(parseDuelCode("short")).toBeNull();
+	});
+
+	it("applies veto turns from the room log", () => {
+		const first = applyRoomVeto(room(), "host", "mirage");
+		expect(first.ok).toBe(true);
+		if (!first.ok) return;
+		expect(first.value.actions[0]).toMatchObject({ side: 0, kind: "ban", mapId: "mirage" });
+		const guest = applyRoomVeto(room({ vetoLog: first.value.actions }), "guest", "dust2");
+		expect(guest.ok).toBe(true);
+		expect(sideIndex("guest")).toBe(1);
+	});
+
+	it("hydrates a map queue with pick sides", () => {
+		const maps = mapContextsFromRows([
+			{ mapId: "nuke", pickedBy: 0 },
+			{ mapId: "mirage", pickedBy: 1 },
+			{ mapId: "inferno" },
+		]);
+		expect(maps[0]).toMatchObject({ mapId: "nuke", pickedBy: 0, homePick: true });
+		expect(maps[1]).toMatchObject({ mapId: "mirage", pickedBy: 1, homePick: false });
+		expect(maps[2]?.pickedBy).toBeUndefined();
+		expect(MAP_POOL.some((map) => map.id === maps[2]?.mapId)).toBe(true);
+	});
+
+	it("rebuilds veto state from a room", () => {
+		const state = vetoStateFromRoom(
+			room({
+				vetoLog: [{ side: 0, kind: "ban", mapId: "mirage" }],
+			}),
+		);
+		expect(state.next).toEqual({ side: 1, kind: "ban" });
+		expect(state.remaining).not.toContain("mirage");
+	});
+
+	it("rejects a persisted duel without a secret", () => {
+		expect(
+			parsePersistedDuel(JSON.stringify({ version: 1, code: "K7M2QX", side: "host" })),
+		).toBeNull();
+	});
+});

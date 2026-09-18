@@ -14,6 +14,14 @@ import type {
 	Side,
 } from "./types";
 
+export const HOME_PICK_EDGE = 0.03;
+
+export function homePickDelta(context: { homePick?: boolean; pickedBy?: 0 | 1 }): number {
+	if (context.pickedBy === 1) return -HOME_PICK_EDGE;
+	if (context.pickedBy === 0 || context.homePick) return HOME_PICK_EDGE;
+	return 0;
+}
+
 function round(value: number, digits = 3): number {
 	const multiplier = 10 ** digits;
 	return Math.round(value * multiplier) / multiplier;
@@ -101,7 +109,7 @@ export function roundWinProbability(
 			: deficit < 0
 				? -(teams[1].details.coaching.comebackResilience - 50) * 0.00025
 				: 0;
-	const home = context.homePick ? 0.03 : 0;
+	const home = homePickDelta(context);
 	const morale =
 		context.morale !== undefined ? (context.morale[0] - context.morale[1]) * 0.0012 : 0;
 	const timeout = context.timeoutTeam === 0 ? 0.04 : context.timeoutTeam === 1 ? -0.04 : 0;

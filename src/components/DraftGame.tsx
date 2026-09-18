@@ -1,24 +1,41 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import {
 	buildCommunityOpponents,
+	clearPersistedDuel,
 	completedDraftFromSnapshot,
+	createDuel,
+	DUEL_POLL_MS,
+	DUEL_STORAGE_VERSION,
+	type DuelRoom,
+	type DuelSide,
 	fetchBestRuns,
+	fetchDuel,
 	fetchMyTeams,
 	fetchSavedTeams,
 	getSession,
 	isCommunityEnabled,
+	joinDuel,
+	liveSeriesFromDuelRoom,
+	loadPersistedDuel,
 	loadPublishedFingerprints,
 	mergeOpponentPools,
+	normalizeDuelCode,
 	onAuthChange,
+	otherSide,
 	type PublishedRunSnapshot,
 	parseAuthorName,
 	publishFinishedRun,
 	rememberPublishedFingerprint,
+	rosterForSide,
 	runFingerprint,
 	type SavedTeamSnapshot,
+	savePersistedDuel,
+	sideIndex,
 	signInWithMagicLink,
 	signOut as signOutCommunity,
 	snapshotDraftFields,
+	submitDuelRoster,
+	submitDuelVeto,
 } from "../community";
 import type { Coach, Dataset, Org, Role } from "../data";
 import { ROLES } from "../data";
@@ -38,12 +55,14 @@ import {
 	EMPTY_DAILY_STATS,
 	formatDailyShare,
 	getCompletedDraft,
+	type LiveSeriesState,
 	markDailyPlayed,
 	otherMajorAppearances,
 	ratePlayer,
 	ratePlayers,
 	recordDailyResult,
 	startDraft,
+	startNextMap,
 	summarizeTournamentRun,
 	type TeamProfile,
 	type TournamentState,
@@ -51,6 +70,7 @@ import {
 import { parseCustomSeed } from "./customSeed";
 import { LiveRoster, PlayerDraftCard, PlayerDragGhost, usePlayerDrag } from "./DraftBoard.tsx";
 import { DraftRoll, type DraftRollKind } from "./DraftRoll";
+import { DuelRoomBanner, DuelVeto } from "./DuelVeto";
 import {
 	clearDailyAttempt,
 	DAILY_ATTEMPT_STORAGE_VERSION,
@@ -65,6 +85,7 @@ import { LEGACY_MAJOR_LOGO, LEGACY_MAJOR_REEL_ID, visibleLabel } from "./draftRe
 import { HomeLogo } from "./HomeLogo";
 import { DailyStatsPanel, type HomeAction, HomeScreen, type HomeView } from "./HomeScreen";
 import { MajorCrest } from "./MajorCrest";
+import { MatchPlayback } from "./MatchPlayback";
 import { OrgCrest } from "./OrgCrest";
 import { SaveTeamPanel, saveResultMessage } from "./SaveTeam";
 import { TournamentRun } from "./TournamentRun";
@@ -77,7 +98,7 @@ import {
 } from "./tournamentPersistence";
 
 const INITIAL_SEED = 0x4d_41_4a_4f;
-type GameMode = "daily" | "free" | "community";
+type GameMode = "daily" | "free" | "community" | "duel";
 
 function persistKey(mode: GameMode | null): string | null {
 	if (mode === "free") return TOURNAMENT_STORAGE_KEY;
@@ -378,6 +399,16 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [hasDailyAttempt, setHasDailyAttempt] = useState(false);
 	const [hasFreePlaySave, setHasFreePlaySave] = useState(false);
 	const [hasCommunitySave, setHasCommunitySave] = useState(false);
+	const [hasDuelSave, setHasDuelSave] = useState(false);
+	const [duelCode, setDuelCode] = useState("");
+	const [duelSecret, setDuelSecret] = useState("");
+	const [duelSide, setDuelSide] = useState<DuelSide>("host");
+	const [duelRoom, setDuelRoom] = useState<DuelRoom | null>(null);
+	const [duelLive, setDuelLive] = useState<LiveSeriesState | null>(null);
+	const [joinCode, setJoinCode] = useState("");
+	const [joinError, setJoinError] = useState<string | null>(null);
+	const [duelBusy, setDuelBusy] = useState(false);
+	const [duelError, setDuelError] = useState<string | null>(null);
 	const [pendingRestart, setPendingRestart] = useState(false);
 	const [rollKind, setRollKind] = useState<DraftRollKind>("full");
 	const [settledCardKey, setSettledCardKey] = useState<string | null>(null);
@@ -454,6 +485,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					),
 				),
 			);
+			setHasDuelSave(Boolean(loadPersistedDuel(window.localStorage)));
 			setSavedFingerprints(loadPublishedFingerprints(window.localStorage));
 		} catch {
 			// Storage may be unavailable in privacy-restricted browser contexts.
@@ -588,15 +620,114 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		beginPersistedMode("free", options);
 	}
 
+	function applyDuelClaim(code: string, secret: string, side: DuelSide, room: DuelRoom) {
+		setDuelCode(code);
+		setDuelSecret(secret);
+		setDuelSide(side);
+		setDuelRoom(room);
+		setDuelError(null);
+	}
+
+	function resetDuelLocal() {
+		setDuelCode("");
+		setDuelSecret("");
+		setDuelSide("host");
+		setDuelRoom(null);
+		setDuelLive(null);
+		setDuelError(null);
+		try {
+			clearPersistedDuel(window.localStorage);
+		} catch {
+			// In-memory duel state is authoritative.
+		}
+	}
+
+	async function beginDuel(options: { restore?: boolean } = {}) {
+		setError(null);
+		setPendingRestart(false);
+		setDuelError(null);
+		setJoinError(null);
+		if (options.restore) {
+			const persisted = loadPersistedDuel(window.localStorage);
+			if (persisted) {
+				const fetched = await fetchDuel(persisted.code, persisted.secret);
+				if (fetched.ok) {
+					applyDuelClaim(persisted.code, persisted.secret, persisted.side, fetched.value);
+					setTeamName(persisted.teamName ?? DEFAULT_TEAM_NAME);
+					setNameDraft(
+						persisted.teamName && persisted.teamName !== DEFAULT_TEAM_NAME
+							? persisted.teamName
+							: "",
+					);
+					if (persisted.draft) {
+						setState(persisted.draft);
+						setSettledCardKey(revealKey(persisted.draft));
+					} else {
+						setState(startDraft(dataset, freePlaySeed()));
+						setSettledCardKey(null);
+					}
+					setRollKind("full");
+					setTournament(null);
+					setDuelLive(
+						persisted.liveSeries ?? liveSeriesFromDuelRoom(fetched.value, dataset, ratedPlayers),
+					);
+					setMode("duel");
+					return;
+				}
+			}
+		}
+		setDuelBusy(true);
+		const created = await createDuel();
+		setDuelBusy(false);
+		if (!created.ok) {
+			setDuelError(created.error);
+			return;
+		}
+		applyDuelClaim(
+			created.value.code,
+			created.value.secret,
+			created.value.side,
+			created.value.room,
+		);
+		setTeamName(DEFAULT_TEAM_NAME);
+		setNameDraft("");
+		setNameError(null);
+		setState(startDraft(dataset, freePlaySeed()));
+		setRollKind("full");
+		setSettledCardKey(null);
+		setTournament(null);
+		setDuelLive(null);
+		setMode("duel");
+	}
+
+	async function confirmJoinDuel() {
+		const code = normalizeDuelCode(joinCode);
+		setJoinError(null);
+		setDuelBusy(true);
+		const joined = await joinDuel(code);
+		setDuelBusy(false);
+		if (!joined.ok) {
+			setJoinError(joined.error);
+			return;
+		}
+		applyDuelClaim(joined.value.code, joined.value.secret, joined.value.side, joined.value.room);
+		setTeamName(DEFAULT_TEAM_NAME);
+		setNameDraft("");
+		setNameError(null);
+		setState(startDraft(dataset, freePlaySeed()));
+		setRollKind("full");
+		setSettledCardKey(null);
+		setTournament(null);
+		setDuelLive(null);
+		setMode("duel");
+		setHomeView("menu");
+	}
+
 	function chooseHomeAction(action: HomeAction) {
 		setNameError(null);
 		setSeedError(null);
 		setAuthError(null);
 		setAuthMessage(null);
-		if (action === "stats") {
-			setHomeView("stats");
-			return;
-		}
 		if (action === "daily") {
 			beginDaily();
 			return;
@@ -607,6 +738,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		}
 		if (action === "community") {
 			beginPersistedMode("community", { restore: hasCommunitySave });
+			return;
+		}
+		if (action === "duel") {
+			void beginDuel({ restore: hasDuelSave && homeView === "community" });
 			return;
 		}
 		setHomeView(action);
@@ -707,6 +842,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					),
 				),
 			);
+			setHasDuelSave(Boolean(loadPersistedDuel(window.localStorage)));
 		} catch {
 			// Storage may be unavailable in privacy-restricted browser contexts.
 		}
@@ -715,6 +851,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	function clearSavedRun() {
 		try {
 			if (mode === "daily") clearDailyAttempt(window.localStorage);
+			else if (mode === "duel") clearPersistedDuel(window.localStorage);
 			else {
 				const key = persistKey(mode);
 				if (key) window.localStorage.removeItem(key);
@@ -746,6 +883,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setTournament(null);
 		setError(null);
 		setPendingRestart(false);
+		if (mode === "duel") resetDuelLocal();
 		clearSavedRun();
 		goHome();
 	}
@@ -848,6 +986,49 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		);
 	}
 
+	async function lockDuelRoster() {
+		if (!completedDraft || mode !== "duel" || !duelCode || !duelSecret) return;
+		const name = parseTeamName(nameDraft);
+		if (!name) {
+			setNameError("Name your team to lock in.");
+			return;
+		}
+		setTeamName(name);
+		setNameError(null);
+		setDuelBusy(true);
+		setDuelError(null);
+		const fields = snapshotDraftFields(completedDraft);
+		const result = await submitDuelRoster(duelCode, duelSecret, {
+			...fields,
+			teamName: name,
+		});
+		setDuelBusy(false);
+		if (!result.ok) {
+			setDuelError(result.error);
+			return;
+		}
+		setDuelRoom(result.value);
+		if (result.value.status === "playing") {
+			setDuelLive(liveSeriesFromDuelRoom(result.value, dataset, ratedPlayers));
+		}
+	}
+
+	async function sendDuelVeto(mapId: string) {
+		if (!duelCode || !duelSecret) return;
+		setDuelBusy(true);
+		setDuelError(null);
+		const result = await submitDuelVeto(duelCode, duelSecret, mapId);
+		setDuelBusy(false);
+		if (!result.ok) {
+			setDuelError(result.error);
+			return;
+		}
+		setDuelRoom(result.value);
+		if (result.value.status === "playing" && !duelLive) {
+			setDuelLive(liveSeriesFromDuelRoom(result.value, dataset, ratedPlayers));
+		}
+	}
+
 	useEffect(() => {
 		const key = persistKey(mode);
 		if (!key || !tournament || !completedDraft) return;
@@ -866,6 +1047,45 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			// The run remains playable if storage is unavailable or full.
 		}
 	}, [completedDraft, mode, teamName, tournament]);
+	useEffect(() => {
+		if (mode !== "duel" || !duelCode || !duelSecret) return;
+		try {
+			savePersistedDuel(window.localStorage, {
+				version: DUEL_STORAGE_VERSION,
+				code: duelCode,
+				secret: duelSecret,
+				side: duelSide,
+				draft: state,
+				teamName,
+				...(duelLive ? { liveSeries: duelLive } : {}),
+			});
+			setHasDuelSave(true);
+		} catch {
+			// The room remains playable if storage is unavailable.
+		}
+	}, [duelCode, duelLive, duelSecret, duelSide, mode, state, teamName]);
+	useEffect(() => {
+		if (mode !== "duel" || !duelCode || !duelSecret) return;
+		let cancelled = false;
+		const tick = async () => {
+			const result = await fetchDuel(duelCode, duelSecret);
+			if (cancelled || !result.ok) return;
+			setDuelRoom(result.value);
+			if (result.value.status === "playing") {
+				setDuelLive(
+					(current) => current ?? liveSeriesFromDuelRoom(result.value, dataset, ratedPlayers),
+				);
+			}
+		};
+		void tick();
+		const timer = window.setInterval(() => {
+			void tick();
+		}, DUEL_POLL_MS);
+		return () => {
+			cancelled = true;
+			window.clearInterval(timer);
+		};
+	}, [dataset, duelCode, duelSecret, mode, ratedPlayers]);
 	useEffect(() => {
 		if (mode !== "daily") return;
 		try {
@@ -897,11 +1117,12 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		tournament && teamProfile && tournament.status !== "active"
 			? summarizeTournamentRun(tournament, teamProfile)
 			: null;
+	const publishMode = mode === "duel" ? null : mode;
 	const publishFingerprint =
-		completedDraft && runSummary && mode
+		completedDraft && runSummary && publishMode
 			? runFingerprint({
 					...snapshotDraftFields(completedDraft),
-					mode,
+					mode: publishMode,
 					wins: runSummary.wins,
 					losses: runSummary.losses,
 					mapsWon: runSummary.mapsWon,
@@ -913,14 +1134,14 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const alreadySaved = Boolean(publishFingerprint && savedFingerprints.has(publishFingerprint));
 
 	async function saveFinishedTeam(authorName: string) {
-		if (!completedDraft || !runSummary || !mode || !communityEnabled) return;
+		if (!completedDraft || !runSummary || !publishMode || !communityEnabled) return;
 		setSaveBusy(true);
 		setSaveError(null);
 		setSaveMessage(null);
 		const result = await publishFinishedRun({
 			authorName: parseAuthorName(authorName),
 			teamName,
-			mode,
+			mode: publishMode,
 			draft: completedDraft,
 			summary: runSummary,
 			userId,
@@ -941,7 +1162,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		void fetchSavedTeams().then(setCommunityTeams);
 		if (userId) void fetchMyTeams(userId).then(setMyTeams);
 	}
-	const simulating = Boolean(!pendingRestart && tournament && teamProfile);
+	const simulating = Boolean(
+		!pendingRestart && ((tournament && teamProfile) || (mode === "duel" && duelLive)),
+	);
 	const seedLabel =
 		mode === "daily" ? `${identity.id} · UTC seed ${state.seed}` : `Seed ${state.seed}`;
 	const draggingPlayer = drag ? playersById.get(drag.playerId) : undefined;
@@ -963,7 +1186,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			return [];
 		},
 	};
-	const showSideRoster = Boolean(!simulating && state.phase.type !== "player");
+	const duelOwnRoster = duelRoom ? rosterForSide(duelRoom, duelSide) : null;
+	const duelLocked = mode === "duel" && Boolean(duelOwnRoster);
+	const showDuelVeto = mode === "duel" && duelRoom?.status === "veto";
+	const showDuelMatch = mode === "duel" && Boolean(duelLive);
+	const showSideRoster = Boolean(
+		!simulating && !showDuelVeto && !showDuelMatch && state.phase.type !== "player",
+	);
 	if (mode === null) {
 		return (
 			<HomeScreen
@@ -976,6 +1205,16 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				community={{
 					enabled: communityEnabled,
 					hasSave: hasCommunitySave,
+					hasDuelSave,
+					joinCode,
+					joinError,
+					onJoinCode: (value) => {
+						setJoinCode(normalizeDuelCode(value));
+						setJoinError(null);
+					},
+					onJoinDuel: () => {
+						void confirmJoinDuel();
+					},
 					userEmail,
 					authBusy,
 					authMessage,
@@ -1022,7 +1261,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								? `Today’s Challenge · ${identity.day} UTC · ${identity.id}`
 								: mode === "community"
 									? "Versus community"
-									: "Free Play"}
+									: mode === "duel"
+										? `Private match · ${duelCode || "lobby"}`
+										: "Free Play"}
 						</p>
 						<h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 							{teamName}
@@ -1031,7 +1272,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
 						</p>
 					</div>
-					{!tournament && !pendingRestart && (
+					{!tournament && !duelLocked && !duelLive && !pendingRestart && (
 						<button
 							type="button"
 							onClick={requestNewDraft}
@@ -1041,6 +1282,25 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						</button>
 					)}
 				</header>
+
+				{mode === "duel" && duelCode && !showDuelMatch ? (
+					<DuelRoomBanner
+						code={duelCode}
+						detail={
+							duelRoom?.status === "open"
+								? "Share this code. Draft while you wait for your opponent."
+								: duelRoom?.status === "veto"
+									? "Both rosters are in. Ban four maps, then pick four."
+									: duelLocked
+										? `Locked in. Waiting for ${
+												(duelRoom
+													? rosterForSide(duelRoom, otherSide(duelSide))?.teamName
+													: null) ?? "your opponent"
+											}.`
+										: "Draft five players and a coach, then lock in."
+						}
+					/>
+				) : null}
 
 				<div
 					className={`mt-6 grid gap-5 ${showSideRoster ? "lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start" : ""}`}
@@ -1290,8 +1550,51 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							</section>
 						)}
 
+						{!pendingRestart && showDuelVeto && duelRoom ? (
+							<DuelVeto
+								room={duelRoom}
+								side={duelSide}
+								busy={duelBusy}
+								error={duelError}
+								onPick={(mapId) => {
+									void sendDuelVeto(mapId);
+								}}
+							/>
+						) : null}
+
+						{!pendingRestart && showDuelMatch && duelLive && duelRoom ? (
+							<div>
+								<MatchPlayback
+									live={duelLive}
+									onLiveChange={setDuelLive}
+									viewerSide={sideIndex(duelSide)}
+									teamLabels={[
+										duelRoom.hostRoster?.teamName ?? "Host",
+										duelRoom.guestRoster?.teamName ?? "Guest",
+									]}
+									playersById={playersById}
+									eyebrow="Private match · BO5"
+									onAwaitingNextMap={() => {
+										const started = startNextMap(duelLive);
+										if (started.ok) setDuelLive(started.value);
+									}}
+								/>
+								<div className="mt-4 flex justify-center">
+									<button
+										type="button"
+										onClick={abandonRun}
+										className="rounded-lg border border-white/15 px-4 py-2.5 text-sm font-semibold text-zinc-200"
+									>
+										Leave match
+									</button>
+								</div>
+							</div>
+						) : null}
+
 						{!pendingRestart &&
 							!tournament &&
+							!showDuelVeto &&
+							!showDuelMatch &&
 							state.phase.type === "complete" &&
 							chosenCoach &&
 							teamProfile && (
@@ -1326,21 +1629,41 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										/>
 									</div>
 									<div className="mt-5 flex flex-wrap gap-2">
-										<button
-											type="button"
-											onClick={startMajor}
-											className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-										>
-											Start Major run
-										</button>
-										<button
-											type="button"
-											onClick={requestNewDraft}
-											className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-										>
-											Start another draft
-										</button>
+										{mode === "duel" ? (
+											<button
+												type="button"
+												onClick={() => {
+													void lockDuelRoster();
+												}}
+												disabled={duelBusy || duelLocked}
+												className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+											>
+												{duelBusy ? "Locking in…" : duelLocked ? "Locked in" : "Lock in for veto"}
+											</button>
+										) : (
+											<button
+												type="button"
+												onClick={startMajor}
+												className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+											>
+												Start Major run
+											</button>
+										)}
+										{!duelLocked ? (
+											<button
+												type="button"
+												onClick={requestNewDraft}
+												className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+											>
+												Start another draft
+											</button>
+										) : null}
 									</div>
+									{duelError ? (
+										<p role="alert" className="mt-3 text-sm text-red-200">
+											{duelError}
+										</p>
+									) : null}
 								</section>
 							)}
 

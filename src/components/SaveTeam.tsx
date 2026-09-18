@@ -36,7 +36,7 @@ export function SaveTeamPanel({
 				<p className="text-sm font-semibold text-emerald-100">Team saved</p>
 				<p className="mt-1 text-sm text-zinc-400">
 					{savedName} is on the public boards
-					{signedIn ? " and in My teams." : "."}
+					{signedIn ? " and in My profile." : "."}
 				</p>
 			</div>
 		);

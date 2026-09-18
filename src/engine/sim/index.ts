@@ -46,8 +46,10 @@ export {
 	MAP_POOL,
 	type MapStyle,
 	mapContextFrom,
+	mapsForFormat,
 	type SimMap,
 	type SimMapId,
+	winsNeeded,
 } from "./maps";
 export {
 	applyTimeoutMorale,
@@ -59,6 +61,8 @@ export {
 } from "./morale";
 export { chooseRoundSummary, formatRoundSummary, resolveRoundSummary } from "./roundSummary";
 export {
+	HOME_PICK_EDGE,
+	homePickDelta,
 	partialMapResult,
 	playbackMaps,
 	roundWinProbability,
@@ -97,6 +101,19 @@ export type {
 	SimulateSeriesInput,
 	WeaponId,
 } from "./types";
+export {
+	applyVetoAction,
+	DUEL_VETO_STEPS,
+	emptyVeto,
+	mapQueueFromVeto,
+	type VetoAction,
+	type VetoErrorCode,
+	type VetoKind,
+	type VetoResult,
+	type VetoState,
+	type VetoStep,
+	vetoFromActions,
+} from "./veto";
 export {
 	assignWeapon,
 	isWeaponLegalForBuy,

@@ -47,6 +47,7 @@ type MatchPlaybackProps = {
 	live?: LiveSeriesState;
 	onLiveChange?: (live: LiveSeriesState) => void;
 	teamLabels: readonly [string, string];
+	viewerSide?: 0 | 1;
 	opponentOrg?: Pick<Org, "id" | "name" | "logo">;
 	playersById?: ReadonlyMap<string, PlayerSeason>;
 	eyebrow?: string;
@@ -67,6 +68,30 @@ const SPEED_BUTTON_CLASS =
 	"min-w-11 flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300";
 
 const TEAM_TEXT = ["text-emerald-300", "text-amber-300"] as const;
+
+function otherSideIndex(side: 0 | 1): 0 | 1 {
+	return side === 0 ? 1 : 0;
+}
+
+function pairFromViewer<T>(pair: readonly [T, T], viewer: 0 | 1): [T, T] {
+	return viewer === 0 ? [pair[0], pair[1]] : [pair[1], pair[0]];
+}
+
+function viewOf(team: 0 | 1, viewer: 0 | 1): 0 | 1 {
+	return team === viewer ? 0 : 1;
+}
+
+function mapPickCaption(
+	context: { homePick?: boolean; pickedBy?: 0 | 1 } | undefined,
+	viewer: 0 | 1,
+	labels: readonly [string, string],
+): string {
+	if (!context) return "";
+	if (context.pickedBy === viewer) return " · your pick";
+	if (context.pickedBy !== undefined) return ` · ${labels[context.pickedBy]} pick`;
+	if (context.homePick) return viewer === 0 ? " · your pick" : ` · ${labels[0]} pick`;
+	return "";
+}
 const FEED_BOX_CLASS = "flex h-44 flex-col overflow-hidden";
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -470,18 +495,26 @@ function playerName(result: SeriesResult, playerId: string): string {
 	return playerId;
 }
 
-function KillFeedLine({ kill, result }: { kill: KillEvent; result: SeriesResult }) {
+function KillFeedLine({
+	kill,
+	result,
+	viewerSide,
+}: {
+	kill: KillEvent;
+	result: SeriesResult;
+	viewerSide: 0 | 1;
+}) {
 	const killer = playerName(result, kill.killerId);
 	const victim = playerName(result, kill.victimId);
 	const assist = kill.assisterId ? playerName(result, kill.assisterId) : null;
+	const killerTone = TEAM_TEXT[viewOf(kill.killerTeam, viewerSide)];
+	const victimTone = TEAM_TEXT[viewOf(kill.victimTeam, viewerSide)];
 	return (
 		<span className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-zinc-300">
-			<span className={`font-medium ${TEAM_TEXT[kill.killerTeam]}`}>{killer}</span>
-			{assist ? (
-				<span className={`text-[0.95em] ${TEAM_TEXT[kill.killerTeam]} opacity-70`}>+ {assist}</span>
-			) : null}
-			<WeaponIcon weapon={kill.weapon} className={TEAM_TEXT[kill.killerTeam]} />
-			<span className={TEAM_TEXT[kill.victimTeam]}>{victim}</span>
+			<span className={`font-medium ${killerTone}`}>{killer}</span>
+			{assist ? <span className={`text-[0.95em] ${killerTone} opacity-70`}>+ {assist}</span> : null}
+			<WeaponIcon weapon={kill.weapon} className={killerTone} />
+			<span className={victimTone}>{victim}</span>
 		</span>
 	);
 }
@@ -737,12 +770,14 @@ function RoundFeedItem({
 	settled,
 	result,
 	shortLabels,
+	viewerSide,
 }: {
 	round: RoundResult;
 	kills: readonly KillEvent[];
 	settled: boolean;
 	result: SeriesResult;
 	shortLabels: readonly [string, string];
+	viewerSide: 0 | 1;
 }) {
 	return (
 		<li
@@ -768,7 +803,7 @@ function RoundFeedItem({
 						className="feed-stack-in"
 					>
 						<div className="feed-stack-in-inner">
-							<KillFeedLine kill={kill} result={result} />
+							<KillFeedLine kill={kill} result={result} viewerSide={viewerSide} />
 						</div>
 					</li>
 				))}
@@ -952,6 +987,7 @@ export function MatchPlayback({
 	live,
 	onLiveChange,
 	teamLabels,
+	viewerSide = 0,
 	opponentOrg,
 	playersById,
 	eyebrow,
@@ -960,7 +996,10 @@ export function MatchPlayback({
 	onContinueMatch,
 }: MatchPlaybackProps) {
 	const result = live ? seriesFromLive(live) : completedResult;
-	const shortLabels = [teamLabels[0], opponentOrg?.name ?? teamLabels[1]] as const;
+	const opponent = otherSideIndex(viewerSide);
+	const simLabels = [teamLabels[0], opponentOrg?.name ?? teamLabels[1]] as const;
+	const viewLabels = pairFromViewer(simLabels, viewerSide);
+	const shortLabels = simLabels;
 	const maps = result?.maps ?? [];
 	const playbackTicks = useMemo(() => buildPlaybackTicks(maps), [maps]);
 	const mapArt = useMemo(() => {
@@ -1098,7 +1137,7 @@ export function MatchPlayback({
 		? (maps[cursor.mapIndex] ?? maps[0])?.highlights.find(
 				(highlight) =>
 					highlight.type === "clutch-sequence" &&
-					highlight.team === 0 &&
+					highlight.team === viewerSide &&
 					highlight.round === cursor.inProgressRound?.round,
 			)
 		: undefined;
@@ -1305,15 +1344,17 @@ export function MatchPlayback({
 			: undefined,
 	);
 	const momentClutch =
-		featuredClutch && featuredClutch.type === "clutch-sequence" && featuredClutch.team === 0
+		featuredClutch &&
+		featuredClutch.type === "clutch-sequence" &&
+		featuredClutch.team === viewerSide
 			? featuredClutch
 			: undefined;
 	const clutcher = momentClutch
-		? result.teams[0].members.find((member) => member.id === momentClutch.playerId)
+		? result.teams[viewerSide].members.find((member) => member.id === momentClutch.playerId)
 		: undefined;
 	const momentOpponents = momentClutch
 		? clutchOpponents(
-				result.teams[1].members,
+				result.teams[opponent].members,
 				cursor.inProgressRound?.kills ?? [],
 				momentClutch.startKillIndex,
 				cursor.inProgressKills.length,
@@ -1324,7 +1365,7 @@ export function MatchPlayback({
 			? clutchMomentLines({
 					player: clutcher.nick,
 					playerId: clutcher.id,
-					clutchTeam: 0,
+					clutchTeam: viewerSide,
 					against: momentClutch.against,
 					won: momentClutch.won,
 					startKillIndex: momentClutch.startKillIndex,
@@ -1383,7 +1424,19 @@ export function MatchPlayback({
 	const background =
 		getMap(activeMap.mapContext?.mapId ?? "")?.background ?? activeMap.mapContext?.background;
 	const roundWinner = settleWinner(maps, playbackTicks, revealedCount);
-	const settleSide = roundWinner === 0 ? "player" : roundWinner === 1 ? "opponent" : undefined;
+	const settleSide =
+		roundWinner === undefined
+			? undefined
+			: viewOf(roundWinner, viewerSide) === 0
+				? "player"
+				: "opponent";
+	const displayScore = pairFromViewer(cursor.score, viewerSide);
+	const displaySeries = pairFromViewer(cursor.seriesScore, viewerSide);
+	const displayMorale = pairFromViewer(morale, viewerSide);
+	const displayRoundValues = pairFromViewer(roundValues, viewerSide);
+	const displayTotals = pairFromViewer(totals, viewerSide);
+	const displayBuys = pairFromViewer(buys, viewerSide);
+	const timeoutTeam = live?.current?.pendingTimeoutTeam ?? 0;
 
 	return (
 		<section
@@ -1401,11 +1454,11 @@ export function MatchPlayback({
 		>
 			{mapWinMoment ? (
 				<MapWinMoment
-					playerWon={mapWinMoment.winner === 0}
+					playerWon={mapWinMoment.winner === viewerSide}
 					winnerLabel={shortLabels[mapWinMoment.winner]}
 					mapLabel={mapWinMoment.label}
-					score={mapWinMoment.score}
-					seriesScore={cursor.seriesScore}
+					score={pairFromViewer(mapWinMoment.score, viewerSide)}
+					seriesScore={displaySeries}
 					footer={
 						<button
 							type="button"
@@ -1420,9 +1473,9 @@ export function MatchPlayback({
 
 			{timeoutMoment && live?.current ? (
 				<TimeoutMoment
-					teamLabel={shortLabels[0]}
-					coachNick={result.teams[0].coach.nick}
-					members={result.teams[0].members}
+					teamLabel={shortLabels[timeoutTeam]}
+					coachNick={result.teams[timeoutTeam].coach.nick}
+					members={result.teams[timeoutTeam].members}
 					crestFor={(member) => crestFor(member, playersById)}
 					moraleGain={TIMEOUT_MORALE}
 					footer={
@@ -1437,9 +1490,10 @@ export function MatchPlayback({
 				<BonusMoment
 					trait={bonusById(upcomingBonus.round.bonus.bonusId)}
 					player={crestFor(
-						result.teams[0].members.find(
-							(member) => member.id === upcomingBonus.round.bonus?.seasonId,
-						) ?? result.teams[0].members[0],
+						result.teams
+							.flatMap((team) => team.members)
+							.find((member) => member.id === upcomingBonus.round.bonus?.seasonId) ??
+							result.teams[viewerSide].members[0],
 						playersById,
 					)}
 				/>
@@ -1480,11 +1534,11 @@ export function MatchPlayback({
 					{headingEyebrow}
 				</p>
 				<h3 id="match-heading" className="mt-1 text-xl font-semibold tracking-tight text-white">
-					{shortLabels[0]} <span className="text-zinc-600">vs</span> {shortLabels[1]}
+					{viewLabels[0]} <span className="text-zinc-600">vs</span> {viewLabels[1]}
 				</h3>
 				<p className="mt-1 text-xs text-zinc-500">
-					Series {cursor.seriesScore[0]}–{cursor.seriesScore[1]} · {activeMap.label}
-					{activeMap.mapContext?.homePick ? " · home pick" : ""}
+					Series {displaySeries[0]}–{displaySeries[1]} · {activeMap.label}
+					{mapPickCaption(activeMap.mapContext, viewerSide, simLabels)}
 					{activeMap.overtimeBlocks > 0 ? ` · ${activeMap.overtimeBlocks}× OT` : ""}
 				</p>
 			</div>
@@ -1493,11 +1547,11 @@ export function MatchPlayback({
 				<div className="max-lg:order-2">
 					<TeamLineup
 						align="left"
-						label={teamLabels[0]}
-						members={result.teams[0].members}
-						coachNick={result.teams[0].coach.nick}
-						overall={result.teams[0].overall}
-						side={currentSides?.[0]}
+						label={viewLabels[0]}
+						members={result.teams[viewerSide].members}
+						coachNick={result.teams[viewerSide].coach.nick}
+						overall={result.teams[viewerSide].overall}
+						side={currentSides?.[viewerSide]}
 						stats={stats}
 						involvedIds={involvedIds}
 						deadIds={boardDeadIds}
@@ -1524,7 +1578,7 @@ export function MatchPlayback({
 								/>
 							) : null}
 							<strong className="relative text-5xl tabular-nums text-emerald-300 sm:text-6xl">
-								{cursor.score[0]}
+								{displayScore[0]}
 							</strong>
 						</span>
 						<span className="text-2xl text-zinc-700">:</span>
@@ -1541,7 +1595,7 @@ export function MatchPlayback({
 								/>
 							) : null}
 							<strong className="relative text-5xl tabular-nums text-amber-300 sm:text-6xl">
-								{cursor.score[1]}
+								{displayScore[1]}
 							</strong>
 						</span>
 					</section>
@@ -1552,14 +1606,19 @@ export function MatchPlayback({
 						teamLabels={shortLabels}
 					/>
 
-					<EconomyBars roundValues={roundValues} totals={totals} buys={buys} labels={shortLabels} />
+					<EconomyBars
+						roundValues={displayRoundValues}
+						totals={displayTotals}
+						buys={displayBuys}
+						labels={viewLabels}
+					/>
 					<MoraleBars
-						values={morale}
-						labels={shortLabels}
+						values={displayMorale}
+						labels={viewLabels}
 						boosted={timeoutBoostVisible(
 							caughtUp,
-							Boolean(live?.current?.pendingTimeout),
-							timeoutMoment,
+							Boolean(live?.current?.pendingTimeout && timeoutTeam === viewerSide),
+							timeoutMoment && timeoutTeam === viewerSide,
 						)}
 					/>
 
@@ -1642,6 +1701,7 @@ export function MatchPlayback({
 										settled={feed.settled}
 										result={result}
 										shortLabels={shortLabels}
+										viewerSide={viewerSide}
 									/>
 								</ol>
 							) : (
@@ -1659,12 +1719,12 @@ export function MatchPlayback({
 				<div className="max-lg:order-3">
 					<TeamLineup
 						align="right"
-						label={teamLabels[1]}
-						members={result.teams[1].members}
-						coachNick={result.teams[1].coach.nick}
-						overall={result.teams[1].overall}
-						org={opponentOrg}
-						side={currentSides?.[1]}
+						label={viewLabels[1]}
+						members={result.teams[opponent].members}
+						coachNick={result.teams[opponent].coach.nick}
+						overall={result.teams[opponent].overall}
+						org={viewerSide === 0 ? opponentOrg : undefined}
+						side={currentSides?.[opponent]}
 						stats={stats}
 						involvedIds={involvedIds}
 						deadIds={boardDeadIds}
@@ -1679,7 +1739,8 @@ export function MatchPlayback({
 						Final result
 					</p>
 					<h4 className="mt-1 text-2xl font-semibold text-white">
-						{shortLabels[result.winner]} win {result.score[0]}–{result.score[1]}
+						{viewLabels[viewOf(result.winner, viewerSide)]} win{" "}
+						{pairFromViewer(result.score, viewerSide).join("–")}
 					</h4>
 					{result.maps.length > 1 ? (
 						<p className="mt-1 text-sm text-zinc-500">

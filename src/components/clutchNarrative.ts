@@ -38,6 +38,8 @@ export function isCrucialRound({
 	if (before[0] >= 12 || before[1] >= 12) return true;
 	if (format === "BO3" && mapIndex >= 2) return true;
 	if (format === "BO3" && seriesScore[0] === 1 && seriesScore[1] === 1) return true;
+	if (format === "BO5" && mapIndex >= 4) return true;
+	if (format === "BO5" && Math.max(seriesScore[0], seriesScore[1]) >= 2) return true;
 	return false;
 }
 

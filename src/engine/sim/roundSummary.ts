@@ -43,6 +43,7 @@ export function chooseRoundSummary({
 	phase,
 	mapId,
 	rng,
+	timeoutTeam = 0,
 }: {
 	winner: 0 | 1;
 	sides: readonly [Side, Side];
@@ -54,6 +55,7 @@ export function chooseRoundSummary({
 	phase: "regulation" | "overtime";
 	mapId: string;
 	rng: Rng;
+	timeoutTeam?: 0 | 1;
 }): RoundSummary {
 	const loser = winner === 0 ? 1 : 0;
 	const winnerBuy = buys[winner];
@@ -82,7 +84,7 @@ export function chooseRoundSummary({
 	if (top && (top.count === 3 || top.count === 4)) {
 		return { kind: "multikill", team: winner, playerId: top.playerId, kills: top.count };
 	}
-	if (timeout && winner === 0) {
+	if (timeout && winner === timeoutTeam) {
 		return { kind: "timeout-payoff", team: winner };
 	}
 	if (pistol) {

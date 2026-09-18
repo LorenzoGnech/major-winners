@@ -52,23 +52,36 @@ export function getMap(id: string): SimMap | undefined {
 	return MAP_BY_ID.get(id as SimMapId);
 }
 
-export function mapContextFrom(map: SimMap, homePick: boolean): MapContext {
+export function mapContextFrom(map: SimMap, homePick: boolean, pickedBy?: 0 | 1): MapContext {
 	return {
 		mapId: map.id,
 		label: map.label,
 		homePick,
 		style: map.style,
 		background: map.background,
+		...(pickedBy !== undefined ? { pickedBy } : {}),
 	};
 }
 
-/** Optional player pick is map 1 with a home bonus. Otherwise the series is a seed shuffle with no home map. Remaining BO3 maps are without replacement. */
+export function mapsForFormat(format: SeriesFormat): number {
+	if (format === "BO1") return 1;
+	if (format === "BO5") return 5;
+	return 3;
+}
+
+export function winsNeeded(format: SeriesFormat): number {
+	if (format === "BO1") return 1;
+	if (format === "BO5") return 3;
+	return 2;
+}
+
+/** Optional player pick is map 1 with a home bonus. Otherwise the series is a seed shuffle with no home map. Remaining maps are without replacement. */
 export function chooseSeriesMaps(
 	rng: Rng,
 	format: SeriesFormat,
 	playerMapId?: string,
 ): MapContext[] {
-	const count = format === "BO1" ? 1 : 3;
+	const count = mapsForFormat(format);
 	if (playerMapId) {
 		const picked = getMap(playerMapId);
 		if (!picked) {

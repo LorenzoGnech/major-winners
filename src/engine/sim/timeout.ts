@@ -101,43 +101,70 @@ export function shouldCallTimeout(ctx: TimeoutCallContext): boolean {
 export function timeoutContextFromMap(
 	current: LiveMapState,
 	teams: readonly [TeamProfile, TeamProfile],
+	side: 0 | 1 = 0,
 ): TimeoutCallContext {
 	const upcomingRound = current.rounds.length + 1;
 	const pistol = current.phase === "regulation" && (upcomingRound === 1 || upcomingRound === 13);
 	const planned = applyGamePlan(teams[0], resolveGamePlan(current.gamePlan));
-	const ourBuy = chooseBuy(current.economies[0], {
+	const simTeams = [planned, teams[1]] as const;
+	const them: 0 | 1 = side === 0 ? 1 : 0;
+	const ourBuy = chooseBuy(current.economies[side], {
 		pistol,
-		economyDiscipline: planned.details.coaching.economyDiscipline,
+		economyDiscipline: simTeams[side].details.coaching.economyDiscipline,
 	});
-	const theirBuy = chooseBuy(current.economies[1], {
+	const theirBuy = chooseBuy(current.economies[them], {
 		pistol,
-		economyDiscipline: teams[1].details.coaching.economyDiscipline,
+		economyDiscipline: simTeams[them].details.coaching.economyDiscipline,
 	});
+	const score: readonly [number, number] =
+		side === 0 ? current.score : [current.score[1], current.score[0]];
+	const winners =
+		side === 0
+			? current.rounds.map((round) => round.winner)
+			: current.rounds.map((round) => (round.winner === 0 ? 1 : 0));
 	return {
-		score: current.score,
+		score,
 		phase: current.phase,
 		upcomingRound,
-		winners: current.rounds.map((round) => round.winner),
-		morale: current.morale[0],
+		winners,
+		morale: current.morale[side],
 		ourBuy,
 		theirBuy,
 		pistol,
-		coachJudgment: coachTimeoutJudgment(teams[0]),
+		coachJudgment: coachTimeoutJudgment(simTeams[side]),
 	};
 }
 
 export function maybeQueueAutoTimeout(
 	current: LiveMapState,
 	teams: readonly [TeamProfile, TeamProfile],
+	options?: { bothSides?: boolean },
 ): LiveMapState {
-	if (current.complete || current.pendingTimeout || current.timeoutsRemaining <= 0) {
+	if (current.complete || current.pendingTimeout) {
 		return current;
 	}
-	if (!shouldCallTimeout(timeoutContextFromMap(current, teams))) return current;
+	const hostWants =
+		current.timeoutsRemaining > 0 && shouldCallTimeout(timeoutContextFromMap(current, teams, 0));
+	const awayWants =
+		Boolean(options?.bothSides) &&
+		(current.awayTimeoutsRemaining ?? 0) > 0 &&
+		shouldCallTimeout(timeoutContextFromMap(current, teams, 1));
+	let team: 0 | 1 | undefined;
+	if (hostWants && awayWants) {
+		team = current.score[0] <= current.score[1] ? 0 : 1;
+	} else if (hostWants) {
+		team = 0;
+	} else if (awayWants) {
+		team = 1;
+	}
+	if (team === undefined) return current;
 	return {
 		...current,
 		pendingTimeout: true,
-		timeoutsRemaining: current.timeoutsRemaining - 1,
-		morale: applyTimeoutMorale(current.morale, 0),
+		...(team === 1 ? { pendingTimeoutTeam: 1 } : {}),
+		timeoutsRemaining: team === 0 ? current.timeoutsRemaining - 1 : current.timeoutsRemaining,
+		awayTimeoutsRemaining:
+			team === 1 ? (current.awayTimeoutsRemaining ?? 1) - 1 : current.awayTimeoutsRemaining,
+		morale: applyTimeoutMorale(current.morale, team),
 	};
 }

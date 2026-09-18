@@ -30,7 +30,7 @@ create table public.published_runs (
 	created_at timestamptz not null default now(),
 	constraint published_runs_mode check (mode in ('daily', 'free', 'community')),
 	constraint published_runs_wins check (wins >= 0 and wins <= 9),
-	constraint published_runs_losses check (losses >= 0 and losses <= 3),
+	constraint published_runs_losses check (losses >= 0 and losses <= 5),
 	constraint published_runs_maps_won check (maps_won >= 0),
 	constraint published_runs_maps_lost check (maps_lost >= 0),
 	constraint published_runs_rounds_won check (rounds_won >= 0),

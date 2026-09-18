@@ -47,7 +47,7 @@ function isLiveSeries(value: unknown): boolean {
 	return (
 		isObject(value) &&
 		Number.isInteger(value.seed) &&
-		(value.format === "BO1" || value.format === "BO3") &&
+		(value.format === "BO1" || value.format === "BO3" || value.format === "BO5") &&
 		Array.isArray(value.maps) &&
 		Array.isArray(value.teams) &&
 		value.teams.length === 2 &&
