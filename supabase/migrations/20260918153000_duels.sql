@@ -1,6 +1,6 @@
 -- Casual 1v1 duel rooms. Mutations go through security-definer RPCs only.
 
-create extension if not exists pgcrypto;
+create extension if not exists pgcrypto with schema extensions;
 
 create table public.duels (
 	id uuid primary key default gen_random_uuid(),
@@ -29,6 +29,7 @@ create or replace function public.duel_hash_secret(p_secret text)
 returns text
 language sql
 immutable
+set search_path = public, extensions
 as $$
 	select encode(digest(p_secret, 'sha256'), 'hex');
 $$;
@@ -36,6 +37,7 @@ $$;
 create or replace function public.duel_new_code()
 returns text
 language plpgsql
+set search_path = public, extensions
 as $$
 declare
 	alphabet constant text := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -89,7 +91,7 @@ create or replace function public.create_duel()
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
 	secret text := encode(gen_random_bytes(16), 'hex');
@@ -113,7 +115,7 @@ create or replace function public.join_duel(p_code text)
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
 	secret text := encode(gen_random_bytes(16), 'hex');

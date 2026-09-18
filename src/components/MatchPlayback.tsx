@@ -624,7 +624,7 @@ function Scoreboard({
 	roundsWon: readonly [number, number];
 }) {
 	return (
-		<div className="mt-5 space-y-4">
+		<div className="space-y-4">
 			{teams.map((teamRows, teamIndex) => (
 				<div key={teamLabels[teamIndex]}>
 					<div className="mb-2 flex items-baseline justify-between gap-3">
@@ -1437,82 +1437,217 @@ export function MatchPlayback({
 	const displayTotals = pairFromViewer(totals, viewerSide);
 	const displayBuys = pairFromViewer(buys, viewerSide);
 	const timeoutTeam = live?.current?.pendingTimeoutTeam ?? 0;
+	const mapWinMap = mapWinMoment ? maps[mapWinMoment.mapIndex] : undefined;
+	const mapWinBoard = mapWinMoment
+		? complete
+			? {
+					teams: pairFromViewer(aggregateSeriesScoreboard(result.maps), viewerSide),
+					roundsWon: pairFromViewer(seriesRoundsWon(result.maps), viewerSide),
+				}
+			: mapWinMap
+				? {
+						teams: pairFromViewer(mapWinMap.scoreboard, viewerSide),
+						roundsWon: pairFromViewer(mapWinMap.score, viewerSide),
+					}
+				: null
+		: null;
 
 	return (
-		<section
-			aria-labelledby="match-heading"
-			className="relative mt-5 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6"
-			style={
-				background
-					? {
-							backgroundImage: `linear-gradient(to bottom, rgb(9 9 11 / 0.58), rgb(9 9 11 / 0.84)), url(${background})`,
-							backgroundSize: "cover",
-							backgroundPosition: "center",
+		<div className="mt-5 space-y-4">
+			<section
+				aria-labelledby="match-heading"
+				className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6"
+				style={
+					background
+						? {
+								backgroundImage: `linear-gradient(to bottom, rgb(9 9 11 / 0.58), rgb(9 9 11 / 0.84)), url(${background})`,
+								backgroundSize: "cover",
+								backgroundPosition: "center",
+							}
+						: undefined
+				}
+			>
+				{mapWinMoment ? (
+					<MapWinMoment
+						playerWon={mapWinMoment.winner === viewerSide}
+						winnerLabel={shortLabels[mapWinMoment.winner]}
+						mapLabel={mapWinMoment.label}
+						score={pairFromViewer(mapWinMoment.score, viewerSide)}
+						seriesScore={displaySeries}
+						scoreboard={
+							mapWinBoard ? (
+								<Scoreboard
+									teams={mapWinBoard.teams}
+									teamLabels={viewLabels}
+									roundsWon={mapWinBoard.roundsWon}
+								/>
+							) : null
 						}
-					: undefined
-			}
-		>
-			{mapWinMoment ? (
-				<MapWinMoment
-					playerWon={mapWinMoment.winner === viewerSide}
-					winnerLabel={shortLabels[mapWinMoment.winner]}
-					mapLabel={mapWinMoment.label}
-					score={pairFromViewer(mapWinMoment.score, viewerSide)}
-					seriesScore={displaySeries}
-					footer={
-						<button
-							type="button"
-							onClick={dismissMapWinMoment}
-							className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+						footer={
+							<button
+								type="button"
+								onClick={dismissMapWinMoment}
+								className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+							>
+								Continue
+							</button>
+						}
+					/>
+				) : null}
+
+				{timeoutMoment && live?.current ? (
+					<TimeoutMoment
+						teamLabel={shortLabels[timeoutTeam]}
+						coachNick={result.teams[timeoutTeam].coach.nick}
+						members={result.teams[timeoutTeam].members}
+						crestFor={(member) => crestFor(member, playersById)}
+						moraleGain={TIMEOUT_MORALE}
+						footer={
+							<button type="button" onClick={dismissTimeoutMoment} className={CONTROL_CLASS}>
+								Continue
+							</button>
+						}
+					/>
+				) : null}
+
+				{bonusMoment && upcomingBonus?.round.bonus ? (
+					<BonusMoment
+						trait={bonusById(upcomingBonus.round.bonus.bonusId)}
+						player={crestFor(
+							result.teams
+								.flatMap((team) => team.members)
+								.find((member) => member.id === upcomingBonus.round.bonus?.seasonId) ??
+								result.teams[viewerSide].members[0],
+							playersById,
+						)}
+					/>
+				) : null}
+
+				{showClutchMoment && clutcher && momentClutch ? (
+					<ClutchMoment
+						player={clutcher.nick}
+						playerCrest={crestFor(clutcher, playersById)}
+						opponents={momentOpponents.map((row) => ({
+							...row,
+							crest: crestFor(row.member, playersById),
+						}))}
+						against={momentClutch.against}
+						lines={momentLines}
+						speed={speed}
+						footer={
+							<fieldset className="flex flex-wrap justify-center gap-2">
+								<legend className="sr-only">Clutch replay controls</legend>
+								<button
+									type="button"
+									onClick={playPause}
+									disabled={complete || waitingForPlan || holdPlayback}
+									className={CONTROL_CLASS}
+								>
+									{playing ? "Pause" : "Play"}
+								</button>
+								<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
+									Skip to end
+								</button>
+							</fieldset>
+						}
+					/>
+				) : null}
+
+				<div className="relative z-20 text-center">
+					<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+						{headingEyebrow}
+					</p>
+					<h3 id="match-heading" className="mt-1 text-xl font-semibold tracking-tight text-white">
+						{viewLabels[0]} <span className="text-zinc-600">vs</span> {viewLabels[1]}
+					</h3>
+					<p className="mt-1 text-xs text-zinc-500">
+						Series {displaySeries[0]}–{displaySeries[1]} · {activeMap.label}
+						{mapPickCaption(activeMap.mapContext, viewerSide, simLabels)}
+						{activeMap.overtimeBlocks > 0 ? ` · ${activeMap.overtimeBlocks}× OT` : ""}
+					</p>
+				</div>
+
+				<div className="mt-5 grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)_minmax(15rem,18rem)]">
+					<div className="max-lg:order-2">
+						<TeamLineup
+							align="left"
+							label={viewLabels[0]}
+							members={result.teams[viewerSide].members}
+							coachNick={result.teams[viewerSide].coach.nick}
+							overall={result.teams[viewerSide].overall}
+							side={currentSides?.[viewerSide]}
+							stats={stats}
+							involvedIds={involvedIds}
+							deadIds={boardDeadIds}
+							playersById={playersById}
+						/>
+					</div>
+
+					<div className="relative min-w-0 max-lg:order-1 max-lg:col-span-full">
+						<section
+							className="flex items-center justify-center gap-4"
+							aria-label="Current map score"
+							data-round-winner={settleSide}
 						>
-							Continue
-						</button>
-					}
-				/>
-			) : null}
+							<span
+								key={settleSide === "player" ? `player-${revealedCount}` : "player"}
+								className={`relative inline-flex items-center justify-center ${
+									settleSide === "player" ? "round-score-pulse" : ""
+								}`}
+							>
+								{settleSide === "player" ? (
+									<span
+										aria-hidden
+										className="round-score-pulse-ring round-score-pulse-ring-player"
+									/>
+								) : null}
+								<strong className="relative text-5xl tabular-nums text-emerald-300 sm:text-6xl">
+									{displayScore[0]}
+								</strong>
+							</span>
+							<span className="text-2xl text-zinc-700">:</span>
+							<span
+								key={settleSide === "opponent" ? `opponent-${revealedCount}` : "opponent"}
+								className={`relative inline-flex items-center justify-center ${
+									settleSide === "opponent" ? "round-score-pulse" : ""
+								}`}
+							>
+								{settleSide === "opponent" ? (
+									<span
+										aria-hidden
+										className="round-score-pulse-ring round-score-pulse-ring-opponent"
+									/>
+								) : null}
+								<strong className="relative text-5xl tabular-nums text-amber-300 sm:text-6xl">
+									{displayScore[1]}
+								</strong>
+							</span>
+						</section>
 
-			{timeoutMoment && live?.current ? (
-				<TimeoutMoment
-					teamLabel={shortLabels[timeoutTeam]}
-					coachNick={result.teams[timeoutTeam].coach.nick}
-					members={result.teams[timeoutTeam].members}
-					crestFor={(member) => crestFor(member, playersById)}
-					moraleGain={TIMEOUT_MORALE}
-					footer={
-						<button type="button" onClick={dismissTimeoutMoment} className={CONTROL_CLASS}>
-							Continue
-						</button>
-					}
-				/>
-			) : null}
+						<RoundTimeline
+							map={activeMap}
+							revealed={cursor.settledRoundCount}
+							teamLabels={shortLabels}
+						/>
 
-			{bonusMoment && upcomingBonus?.round.bonus ? (
-				<BonusMoment
-					trait={bonusById(upcomingBonus.round.bonus.bonusId)}
-					player={crestFor(
-						result.teams
-							.flatMap((team) => team.members)
-							.find((member) => member.id === upcomingBonus.round.bonus?.seasonId) ??
-							result.teams[viewerSide].members[0],
-						playersById,
-					)}
-				/>
-			) : null}
+						<EconomyBars
+							roundValues={displayRoundValues}
+							totals={displayTotals}
+							buys={displayBuys}
+							labels={viewLabels}
+						/>
+						<MoraleBars
+							values={displayMorale}
+							labels={viewLabels}
+							boosted={timeoutBoostVisible(
+								caughtUp,
+								Boolean(live?.current?.pendingTimeout && timeoutTeam === viewerSide),
+								timeoutMoment && timeoutTeam === viewerSide,
+							)}
+						/>
 
-			{showClutchMoment && clutcher && momentClutch ? (
-				<ClutchMoment
-					player={clutcher.nick}
-					playerCrest={crestFor(clutcher, playersById)}
-					opponents={momentOpponents.map((row) => ({
-						...row,
-						crest: crestFor(row.member, playersById),
-					}))}
-					against={momentClutch.against}
-					lines={momentLines}
-					speed={speed}
-					footer={
-						<fieldset className="flex flex-wrap justify-center gap-2">
-							<legend className="sr-only">Clutch replay controls</legend>
+						<fieldset className="mt-5 flex flex-wrap items-start justify-center gap-2">
+							<legend className="sr-only">Replay controls</legend>
 							<button
 								type="button"
 								onClick={playPause}
@@ -1524,217 +1659,109 @@ export function MatchPlayback({
 							<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
 								Skip to end
 							</button>
-						</fieldset>
-					}
-				/>
-			) : null}
-
-			<div className="relative z-20 text-center">
-				<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-					{headingEyebrow}
-				</p>
-				<h3 id="match-heading" className="mt-1 text-xl font-semibold tracking-tight text-white">
-					{viewLabels[0]} <span className="text-zinc-600">vs</span> {viewLabels[1]}
-				</h3>
-				<p className="mt-1 text-xs text-zinc-500">
-					Series {displaySeries[0]}–{displaySeries[1]} · {activeMap.label}
-					{mapPickCaption(activeMap.mapContext, viewerSide, simLabels)}
-					{activeMap.overtimeBlocks > 0 ? ` · ${activeMap.overtimeBlocks}× OT` : ""}
-				</p>
-			</div>
-
-			<div className="mt-5 grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)_minmax(15rem,18rem)]">
-				<div className="max-lg:order-2">
-					<TeamLineup
-						align="left"
-						label={viewLabels[0]}
-						members={result.teams[viewerSide].members}
-						coachNick={result.teams[viewerSide].coach.nick}
-						overall={result.teams[viewerSide].overall}
-						side={currentSides?.[viewerSide]}
-						stats={stats}
-						involvedIds={involvedIds}
-						deadIds={boardDeadIds}
-						playersById={playersById}
-					/>
-				</div>
-
-				<div className="relative min-w-0 max-lg:order-1 max-lg:col-span-full">
-					<section
-						className="flex items-center justify-center gap-4"
-						aria-label="Current map score"
-						data-round-winner={settleSide}
-					>
-						<span
-							key={settleSide === "player" ? `player-${revealedCount}` : "player"}
-							className={`relative inline-flex items-center justify-center ${
-								settleSide === "player" ? "round-score-pulse" : ""
-							}`}
-						>
-							{settleSide === "player" ? (
-								<span
-									aria-hidden
-									className="round-score-pulse-ring round-score-pulse-ring-player"
-								/>
-							) : null}
-							<strong className="relative text-5xl tabular-nums text-emerald-300 sm:text-6xl">
-								{displayScore[0]}
-							</strong>
-						</span>
-						<span className="text-2xl text-zinc-700">:</span>
-						<span
-							key={settleSide === "opponent" ? `opponent-${revealedCount}` : "opponent"}
-							className={`relative inline-flex items-center justify-center ${
-								settleSide === "opponent" ? "round-score-pulse" : ""
-							}`}
-						>
-							{settleSide === "opponent" ? (
-								<span
-									aria-hidden
-									className="round-score-pulse-ring round-score-pulse-ring-opponent"
-								/>
-							) : null}
-							<strong className="relative text-5xl tabular-nums text-amber-300 sm:text-6xl">
-								{displayScore[1]}
-							</strong>
-						</span>
-					</section>
-
-					<RoundTimeline
-						map={activeMap}
-						revealed={cursor.settledRoundCount}
-						teamLabels={shortLabels}
-					/>
-
-					<EconomyBars
-						roundValues={displayRoundValues}
-						totals={displayTotals}
-						buys={displayBuys}
-						labels={viewLabels}
-					/>
-					<MoraleBars
-						values={displayMorale}
-						labels={viewLabels}
-						boosted={timeoutBoostVisible(
-							caughtUp,
-							Boolean(live?.current?.pendingTimeout && timeoutTeam === viewerSide),
-							timeoutMoment && timeoutTeam === viewerSide,
-						)}
-					/>
-
-					<fieldset className="mt-5 flex flex-wrap items-start justify-center gap-2">
-						<legend className="sr-only">Replay controls</legend>
-						<button
-							type="button"
-							onClick={playPause}
-							disabled={complete || waitingForPlan || holdPlayback}
-							className={CONTROL_CLASS}
-						>
-							{playing ? "Pause" : "Play"}
-						</button>
-						<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
-							Skip to end
-						</button>
-						<div className="relative">
-							<button
-								type="button"
-								aria-expanded={settingsOpen}
-								aria-controls="playback-settings"
-								onClick={() => setSettingsOpen((open) => !open)}
-								className={CONTROL_CLASS}
-							>
-								Settings · {speed}×
-							</button>
-							{settingsOpen ? (
-								<div
-									id="playback-settings"
-									className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-white/15 bg-zinc-950/95 p-2 shadow-xl"
+							<div className="relative">
+								<button
+									type="button"
+									aria-expanded={settingsOpen}
+									aria-controls="playback-settings"
+									onClick={() => setSettingsOpen((open) => !open)}
+									className={CONTROL_CLASS}
 								>
-									<button
-										type="button"
-										onClick={restart}
-										disabled={revealedCount === 0}
-										className={`${CONTROL_CLASS} w-full`}
+									Settings · {speed}×
+								</button>
+								{settingsOpen ? (
+									<div
+										id="playback-settings"
+										className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-white/15 bg-zinc-950/95 p-2 shadow-xl"
 									>
-										Restart replay
-									</button>
-									<fieldset className="mt-2 flex gap-1.5">
-										<legend className="sr-only">Replay speed</legend>
-										{PLAYBACK_SPEEDS.map((option) => {
-											const selected = option === speed;
-											return (
-												<button
-													key={option}
-													type="button"
-													aria-pressed={selected}
-													onClick={() => chooseSpeed(option)}
-													className={`${SPEED_BUTTON_CLASS} ${
-														selected
-															? "border-emerald-300 bg-emerald-300 text-zinc-950"
-															: "border-white/15 bg-white/5 text-zinc-200 hover:border-white/30 hover:bg-white/10"
-													}`}
-												>
-													{option}×
-												</button>
-											);
-										})}
-									</fieldset>
-								</div>
-							) : null}
-						</div>
-					</fieldset>
-					<p className="sr-only" aria-live="polite" aria-atomic="true">
-						{announcement}
-					</p>
+										<button
+											type="button"
+											onClick={restart}
+											disabled={revealedCount === 0}
+											className={`${CONTROL_CLASS} w-full`}
+										>
+											Restart replay
+										</button>
+										<fieldset className="mt-2 flex gap-1.5">
+											<legend className="sr-only">Replay speed</legend>
+											{PLAYBACK_SPEEDS.map((option) => {
+												const selected = option === speed;
+												return (
+													<button
+														key={option}
+														type="button"
+														aria-pressed={selected}
+														onClick={() => chooseSpeed(option)}
+														className={`${SPEED_BUTTON_CLASS} ${
+															selected
+																? "border-emerald-300 bg-emerald-300 text-zinc-950"
+																: "border-white/15 bg-white/5 text-zinc-200 hover:border-white/30 hover:bg-white/10"
+														}`}
+													>
+														{option}×
+													</button>
+												);
+											})}
+										</fieldset>
+									</div>
+								) : null}
+							</div>
+						</fieldset>
+						<p className="sr-only" aria-live="polite" aria-atomic="true">
+							{announcement}
+						</p>
 
-					<div className="mt-5">
-						<h4 className="text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
-							Play-by-play
-						</h4>
-						<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
-							{feed ? (
-								<ol>
-									<RoundFeedItem
-										key={feed.round.round}
-										round={feed.round}
-										kills={feed.kills}
-										settled={feed.settled}
-										result={result}
-										shortLabels={shortLabels}
-										viewerSide={viewerSide}
-									/>
-								</ol>
-							) : (
-								<div
-									className={`${FEED_BOX_CLASS} items-center justify-center rounded-xl border border-white/12 bg-zinc-950/70 px-3 py-2.5`}
-								>
-									<p className="text-center text-sm text-zinc-600">Replay starting.</p>
-								</div>
-							)}
-							<RoundCast lines={castLines} />
+						<div className="mt-5">
+							<h4 className="text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
+								Play-by-play
+							</h4>
+							<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
+								{feed ? (
+									<ol>
+										<RoundFeedItem
+											key={feed.round.round}
+											round={feed.round}
+											kills={feed.kills}
+											settled={feed.settled}
+											result={result}
+											shortLabels={shortLabels}
+											viewerSide={viewerSide}
+										/>
+									</ol>
+								) : (
+									<div
+										className={`${FEED_BOX_CLASS} items-center justify-center rounded-xl border border-white/12 bg-zinc-950/70 px-3 py-2.5`}
+									>
+										<p className="text-center text-sm text-zinc-600">Replay starting.</p>
+									</div>
+								)}
+								<RoundCast lines={castLines} />
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<div className="max-lg:order-3">
-					<TeamLineup
-						align="right"
-						label={viewLabels[1]}
-						members={result.teams[opponent].members}
-						coachNick={result.teams[opponent].coach.nick}
-						overall={result.teams[opponent].overall}
-						org={viewerSide === 0 ? opponentOrg : undefined}
-						side={currentSides?.[opponent]}
-						stats={stats}
-						involvedIds={involvedIds}
-						deadIds={boardDeadIds}
-						playersById={playersById}
-					/>
+					<div className="max-lg:order-3">
+						<TeamLineup
+							align="right"
+							label={viewLabels[1]}
+							members={result.teams[opponent].members}
+							coachNick={result.teams[opponent].coach.nick}
+							overall={result.teams[opponent].overall}
+							org={viewerSide === 0 ? opponentOrg : undefined}
+							side={currentSides?.[opponent]}
+							stats={stats}
+							involvedIds={involvedIds}
+							deadIds={boardDeadIds}
+							playersById={playersById}
+						/>
+					</div>
 				</div>
-			</div>
-
-			{complete && (
-				<div className="mt-6 border-t border-white/10 pt-5">
+			</section>
+			{complete && !mapWinMoment ? (
+				<section
+					aria-label="Series scoreboard"
+					className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6"
+				>
 					<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
 						Final result
 					</p>
@@ -1744,18 +1771,20 @@ export function MatchPlayback({
 					</h4>
 					{result.maps.length > 1 ? (
 						<p className="mt-1 text-sm text-zinc-500">
-							{result.maps.map((map) => `${map.label} ${map.score[0]}–${map.score[1]}`).join(" · ")}
+							{result.maps
+								.map((map) => `${map.label} ${pairFromViewer(map.score, viewerSide).join("–")}`)
+								.join(" · ")}
 						</p>
 					) : null}
-					<section aria-label="Series scoreboard">
+					<div className="mt-5">
 						<Scoreboard
-							teams={aggregateSeriesScoreboard(result.maps)}
-							teamLabels={shortLabels}
-							roundsWon={seriesRoundsWon(result.maps)}
+							teams={pairFromViewer(aggregateSeriesScoreboard(result.maps), viewerSide)}
+							teamLabels={viewLabels}
+							roundsWon={pairFromViewer(seriesRoundsWon(result.maps), viewerSide)}
 						/>
-					</section>
-				</div>
-			)}
-		</section>
+					</div>
+				</section>
+			) : null}
+		</div>
 	);
 }

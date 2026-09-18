@@ -380,6 +380,7 @@ describe("bonusById", () => {
 
 	it("points overlay art at public/bonuses/art/{id}.webp", () => {
 		expect(bonusById("new-porsche").art).toBe("/bonuses/art/new-porsche.webp");
-		expect(bonusById("choke").icon).toBe("/bonuses/choke.svg");
+		expect(bonusById("mastermind").icon).toBe("/bonuses/bonus.svg");
+		expect(bonusById("choke").icon).toBe("/bonuses/malus.svg");
 	});
 });

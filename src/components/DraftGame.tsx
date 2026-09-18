@@ -410,6 +410,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [duelBusy, setDuelBusy] = useState(false);
 	const [duelError, setDuelError] = useState<string | null>(null);
 	const [pendingRestart, setPendingRestart] = useState(false);
+	const [confirmAbandon, setConfirmAbandon] = useState(false);
 	const [rollKind, setRollKind] = useState<DraftRollKind>("full");
 	const [settledCardKey, setSettledCardKey] = useState<string | null>(null);
 	const [communityRuns, setCommunityRuns] = useState<PublishedRunSnapshot[]>([]);
@@ -817,6 +818,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 
 	function goHome() {
 		setPendingRestart(false);
+		setConfirmAbandon(false);
 		setNameError(null);
 		setSeedError(null);
 		setHomeView("menu");
@@ -862,11 +864,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	}
 
 	function requestNewDraft() {
+		if (mode === "duel") return;
 		setPendingRestart(true);
 		setNameError(null);
 	}
 
 	function confirmNewDraft() {
+		if (mode === "duel") return;
 		setTeamName(DEFAULT_TEAM_NAME);
 		setNameDraft("");
 		setNameError(null);
@@ -879,10 +883,19 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		clearSavedRun();
 	}
 
+	function requestAbandon() {
+		if (!confirmAbandon) {
+			setConfirmAbandon(true);
+			return;
+		}
+		abandonRun();
+	}
+
 	function abandonRun() {
 		setTournament(null);
 		setError(null);
 		setPendingRestart(false);
+		setConfirmAbandon(false);
 		if (mode === "duel") resetDuelLocal();
 		clearSavedRun();
 		goHome();
@@ -1272,13 +1285,23 @@ export function DraftGame({ dataset }: DraftGameProps) {
 							Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
 						</p>
 					</div>
-					{!tournament && !duelLocked && !duelLive && !pendingRestart && (
+					{!tournament && !pendingRestart && mode !== "duel" && (
 						<button
 							type="button"
 							onClick={requestNewDraft}
 							className="shrink-0 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 						>
 							New draft
+						</button>
+					)}
+					{mode === "duel" && !showDuelMatch && (
+						<button
+							type="button"
+							onClick={requestAbandon}
+							onBlur={() => setConfirmAbandon(false)}
+							className="shrink-0 rounded-lg border border-red-300/20 px-3 py-2 text-xs font-semibold text-red-200 transition hover:border-red-300/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
+						>
+							{confirmAbandon ? "Confirm abandon" : "Abandon run"}
 						</button>
 					)}
 				</header>
@@ -1582,10 +1605,11 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								<div className="mt-4 flex justify-center">
 									<button
 										type="button"
-										onClick={abandonRun}
-										className="rounded-lg border border-white/15 px-4 py-2.5 text-sm font-semibold text-zinc-200"
+										onClick={requestAbandon}
+										onBlur={() => setConfirmAbandon(false)}
+										className="rounded-lg border border-red-300/20 px-4 py-2.5 text-sm font-semibold text-red-200 transition hover:border-red-300/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
 									>
-										Leave match
+										{confirmAbandon ? "Confirm abandon" : "Leave match"}
 									</button>
 								</div>
 							</div>
@@ -1649,7 +1673,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 												Start Major run
 											</button>
 										)}
-										{!duelLocked ? (
+										{mode !== "duel" ? (
 											<button
 												type="button"
 												onClick={requestNewDraft}

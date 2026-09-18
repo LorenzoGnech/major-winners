@@ -77,7 +77,7 @@ function def(
 		polarity,
 		name,
 		blurb,
-		icon: `/bonuses/${id}.svg`,
+		icon: polarity === "malus" ? "/bonuses/malus.svg" : "/bonuses/bonus.svg",
 		art: `/bonuses/art/${id}.webp`,
 		effects,
 		linger,

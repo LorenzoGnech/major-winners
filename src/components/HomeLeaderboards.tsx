@@ -79,18 +79,18 @@ function RosterStrip({
 	photos: ReadonlyMap<string, { playerId: string; nick: string; photo?: string }>;
 }) {
 	return (
-		<ul className="mt-3 grid grid-cols-5 gap-2">
+		<ul className="mt-2 grid grid-cols-5 justify-items-center gap-1">
 			{ROLES.map((role) => {
 				const season = photos.get(roster[role]);
 				const nick = nicks.get(roster[role]) ?? "—";
 				return (
-					<li key={role} className="flex min-w-0 flex-col items-center">
+					<li key={role} className="flex w-full max-w-17 min-w-0 flex-col items-center">
 						{season ? (
 							<PlayerCrest player={season} size="card" />
 						) : (
 							<div className="aspect-[3/4] w-full rounded-lg bg-white/5" />
 						)}
-						<p className="mt-1.5 w-full truncate text-center text-xs font-medium text-zinc-300">
+						<p className="mt-1 w-full truncate text-center text-[10px] font-medium text-zinc-300">
 							{nick}
 						</p>
 					</li>
@@ -120,11 +120,11 @@ export function HomeLeaderboards({
 		<div className="grid w-full grid-cols-1 gap-4 min-[900px]:grid-cols-2">
 			<BoardShell title="Best runs">
 				{best.length > 0 ? (
-					<ol className="space-y-3">
+					<ol className="space-y-2">
 						{best.map((run, index) => {
 							const saved = formatSavedAt(run.createdAt);
 							return (
-								<li key={run.id} className="border border-white/10 px-3 py-3">
+								<li key={run.id} className="border border-white/10 px-2.5 py-2">
 									<div className="flex items-start justify-between gap-3">
 										<div className="min-w-0">
 											<p className="truncate text-sm font-semibold text-white">
@@ -156,11 +156,11 @@ export function HomeLeaderboards({
 			</BoardShell>
 			<BoardShell title="Highest rated teams">
 				{top.length > 0 ? (
-					<ol className="space-y-3">
+					<ol className="space-y-2">
 						{top.map(({ team, overall }, index) => {
 							const saved = formatSavedAt(team.createdAt);
 							return (
-								<li key={team.id} className="border border-white/10 px-3 py-3">
+								<li key={team.id} className="border border-white/10 px-2.5 py-2">
 									<div className="flex items-start justify-between gap-2">
 										<div className="min-w-0">
 											<p className="truncate text-sm font-semibold text-white">
