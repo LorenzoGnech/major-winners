@@ -10,9 +10,12 @@ export type SwissRecord = {
 	losses: number;
 };
 
+export type OpponentSource = "historical" | "community";
+
 export type HistoricalOpponent = {
 	id: string;
 	label: string;
+	source: OpponentSource;
 	org: {
 		id: string;
 		name: string;

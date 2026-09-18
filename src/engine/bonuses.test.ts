@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+	BONUS_CATALOG,
 	bonusById,
 	collectTraitHolders,
+	combatWinProb,
 	eligibleTraits,
 	pickTraitHits,
 	resolveTraitRound,
@@ -9,6 +11,7 @@ import {
 	TRAIT_PROC_CHANCE,
 	TRAIT_REVEAL_CHANCE,
 	tickLingering,
+	traitDraftHint,
 } from "./bonuses";
 import type { Attributes } from "./ratings/attributes";
 import { createRng } from "./rng";
@@ -117,8 +120,21 @@ describe("trait catalog", () => {
 		expect(eligibleTraits("pashabiceps-2021-liquid")).toEqual(["brother", "duk"]);
 		expect(bonusById("duk")).toMatchObject({
 			polarity: "malus",
-			effects: [{ kind: "morale", self: -10 }],
+			effects: [
+				{ kind: "win-prob", amount: -0.025 },
+				{ kind: "morale", self: -10 },
+			],
 		});
+	});
+
+	it("writes blurbs as verb phrases that finish the draft chance line", () => {
+		for (const trait of BONUS_CATALOG) {
+			expect(trait.blurb).toMatch(/^[A-Z]/);
+			expect(trait.blurb).not.toMatch(/^[+\-−0-9]|win chance|morale [+\-−]/);
+			const hint = traitDraftHint(trait.blurb);
+			expect(hint.startsWith("Each round has a small chance to ")).toBe(true);
+			expect(hint.slice("Each round has a small chance to ".length)).toMatch(/^[a-z]/);
+		}
 	});
 
 	it("reveals traits independently from a derived seed", () => {
@@ -167,7 +183,92 @@ describe("resolveTraitRound", () => {
 			pistol: false,
 		});
 		expect(second.proc).toBeUndefined();
-		expect(second.winProb).toBeCloseTo(0.018);
+		expect(second.winProb).toBeCloseTo(0.035);
+	});
+
+	it("turns combat scale into a timeout-sized round swing", () => {
+		expect(combatWinProb(2)).toBeCloseTo(0.045);
+		expect(combatWinProb(0.5)).toBeCloseTo(-0.0225);
+		expect(combatWinProb(0.25)).toBeCloseTo(-0.03375);
+		const doubled = resolveTraitRound({
+			lingering: [],
+			hits: [{ member, bonusId: "god-cs" }],
+			buy: "full-buy",
+			pistol: false,
+		});
+		expect(doubled.winProb).toBeCloseTo(0.045);
+		expect(doubled.modifiers.combatScale.get(member.id)).toBe(2);
+		const halved = resolveTraitRound({
+			lingering: [],
+			hits: [{ member, bonusId: "in-jail" }],
+			buy: "full-buy",
+			pistol: false,
+		});
+		expect(halved.winProb).toBeCloseTo(-0.0225);
+	});
+
+	it("keeps VAC Ban combat swing on lingering rounds without a new overlay", () => {
+		const first = resolveTraitRound({
+			lingering: [],
+			hits: [{ member, bonusId: "vac-ban" }],
+			buy: "full-buy",
+			pistol: false,
+		});
+		expect(first.proc?.bonusId).toBe("vac-ban");
+		expect(first.winProb).toBeCloseTo(-0.03375);
+		const later = resolveTraitRound({
+			lingering: first.lingering,
+			hits: [],
+			buy: "full-buy",
+			pistol: false,
+		});
+		expect(later.proc).toBeUndefined();
+		expect(later.winProb).toBeCloseTo(-0.03375);
+	});
+
+	it("applies Olofboost only on eco or force", () => {
+		const eco = resolveTraitRound({
+			lingering: [],
+			hits: [{ member, bonusId: "olofboost" }],
+			buy: "eco",
+			pistol: false,
+		});
+		const rifles = resolveTraitRound({
+			lingering: [],
+			hits: [{ member, bonusId: "olofboost" }],
+			buy: "full-buy",
+			pistol: false,
+		});
+		expect(eco.winProb).toBeCloseTo(0.12);
+		expect(rifles.winProb).toBeCloseTo(0);
+	});
+
+	it("stacks One Tap Master combat with the pistol spike", () => {
+		const pistol = resolveTraitRound({
+			lingering: [],
+			hits: [{ member, bonusId: "one-tap-master" }],
+			buy: "pistol",
+			pistol: true,
+		});
+		expect(pistol.winProb).toBeCloseTo(0.045 + 0.08);
+	});
+
+	it("makes Choke a real slip and morale cards spike the proc round", () => {
+		const choke = resolveTraitRound({
+			lingering: [],
+			hits: [{ member, bonusId: "choke" }],
+			buy: "full-buy",
+			pistol: false,
+		});
+		expect(choke.winProb).toBeCloseTo(combatWinProb(0.4) - 0.03);
+		const brother = resolveTraitRound({
+			lingering: [],
+			hits: [{ member, bonusId: "brother" }],
+			buy: "full-buy",
+			pistol: false,
+		});
+		expect(brother.winProb).toBeCloseTo(0.04);
+		expect(brother.moraleSelf).toBe(30);
 	});
 });
 

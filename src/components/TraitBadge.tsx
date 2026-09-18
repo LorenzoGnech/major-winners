@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { type BonusId, bonusById } from "../engine/bonuses";
+import { type BonusId, bonusById, traitDraftHint } from "../engine/bonuses";
 
 const ICON_CLASS = {
 	sm: "size-6",
@@ -14,11 +14,6 @@ const BOX_CLASS = {
 
 const TIP_WIDTH = 224;
 
-function chanceCopy(blurb: string): string {
-	const rest = /^[A-Za-z]/.test(blurb) ? blurb.charAt(0).toLowerCase() + blurb.slice(1) : blurb;
-	return `Each round a small chance to ${rest}`;
-}
-
 export function TraitBadge({
 	id,
 	size = "md",
@@ -30,7 +25,7 @@ export function TraitBadge({
 }) {
 	const trait = bonusById(id);
 	const malus = trait.polarity === "malus";
-	const detail = chanceCopy(trait.blurb);
+	const detail = traitDraftHint(trait.blurb);
 	const [open, setOpen] = useState(false);
 	const [hover, setHover] = useState(false);
 	const [pos, setPos] = useState<{ top: number; left: number } | null>(null);

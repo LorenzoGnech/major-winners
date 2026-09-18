@@ -22,6 +22,9 @@ export function MapWinMoment({
 			aria-label={`${winnerLabel} take ${mapLabel} ${score[0]}–${score[1]}. Series ${seriesScore[0]}–${seriesScore[1]}.`}
 			className="absolute inset-0 z-40 flex flex-col justify-center bg-zinc-950/88 px-4 py-6 backdrop-blur-[3px] motion-safe:animate-[map-win-in_480ms_ease-out] sm:px-8"
 		>
+			{footer ? (
+				<div className="absolute top-4 right-4 z-10 sm:top-6 sm:right-6">{footer}</div>
+			) : null}
 			<div className="mx-auto w-full max-w-xl text-center">
 				<p className={`text-[10px] font-semibold uppercase tracking-[0.28em] ${tone}`}>
 					{mapLabel}
@@ -55,7 +58,6 @@ export function MapWinMoment({
 					Series {seriesScore[0]}–{seriesScore[1]}
 				</p>
 			</div>
-			{footer ? <div className="mt-8 flex justify-center">{footer}</div> : null}
 		</div>
 	);
 }

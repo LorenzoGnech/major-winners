@@ -15,6 +15,7 @@ export {
 } from "./summary";
 export type {
 	HistoricalOpponent,
+	OpponentSource,
 	PlayoffRound,
 	SeriesResolver,
 	SwissRecord,

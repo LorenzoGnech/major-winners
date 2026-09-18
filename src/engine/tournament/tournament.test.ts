@@ -154,4 +154,34 @@ describe("Major tournament runner", () => {
 			expect(overalls[8]).toBeGreaterThanOrEqual(topDecile);
 		}
 	});
+
+	it("prefers community opponents that still meet the strength floor, then fills historically", () => {
+		const weak = opponents[8];
+		const mid = opponents[Math.floor(opponents.length / 2)];
+		if (!weak || !mid) throw new Error("need historical fixtures");
+		const community = [
+			{ ...weak, id: "community-weak", source: "community" as const },
+			{ ...mid, id: "community-mid", source: "community" as const },
+		];
+		const mixed = [...opponents, ...community].sort(
+			(left, right) =>
+				left.profile.overall - right.profile.overall || left.id.localeCompare(right.id),
+		);
+		const playMixed = (state: ReturnType<typeof createTournament>, won: boolean) => {
+			const result = runNextMatch(state, playerTeam, mixed, forced(won));
+			if (!result.ok) throw result.error;
+			return result.value;
+		};
+		let state = createTournament({ rootSeed: 3, playerTeam, opponents: mixed });
+		const used: string[] = [];
+		for (let index = 0; index < 9; index += 1) {
+			const opponent = state.nextMatch?.opponent;
+			if (!opponent) throw new Error("expected an opponent");
+			used.push(opponent.id);
+			state = playMixed(state, true);
+		}
+		expect(used[0]?.startsWith("community-")).toBe(true);
+		expect(used.some((id) => id.startsWith("community-"))).toBe(true);
+		expect(used.some((id) => !id.startsWith("community-"))).toBe(true);
+	});
 });

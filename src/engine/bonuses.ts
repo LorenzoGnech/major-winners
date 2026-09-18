@@ -57,6 +57,12 @@ export type BonusDefinition = {
 
 export const TRAIT_REVEAL_CHANCE = 0.5;
 export const TRAIT_PROC_CHANCE = 0.02;
+/** Combat scale 2.0 is about a timeout-sized round swing; 0.25 (VAC) is −3.4% per remaining round. */
+export const COMBAT_WIN_PROB_WEIGHT = 0.045;
+
+export function combatWinProb(scale: number): number {
+	return (scale - 1) * COMBAT_WIN_PROB_WEIGHT;
+}
 
 function def(
 	id: BonusId,
@@ -83,81 +89,110 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"mastermind",
 		"bonus",
 		"Mastermind",
-		"+1.8% round win chance for the rest of the map",
-		[{ kind: "win-prob", amount: 0.018 }],
+		"Take over calling and tilt the rest of the map our way",
+		[{ kind: "win-prob", amount: 0.035 }],
 		{ type: "map" },
 	),
 	def(
 		"professor",
 		"bonus",
 		"The Professor",
-		"+1.8% round win chance for the rest of the map",
-		[{ kind: "win-prob", amount: 0.018 }],
+		"Out-think them for the rest of the map",
+		[{ kind: "win-prob", amount: 0.035 }],
 		{ type: "map" },
 	),
-	def("red-bull", "bonus", "Red Bull", "Doubles this player's power this round", [
+	def("red-bull", "bonus", "Red Bull", "Go nuclear and swing a round our way", [
 		{ kind: "combat", scale: 2 },
-	]),
-	def("trashtalk", "bonus", "Trashtalk", "Opponent morale −20", [
-		{ kind: "morale", opponent: -20 },
-	]),
-	def("x-god", "bonus", "X-God", "Team morale +20", [{ kind: "morale", self: 20 }]),
-	def("olofboost", "bonus", "Olofboost", "Big steal chance on eco or force this round", [
-		{ kind: "win-prob", amount: 0.08, when: "eco-force" },
 	]),
 	def(
-		"clutch-minister",
+		"trashtalk",
 		"bonus",
-		"Clutch Minister",
-		"Much more likely to be last alive this round",
-		[{ kind: "clutch", scale: 2.5 }],
+		"Trashtalk",
+		"Get in their heads, drain their morale, and steal a round",
+		[
+			{ kind: "win-prob", amount: 0.03 },
+			{ kind: "morale", opponent: -20 },
+		],
 	),
-	def("god-cs", "bonus", "God CS", "Doubles this player's power this round", [
+	def("x-god", "bonus", "X-God", "Lift the whole squad and take a round", [
+		{ kind: "win-prob", amount: 0.03 },
+		{ kind: "morale", self: 20 },
+	]),
+	def("olofboost", "bonus", "Olofboost", "Steal a round on a save or force buy", [
+		{ kind: "win-prob", amount: 0.12, when: "eco-force" },
+	]),
+	def("clutch-minister", "bonus", "Clutch Minister", "Stay last alive and snatch a round", [
+		{ kind: "win-prob", amount: 0.03 },
+		{ kind: "clutch", scale: 2.5 },
+	]),
+	def("god-cs", "bonus", "God CS", "Take over a round like nobody else is on the server", [
 		{ kind: "combat", scale: 2 },
 	]),
-	def("inhuman-reactions", "bonus", "Inhuman Reactions", "Opens the round and clutches harder", [
-		{ kind: "opener", scale: 3 },
-		{ kind: "clutch", scale: 2 },
-		{ kind: "win-prob", amount: 0.02 },
-	]),
-	def("one-tap-master", "bonus", "One Tap Master", "Doubles power; pistols hit even harder", [
+	def(
+		"inhuman-reactions",
+		"bonus",
+		"Inhuman Reactions",
+		"Win the opener, clutch harder, and take a round",
+		[
+			{ kind: "opener", scale: 3 },
+			{ kind: "clutch", scale: 2 },
+			{ kind: "win-prob", amount: 0.045 },
+		],
+	),
+	def(
+		"one-tap-master",
+		"bonus",
+		"One Tap Master",
+		"Pop off for a round, and even harder on pistols",
+		[
+			{ kind: "combat", scale: 2 },
+			{ kind: "win-prob", amount: 0.08, when: "pistol" },
+		],
+	),
+	def(
+		"brother",
+		"bonus",
+		"You're not my friend, you're my brother my friend",
+		"Bind the squad together and take a round",
+		[
+			{ kind: "win-prob", amount: 0.04 },
+			{ kind: "morale", self: 30 },
+		],
+	),
+	def("god-denis", "bonus", "God Denis", "Go superhuman and take a round", [
 		{ kind: "combat", scale: 2 },
-		{ kind: "win-prob", amount: 0.05, when: "pistol" },
 	]),
-	def("brother", "bonus", "You're not my friend, you're my brother my friend", "Team morale +30", [
-		{ kind: "morale", self: 30 },
+	def("ez4ence", "bonus", "EZ4ENCE", "Send the crowd into a frenzy and take a round", [
+		{ kind: "win-prob", amount: 0.03 },
+		{ kind: "morale", self: 20 },
 	]),
-	def("god-denis", "bonus", "God Denis", "Doubles this player's power this round", [
-		{ kind: "combat", scale: 2 },
-	]),
-	def("ez4ence", "bonus", "EZ4ENCE", "Team morale +20", [{ kind: "morale", self: 20 }]),
 	def(
 		"guardian-flick",
 		"bonus",
 		"I remember a Guardian flick",
-		"Always an AWP, opens the round, doubles power",
+		"Pull the AWP, win the opener, and take over a round",
 		[{ kind: "force-awp" }, { kind: "opener", scale: 3 }, { kind: "combat", scale: 2 }],
 	),
-	def("choke", "malus", "Choke", "Much weaker this round, and the round is slipperier", [
+	def("choke", "malus", "Choke", "Freeze up and throw a winnable round", [
 		{ kind: "combat", scale: 0.4 },
 		{ kind: "clutch", scale: 0.2 },
 		{ kind: "win-prob", amount: -0.03 },
 	]),
-	def("in-jail", "malus", "In jail", "Halves this player's power this round", [
+	def("in-jail", "malus", "In jail", "Play a round at half strength", [
 		{ kind: "combat", scale: 0.5 },
 	]),
-	def("pregnant", "malus", "Pregnant", "Halves this player's power this round", [
+	def("pregnant", "malus", "Pregnant", "Play a step slow and lose a bit of bite for a round", [
 		{ kind: "combat", scale: 0.5 },
 	]),
 	def(
 		"vac-ban",
 		"malus",
 		"VAC ban",
-		"This player is at 25% power for the rest of the map",
+		"Play the rest of the map at a quarter strength",
 		[{ kind: "combat", scale: 0.25 }],
 		{ type: "map" },
 	),
-	def("save", "malus", "Save", "This player does not take a fight this round", [
+	def("save", "malus", "Save", "Sit out the fights and leave the team a man short", [
 		{ kind: "combat", scale: 0.05 },
 		{ kind: "exclude-killer" },
 	]),
@@ -165,29 +200,42 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"tactical-genius",
 		"bonus",
 		"Tactical Genius",
-		"+1.5% round win chance for the rest of the map, +10 morale",
+		"Draw up the rest of the map and lift the squad",
 		[
-			{ kind: "win-prob", amount: 0.015 },
-			{ kind: "morale", self: 10 },
+			{ kind: "win-prob", amount: 0.03 },
+			{ kind: "morale", self: 15 },
 		],
 		{ type: "map" },
 	),
-	def("na-player", "malus", "The North American Player", "Halves this player's power this round", [
-		{ kind: "combat", scale: 0.5 },
-	]),
-	def("jacked", "bonus", "Jacked", "+50% power this round", [{ kind: "combat", scale: 1.5 }]),
-	def("one-more-star", "malus", "Just one more star", "Team morale −20", [
+	def(
+		"na-player",
+		"malus",
+		"The North American Player",
+		"Have a classic off-round and play at half strength",
+		[{ kind: "combat", scale: 0.5 }],
+	),
+	def("jacked", "bonus", "Jacked", "Play a round much stronger", [{ kind: "combat", scale: 1.5 }]),
+	def("one-more-star", "malus", "Just one more star", "Tilt the squad and leak a round", [
+		{ kind: "win-prob", amount: -0.04 },
 		{ kind: "morale", self: -20 },
 	]),
 	def(
 		"new-porsche",
 		"malus",
 		"New Porsche",
-		"Halves this player's power this round; he's busy trying out the new Porsche",
+		"Admire the new ride and play a round at half strength",
 		[{ kind: "combat", scale: 0.5 }],
 	),
-	def("duk", "malus", "Duk", "Too many chickens. Team morale −10", [{ kind: "morale", self: -10 }]),
+	def("duk", "malus", "Duk", "Get lost in the chickens and sag for a round", [
+		{ kind: "win-prob", amount: -0.025 },
+		{ kind: "morale", self: -10 },
+	]),
 ];
+
+export function traitDraftHint(blurb: string): string {
+	const rest = /^[A-Za-z]/.test(blurb) ? blurb.charAt(0).toLowerCase() + blurb.slice(1) : blurb;
+	return `Each round has a small chance to ${rest}`;
+}
 
 const byId = new Map(BONUS_CATALOG.map((row) => [row.id, row]));
 
@@ -372,6 +420,9 @@ export function resolveTraitRound(input: {
 			forceAwp,
 		});
 		for (const effect of definition.effects) {
+			if (effect.kind === "combat") {
+				winProb += combatWinProb(effect.scale);
+			}
 			if (effect.kind === "win-prob") {
 				const when = effect.when ?? "always";
 				const matches =

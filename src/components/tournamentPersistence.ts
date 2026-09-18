@@ -3,6 +3,7 @@ import type { CompletedDraft, TournamentState } from "../engine";
 import { parseTeamName } from "./teamName";
 
 export const TOURNAMENT_STORAGE_KEY = "major-winners:tournament:v2";
+export const COMMUNITY_STORAGE_KEY = "major-winners:community:v1";
 export const TOURNAMENT_STORAGE_VERSION = 2;
 
 export type PersistedTournamentRun = {

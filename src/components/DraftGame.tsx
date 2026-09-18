@@ -1,4 +1,25 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
+import {
+	buildCommunityOpponents,
+	completedDraftFromSnapshot,
+	fetchBestRuns,
+	fetchMyTeams,
+	fetchSavedTeams,
+	getSession,
+	isCommunityEnabled,
+	loadPublishedFingerprints,
+	mergeOpponentPools,
+	onAuthChange,
+	type PublishedRunSnapshot,
+	parseAuthorName,
+	publishFinishedRun,
+	rememberPublishedFingerprint,
+	runFingerprint,
+	type SavedTeamSnapshot,
+	signInWithMagicLink,
+	signOut as signOutCommunity,
+	snapshotDraftFields,
+} from "../community";
 import type { Coach, Dataset, Org, Role } from "../data";
 import { ROLES } from "../data";
 import {
@@ -23,6 +44,7 @@ import {
 	ratePlayers,
 	recordDailyResult,
 	startDraft,
+	summarizeTournamentRun,
 	type TeamProfile,
 	type TournamentState,
 } from "../engine";
@@ -41,19 +63,27 @@ import {
 import { GAME_LABELS, TIER_LABELS, TIER_STYLES } from "./draftPresentation";
 import { LEGACY_MAJOR_LOGO, LEGACY_MAJOR_REEL_ID, visibleLabel } from "./draftReel";
 import { HomeLogo } from "./HomeLogo";
-import { DailyStatsPanel, HomeScreen, type HomeView } from "./HomeScreen";
+import { DailyStatsPanel, type HomeAction, HomeScreen, type HomeView } from "./HomeScreen";
 import { MajorCrest } from "./MajorCrest";
 import { OrgCrest } from "./OrgCrest";
+import { SaveTeamPanel, saveResultMessage } from "./SaveTeam";
 import { TournamentRun } from "./TournamentRun";
 import { DEFAULT_TEAM_NAME, parseTeamName, TEAM_NAME_MAX } from "./teamName";
 import {
+	COMMUNITY_STORAGE_KEY,
 	parsePersistedTournamentRun,
 	TOURNAMENT_STORAGE_KEY,
 	TOURNAMENT_STORAGE_VERSION,
 } from "./tournamentPersistence";
 
 const INITIAL_SEED = 0x4d_41_4a_4f;
-type GameMode = "daily" | "free";
+type GameMode = "daily" | "free" | "community";
+
+function persistKey(mode: GameMode | null): string | null {
+	if (mode === "free") return TOURNAMENT_STORAGE_KEY;
+	if (mode === "community") return COMMUNITY_STORAGE_KEY;
+	return null;
+}
 
 type DraftGameProps = {
 	dataset: Dataset;
@@ -347,9 +377,24 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [homeView, setHomeView] = useState<HomeView>("menu");
 	const [hasDailyAttempt, setHasDailyAttempt] = useState(false);
 	const [hasFreePlaySave, setHasFreePlaySave] = useState(false);
+	const [hasCommunitySave, setHasCommunitySave] = useState(false);
 	const [pendingRestart, setPendingRestart] = useState(false);
 	const [rollKind, setRollKind] = useState<DraftRollKind>("full");
 	const [settledCardKey, setSettledCardKey] = useState<string | null>(null);
+	const [communityRuns, setCommunityRuns] = useState<PublishedRunSnapshot[]>([]);
+	const [communityTeams, setCommunityTeams] = useState<SavedTeamSnapshot[]>([]);
+	const [myTeams, setMyTeams] = useState<SavedTeamSnapshot[]>([]);
+	const [userEmail, setUserEmail] = useState<string | null>(null);
+	const [userId, setUserId] = useState<string | null>(null);
+	const [emailDraft, setEmailDraft] = useState("");
+	const [authBusy, setAuthBusy] = useState(false);
+	const [authMessage, setAuthMessage] = useState<string | null>(null);
+	const [authError, setAuthError] = useState<string | null>(null);
+	const [saveBusy, setSaveBusy] = useState(false);
+	const [saveError, setSaveError] = useState<string | null>(null);
+	const [saveMessage, setSaveMessage] = useState<string | null>(null);
+	const [savedFingerprints, setSavedFingerprints] = useState<Set<string>>(() => new Set());
+	const communityEnabled = isCommunityEnabled();
 
 	const playersById = useMemo(
 		() => new Map(dataset.playerSeasons.map((player) => [player.id, player])),
@@ -369,9 +414,20 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		[dataset.coaches],
 	);
 	const ratedPlayers = useMemo(() => ratePlayers(dataset.playerSeasons), [dataset.playerSeasons]);
-	const opponents = useMemo(
+	const historicalOpponents = useMemo(
 		() => buildHistoricalOpponents(dataset, ratedPlayers),
 		[dataset, ratedPlayers],
+	);
+	const communityOpponents = useMemo(
+		() => buildCommunityOpponents(communityTeams, dataset, ratedPlayers),
+		[communityTeams, dataset, ratedPlayers],
+	);
+	const opponents = useMemo(
+		() =>
+			mode === "community"
+				? mergeOpponentPools(communityOpponents, historicalOpponents)
+				: historicalOpponents,
+		[communityOpponents, historicalOpponents, mode],
 	);
 
 	useEffect(() => {
@@ -390,10 +446,64 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					),
 				),
 			);
+			setHasCommunitySave(
+				Boolean(
+					parsePersistedTournamentRun(
+						window.localStorage.getItem(COMMUNITY_STORAGE_KEY) ?? "",
+						dataset,
+					),
+				),
+			);
+			setSavedFingerprints(loadPublishedFingerprints(window.localStorage));
 		} catch {
 			// Storage may be unavailable in privacy-restricted browser contexts.
 		}
 	}, [dataset]);
+
+	useEffect(() => {
+		if (!communityEnabled) return;
+		let cancelled = false;
+		void Promise.all([fetchBestRuns(), fetchSavedTeams()]).then(([runs, teams]) => {
+			if (cancelled) return;
+			setCommunityRuns(runs);
+			setCommunityTeams(teams);
+		});
+		return () => {
+			cancelled = true;
+		};
+	}, [communityEnabled]);
+
+	useEffect(() => {
+		if (!communityEnabled) return;
+		let cancelled = false;
+		void getSession().then((session) => {
+			if (cancelled) return;
+			setUserEmail(session?.user.email ?? null);
+			setUserId(session?.user.id ?? null);
+		});
+		const stop = onAuthChange((session) => {
+			setUserEmail(session?.user.email ?? null);
+			setUserId(session?.user.id ?? null);
+		});
+		return () => {
+			cancelled = true;
+			stop();
+		};
+	}, [communityEnabled]);
+
+	useEffect(() => {
+		if (!communityEnabled || !userId) {
+			setMyTeams([]);
+			return;
+		}
+		let cancelled = false;
+		void fetchMyTeams(userId).then((teams) => {
+			if (!cancelled) setMyTeams(teams);
+		});
+		return () => {
+			cancelled = true;
+		};
+	}, [communityEnabled, userId]);
 
 	function beginDaily() {
 		setError(null);
@@ -423,16 +533,19 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setMode("daily");
 	}
 
-	function beginFree(options: { restore?: boolean; seed?: number | string } = {}) {
+	function beginPersistedMode(
+		nextMode: "free" | "community",
+		options: { restore?: boolean; seed?: number | string } = {},
+	) {
 		setError(null);
 		setPendingRestart(false);
-		if (options.restore) {
+		setSaveError(null);
+		setSaveMessage(null);
+		const key = persistKey(nextMode);
+		if (options.restore && key) {
 			let persisted = null;
 			try {
-				persisted = parsePersistedTournamentRun(
-					window.localStorage.getItem(TOURNAMENT_STORAGE_KEY) ?? "",
-					dataset,
-				);
+				persisted = parsePersistedTournamentRun(window.localStorage.getItem(key) ?? "", dataset);
 			} catch {
 				// Storage may be unavailable in privacy-restricted browser contexts.
 			}
@@ -451,7 +564,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					coachId: draft.coachId,
 				});
 				setTournament(persisted.tournament);
-				setMode("free");
+				setMode(nextMode);
 				return;
 			}
 		}
@@ -460,7 +573,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setNameError(null);
 		setSeedError(null);
 		try {
-			window.localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
+			if (key) window.localStorage.removeItem(key);
 		} catch {
 			// The in-memory run is authoritative until the next persist.
 		}
@@ -468,12 +581,18 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setRollKind("full");
 		setSettledCardKey(null);
 		setTournament(null);
-		setMode("free");
+		setMode(nextMode);
 	}
 
-	function chooseHomeAction(action: "daily" | "free" | "custom" | "stats") {
+	function beginFree(options: { restore?: boolean; seed?: number | string } = {}) {
+		beginPersistedMode("free", options);
+	}
+
+	function chooseHomeAction(action: HomeAction) {
 		setNameError(null);
 		setSeedError(null);
+		setAuthError(null);
+		setAuthMessage(null);
 		if (action === "stats") {
 			setHomeView("stats");
 			return;
@@ -486,6 +605,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			beginFree({ restore: hasFreePlaySave });
 			return;
 		}
+		if (action === "community") {
+			beginPersistedMode("community", { restore: hasCommunitySave });
+			return;
+		}
 		setHomeView(action);
 	}
 
@@ -496,6 +619,65 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			return;
 		}
 		beginFree({ seed });
+	}
+
+	function beginFromSavedTeam(team: SavedTeamSnapshot, nextMode: "free" | "community") {
+		const draft = completedDraftFromSnapshot(team, dataset);
+		if (!draft) {
+			setAuthError("That roster is no longer valid in the current dataset.");
+			return;
+		}
+		setError(null);
+		setPendingRestart(false);
+		setSaveError(null);
+		setSaveMessage(null);
+		setNameError(null);
+		setTeamName(team.teamName);
+		setNameDraft(team.teamName);
+		setState({
+			seed: draft.seed,
+			phase: { type: "complete" },
+			cards: draft.cards,
+			coachIds: dataset.coaches.map((row) => row.id),
+			rerolls: { majorRemaining: 0, teamRemaining: 0 },
+			roster: draft.roster,
+			coachId: draft.coachId,
+		});
+		setRollKind("full");
+		setSettledCardKey(null);
+		setTournament(null);
+		setMode(nextMode);
+		setHomeView("menu");
+		try {
+			const key = persistKey(nextMode);
+			if (key) window.localStorage.removeItem(key);
+		} catch {
+			// In-memory reused roster is authoritative until Start Major.
+		}
+	}
+
+	async function submitMagicLink() {
+		const email = emailDraft.trim();
+		if (!email.includes("@")) {
+			setAuthError("Enter an email for a magic link.");
+			return;
+		}
+		setAuthBusy(true);
+		setAuthError(null);
+		setAuthMessage(null);
+		const error = await signInWithMagicLink(email, window.location.origin);
+		setAuthBusy(false);
+		if (error) {
+			setAuthError(error);
+			return;
+		}
+		setAuthMessage("Check your email for the sign-in link.");
+	}
+
+	async function submitSignOut() {
+		await signOutCommunity();
+		setMyTeams([]);
+		setHomeView("menu");
 	}
 
 	function goHome() {
@@ -517,8 +699,28 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					),
 				),
 			);
+			setHasCommunitySave(
+				Boolean(
+					parsePersistedTournamentRun(
+						window.localStorage.getItem(COMMUNITY_STORAGE_KEY) ?? "",
+						dataset,
+					),
+				),
+			);
 		} catch {
 			// Storage may be unavailable in privacy-restricted browser contexts.
+		}
+	}
+
+	function clearSavedRun() {
+		try {
+			if (mode === "daily") clearDailyAttempt(window.localStorage);
+			else {
+				const key = persistKey(mode);
+				if (key) window.localStorage.removeItem(key);
+			}
+		} catch {
+			// The in-memory reset is authoritative.
 		}
 	}
 
@@ -537,12 +739,15 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setSettledCardKey(null);
 		setError(null);
 		setTournament(null);
-		try {
-			if (mode === "daily") clearDailyAttempt(window.localStorage);
-			else window.localStorage.removeItem(TOURNAMENT_STORAGE_KEY);
-		} catch {
-			// The in-memory reset is authoritative.
-		}
+		clearSavedRun();
+	}
+
+	function abandonRun() {
+		setTournament(null);
+		setError(null);
+		setPendingRestart(false);
+		clearSavedRun();
+		goHome();
 	}
 
 	const card = currentCard(state);
@@ -644,10 +849,11 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	}
 
 	useEffect(() => {
-		if (mode !== "free" || !tournament || !completedDraft) return;
+		const key = persistKey(mode);
+		if (!key || !tournament || !completedDraft) return;
 		try {
 			window.localStorage.setItem(
-				TOURNAMENT_STORAGE_KEY,
+				key,
 				JSON.stringify({
 					version: TOURNAMENT_STORAGE_VERSION,
 					rootSeed: tournament.rootSeed,
@@ -687,6 +893,54 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	}, [identity.day, mode, tournament]);
 	const dailyResult =
 		mode === "daily" && tournament ? dailyResultFromTournament(identity.day, tournament) : null;
+	const runSummary =
+		tournament && teamProfile && tournament.status !== "active"
+			? summarizeTournamentRun(tournament, teamProfile)
+			: null;
+	const publishFingerprint =
+		completedDraft && runSummary && mode
+			? runFingerprint({
+					...snapshotDraftFields(completedDraft),
+					mode,
+					wins: runSummary.wins,
+					losses: runSummary.losses,
+					mapsWon: runSummary.mapsWon,
+					mapsLost: runSummary.mapsLost,
+					roundsWon: runSummary.roundsWon,
+					roundsLost: runSummary.roundsLost,
+				})
+			: null;
+	const alreadySaved = Boolean(publishFingerprint && savedFingerprints.has(publishFingerprint));
+
+	async function saveFinishedTeam(authorName: string) {
+		if (!completedDraft || !runSummary || !mode || !communityEnabled) return;
+		setSaveBusy(true);
+		setSaveError(null);
+		setSaveMessage(null);
+		const result = await publishFinishedRun({
+			authorName: parseAuthorName(authorName),
+			teamName,
+			mode,
+			draft: completedDraft,
+			summary: runSummary,
+			userId,
+		});
+		setSaveBusy(false);
+		if (!result.ok) {
+			setSaveError(result.error);
+			return;
+		}
+		setSaveMessage(saveResultMessage(result));
+		setSavedFingerprints((current) => new Set(current).add(result.fingerprint));
+		try {
+			rememberPublishedFingerprint(window.localStorage, result.fingerprint);
+		} catch {
+			// Remembering locally is best-effort.
+		}
+		void fetchBestRuns().then(setCommunityRuns);
+		void fetchSavedTeams().then(setCommunityTeams);
+		if (userId) void fetchMyTeams(userId).then(setMyTeams);
+	}
 	const simulating = Boolean(!pendingRestart && tournament && teamProfile);
 	const seedLabel =
 		mode === "daily" ? `${identity.id} · UTC seed ${state.seed}` : `Seed ${state.seed}`;
@@ -719,6 +973,31 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				hasFreePlaySave={hasFreePlaySave}
 				seedDraft={seedDraft}
 				seedError={seedError}
+				community={{
+					enabled: communityEnabled,
+					hasSave: hasCommunitySave,
+					userEmail,
+					authBusy,
+					authMessage,
+					authError,
+					emailDraft,
+					runs: communityRuns,
+					teams: communityTeams,
+					myTeams,
+					dataset,
+					ratedPlayers,
+					onEmailDraft: (value) => {
+						setEmailDraft(value);
+						setAuthError(null);
+					},
+					onSignIn: () => {
+						void submitMagicLink();
+					},
+					onSignOut: () => {
+						void submitSignOut();
+					},
+					onPlayTeam: beginFromSavedTeam,
+				}}
 				onView={setHomeView}
 				onSeedDraft={(value) => {
 					setSeedDraft(value);
@@ -741,7 +1020,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						<p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300">
 							{mode === "daily"
 								? `Today’s Challenge · ${identity.day} UTC · ${identity.id}`
-								: "Free Play"}
+								: mode === "community"
+									? "Versus community"
+									: "Free Play"}
 						</p>
 						<h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 							{teamName}
@@ -806,9 +1087,26 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								orgsById={orgsById}
 								playersById={playersById}
 								onChange={setTournament}
-								onAbandon={requestNewDraft}
+								onAbandon={abandonRun}
 								terminalExtras={
-									dailyResult ? (
+									communityEnabled && runSummary ? (
+										<div className="mt-4 space-y-4">
+											<SaveTeamPanel
+												teamName={teamName}
+												signedIn={Boolean(userId)}
+												alreadySaved={alreadySaved}
+												busy={saveBusy}
+												message={saveMessage}
+												error={saveError}
+												onSave={(author) => {
+													void saveFinishedTeam(author);
+												}}
+											/>
+											{dailyResult ? (
+												<DailySharePanel result={dailyResult} stats={dailyStats} />
+											) : null}
+										</div>
+									) : dailyResult ? (
 										<DailySharePanel result={dailyResult} stats={dailyStats} />
 									) : undefined
 								}

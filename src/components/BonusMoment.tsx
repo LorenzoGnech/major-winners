@@ -31,11 +31,9 @@ function TraitArt({ trait }: { trait: BonusDefinition }) {
 export function BonusMoment({
 	trait,
 	player,
-	footer,
 }: {
 	trait: BonusDefinition;
 	player: Pick<PlayerSeason, "playerId" | "nick" | "photo">;
-	footer?: React.ReactNode;
 }) {
 	const malus = trait.polarity === "malus";
 	const tone = malus ? "text-amber-300" : "text-sky-300";
@@ -101,7 +99,6 @@ export function BonusMoment({
 					</div>
 				</div>
 			</div>
-			{footer ? <div className="relative mt-8 flex justify-center">{footer}</div> : null}
 		</div>
 	);
 }

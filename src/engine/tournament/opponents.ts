@@ -138,6 +138,7 @@ export function buildHistoricalOpponents(
 					? (majorsById.get(orgYear.majorId)?.shortName ?? orgYear.year)
 					: `Legacy ${orgYear.year}`
 			}`,
+			source: "historical" as const,
 			org: {
 				id: orgYear.orgId,
 				name: org?.name ?? orgYear.orgId,

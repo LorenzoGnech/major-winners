@@ -2,6 +2,6 @@
 	"name": "major",
 	"compatibility_date": "2026-09-17",
 	"assets": {
-		"directory": "./dist",
-	},
+		"directory": "./dist"
+	}
 }

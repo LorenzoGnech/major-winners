@@ -5,6 +5,8 @@ export {
 	type BonusId,
 	type BonusPolarity,
 	bonusById,
+	COMBAT_WIN_PROB_WEIGHT,
+	combatWinProb,
 	eligibleTraits,
 	isBonusId,
 	type LingeringBonus,
@@ -12,6 +14,7 @@ export {
 	revealTraits,
 	TRAIT_PROC_CHANCE,
 	TRAIT_REVEAL_CHANCE,
+	traitDraftHint,
 } from "./bonuses";
 export {
 	DAILY_STATS_VERSION,
@@ -183,6 +186,7 @@ export {
 	commitLiveMatch,
 	createTournament,
 	type HistoricalOpponent,
+	type OpponentSource,
 	type PlayoffRound,
 	type RunPlayerStats,
 	runNextMatch,

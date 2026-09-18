@@ -205,11 +205,7 @@ export function DraftRoll({
 							durationMs={TEAM_SPIN_MS}
 							onLanded={() => setTeamStatus("locked")}
 							renderItem={(item) => (
-								<TeamReelRow
-									item={item}
-									org={orgsById.get(item.orgId)}
-									showAppearance
-								/>
+								<TeamReelRow item={item} org={orgsById.get(item.orgId)} showAppearance />
 							)}
 						/>
 					)}

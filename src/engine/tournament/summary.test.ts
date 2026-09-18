@@ -147,6 +147,7 @@ function opponent(team: TeamProfile, label: string): HistoricalOpponent {
 	return {
 		id: team.members[0]?.orgId ?? label,
 		label,
+		source: "historical",
 		org: { id: team.members[0]?.orgId ?? "org", name: label },
 		profile: team,
 	};

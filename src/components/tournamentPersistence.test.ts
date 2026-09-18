@@ -6,7 +6,12 @@ import {
 	createTournament,
 	ratePlayers,
 } from "../engine";
-import { parsePersistedTournamentRun, TOURNAMENT_STORAGE_VERSION } from "./tournamentPersistence";
+import {
+	COMMUNITY_STORAGE_KEY,
+	parsePersistedTournamentRun,
+	TOURNAMENT_STORAGE_KEY,
+	TOURNAMENT_STORAGE_VERSION,
+} from "./tournamentPersistence";
 
 const dataset = loadDataset();
 const opponents = buildHistoricalOpponents(dataset, ratePlayers(dataset.playerSeasons));
@@ -84,5 +89,9 @@ describe("tournament persistence", () => {
 				dataset,
 			),
 		).toBeNull();
+	});
+
+	it("keeps Versus community on a separate storage key", () => {
+		expect(COMMUNITY_STORAGE_KEY).not.toBe(TOURNAMENT_STORAGE_KEY);
 	});
 });

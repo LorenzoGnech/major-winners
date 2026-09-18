@@ -14,6 +14,8 @@ const FORBIDDEN = [
 	"from 'astro'",
 	"from 'astro:",
 	'from "astro:',
+	'from "@supabase',
+	"from '@supabase",
 ];
 
 async function listTsFiles(dir: string): Promise<string[]> {

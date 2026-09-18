@@ -41,6 +41,27 @@ function sameRoster(left: TeamProfile, right: TeamProfile): boolean {
 	return ids.size === right.members.length && right.members.every((member) => ids.has(member.id));
 }
 
+function pickFromCandidates(
+	state: TournamentState,
+	candidates: readonly HistoricalOpponent[],
+): HistoricalOpponent {
+	const previousOverall =
+		state.history.at(-1)?.opponent.profile.overall ?? Number.NEGATIVE_INFINITY;
+	const floorIndex = candidates.findIndex(
+		(opponent) => opponent.profile.overall >= previousOverall,
+	);
+	const minIndex = floorIndex === -1 ? candidates.length - 1 : floorIndex;
+	const target = Math.round(desiredPercentile(state) * (candidates.length - 1));
+	const start = Math.max(minIndex, target);
+	const jitter = hashStringToSeed(
+		`${state.rootSeed}:opponent:${state.stage}:${state.history.length}`,
+	);
+	const window = Math.max(1, Math.floor(candidates.length * 0.02));
+	const offset = jitter % (window + 1);
+	const index = Math.min(candidates.length - 1, start + offset);
+	return candidates[index] as HistoricalOpponent;
+}
+
 function chooseOpponent(
 	state: TournamentState,
 	playerTeam: TeamProfile,
@@ -57,22 +78,14 @@ function chooseOpponent(
 	const noImmediateRepeat = available.filter((opponent) => opponent.id !== previousId);
 	const candidates =
 		notUsed.length > 0 ? notUsed : noImmediateRepeat.length > 0 ? noImmediateRepeat : available;
-	// buildHistoricalOpponents returns a stable strength index; filtering preserves that order.
 	const previousOverall =
 		state.history.at(-1)?.opponent.profile.overall ?? Number.NEGATIVE_INFINITY;
-	const floorIndex = candidates.findIndex(
+	const community = candidates.filter((opponent) => opponent.source === "community");
+	const communityFloor = community.filter(
 		(opponent) => opponent.profile.overall >= previousOverall,
 	);
-	const minIndex = floorIndex === -1 ? candidates.length - 1 : floorIndex;
-	const target = Math.round(desiredPercentile(state) * (candidates.length - 1));
-	const start = Math.max(minIndex, target);
-	const jitter = hashStringToSeed(
-		`${state.rootSeed}:opponent:${state.stage}:${state.history.length}`,
-	);
-	const window = Math.max(1, Math.floor(candidates.length * 0.02));
-	const offset = jitter % (window + 1);
-	const index = Math.min(candidates.length - 1, start + offset);
-	return candidates[index] as HistoricalOpponent;
+	if (communityFloor.length > 0) return pickFromCandidates(state, communityFloor);
+	return pickFromCandidates(state, candidates);
 }
 
 function prepareNext(

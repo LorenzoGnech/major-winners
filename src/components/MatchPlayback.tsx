@@ -1341,11 +1341,6 @@ export function MatchPlayback({
 		setPlaying(true);
 	}
 
-	function dismissBonusMoment() {
-		setBonusMoment(false);
-		setPlaying(true);
-	}
-
 	function dismissMapWinMoment() {
 		setMapWinMoment(null);
 		const kind = mapWinContinueKind(live);
@@ -1412,7 +1407,11 @@ export function MatchPlayback({
 					score={mapWinMoment.score}
 					seriesScore={cursor.seriesScore}
 					footer={
-						<button type="button" onClick={dismissMapWinMoment} className={CONTROL_CLASS}>
+						<button
+							type="button"
+							onClick={dismissMapWinMoment}
+							className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+						>
 							Continue
 						</button>
 					}
@@ -1443,11 +1442,6 @@ export function MatchPlayback({
 						) ?? result.teams[0].members[0],
 						playersById,
 					)}
-					footer={
-						<button type="button" onClick={dismissBonusMoment} className={CONTROL_CLASS}>
-							Continue
-						</button>
-					}
 				/>
 			) : null}
 
