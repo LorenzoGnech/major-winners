@@ -1,4 +1,5 @@
 import { access, readFile } from "node:fs/promises";
+import { HOME_HIGHLIGHTS } from "../src/components/homeHighlights";
 import { DatasetValidationError, loadDataset, playerBonusesFileSchema } from "../src/data";
 import { parseRoleOverrides } from "../src/data/roles";
 import { BONUS_CATALOG, isBonusId } from "../src/engine/bonuses";
@@ -90,13 +91,28 @@ try {
 			missingMaps.push(`maps.${map.id}: missing file public${map.background}`);
 		}
 	}
+	const missingHighlights: string[] = [];
+	for (const clip of HOME_HIGHLIGHTS) {
+		try {
+			await access(new URL(`.${clip}`, PUBLIC_DIR));
+		} catch {
+			missingHighlights.push(`homeHighlights: missing file public${clip}`);
+		}
+	}
 	if (
 		missingLogos.length > 0 ||
 		missingPhotos.length > 0 ||
 		missingBonusIcons.length > 0 ||
-		missingMaps.length > 0
+		missingMaps.length > 0 ||
+		missingHighlights.length > 0
 	) {
-		for (const issue of [...missingLogos, ...missingPhotos, ...missingBonusIcons, ...missingMaps]) {
+		for (const issue of [
+			...missingLogos,
+			...missingPhotos,
+			...missingBonusIcons,
+			...missingMaps,
+			...missingHighlights,
+		]) {
 			console.error(issue);
 		}
 		process.exit(1);
@@ -110,6 +126,7 @@ try {
 		`player-seasons  ${dataset.playerSeasons.length}`,
 		`player photos   ${dataset.playerSeasons.filter((season) => season.photo).length}`,
 		`map art         ${MAP_POOL.length}`,
+		`home highlights ${HOME_HIGHLIGHTS.length}`,
 		`role-overrides  ${Object.keys(overrides).length}`,
 		`player-bonuses  ${Object.keys(playerBonuses).length}`,
 		`coaches         ${dataset.coaches.length}`,

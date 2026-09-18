@@ -3,6 +3,9 @@ import type { PlayerSeason } from "../data";
 import type { TeamMemberProfile } from "../engine";
 import { PlayerCrest } from "./PlayerCrest";
 
+const CLUTCH_MOMENT_IN_MS = 400;
+const CLUTCH_LINE_REVEAL_MS = 240;
+
 function keyedLines(lines: readonly string[]): { key: string; line: string; latest: boolean }[] {
 	const seen = new Map<string, number>();
 	return lines.map((line, index) => {
@@ -22,6 +25,7 @@ export function ClutchMoment({
 	opponents,
 	against,
 	lines,
+	speed = 1,
 	footer,
 }: {
 	player: string;
@@ -29,6 +33,7 @@ export function ClutchMoment({
 	opponents: readonly { member: TeamMemberProfile; crest: typeof playerCrest; dead: boolean }[];
 	against: number;
 	lines: readonly string[];
+	speed?: 1 | 2 | 4;
 	footer?: ReactNode;
 }) {
 	return (
@@ -36,6 +41,7 @@ export function ClutchMoment({
 			role="dialog"
 			aria-label={`${player} clutch, 1 vs ${against}`}
 			className="absolute inset-0 z-30 flex flex-col justify-center bg-zinc-950/82 px-4 py-6 backdrop-blur-[3px] motion-safe:animate-[clutch-moment-in_400ms_ease-out] sm:px-8"
+			style={{ animationDuration: `${CLUTCH_MOMENT_IN_MS / speed}ms` }}
 		>
 			<div className="mx-auto grid w-full max-w-5xl grid-cols-1 items-center gap-6 sm:grid-cols-[minmax(8rem,12rem)_minmax(0,1fr)_minmax(10rem,16rem)]">
 				<div className="flex flex-col items-center text-center">
@@ -63,6 +69,9 @@ export function ClutchMoment({
 									latest
 										? "font-medium text-white motion-safe:animate-[draft-reveal_240ms_ease-out]"
 										: "text-zinc-400"
+								}
+								style={
+									latest ? { animationDuration: `${CLUTCH_LINE_REVEAL_MS / speed}ms` } : undefined
 								}
 							>
 								{line}

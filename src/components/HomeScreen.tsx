@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import type { DailyStats } from "../engine";
 import { summarizeDailyStats } from "../engine";
 import { CUSTOM_SEED_MAX } from "./customSeed";
+import { HomeHighlightReel } from "./HomeHighlightReel";
+import { HOME_HIGHLIGHTS } from "./homeHighlights";
 
 export type HomeView = "menu" | "custom" | "stats";
 
@@ -165,10 +167,16 @@ export function HomeScreen({
 	onStart,
 }: HomeScreenProps) {
 	return (
-		<div className="flex min-h-dvh flex-col items-center justify-center bg-black px-6 py-12">
-			<div className="flex w-full max-w-sm flex-col items-center text-center">
+		<div className="relative isolate flex min-h-dvh flex-col items-center justify-center bg-black px-6 py-12">
+			<HomeHighlightReel clips={HOME_HIGHLIGHTS} />
+			<div className="pointer-events-none fixed inset-0 bg-black/35" aria-hidden />
+			<div
+				className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.45)_62%,rgba(0,0,0,0.78)_100%)]"
+				aria-hidden
+			/>
+			<div className="relative z-10 flex w-full max-w-md flex-col items-center border border-white/10 bg-black/55 px-6 py-8 text-center backdrop-blur-xl">
 				<BrandMark size={view === "menu" ? "lg" : "sm"} />
-				<p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
+				<p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-400">
 					Counter-Strike legends draft
 				</p>
 				<h1 className="mt-2 text-4xl font-bold uppercase tracking-[0.16em] text-white sm:text-5xl">

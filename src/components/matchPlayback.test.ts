@@ -9,11 +9,16 @@ import {
 	latestRoundFeed,
 	liveBoardMorale,
 	liveLines,
+	loadPlaybackSpeed,
 	mapWinAt,
 	mapWinContinueKind,
+	PLAYBACK_SPEED_STORAGE_KEY,
+	parsePlaybackSpeed,
+	playbackClutchTickMs,
 	playbackMorale,
 	playbackTickMs,
 	resolvePlayback,
+	savePlaybackSpeed,
 	seriesRoundsWon,
 	settleWinner,
 	shouldHoldForCoachTimeout,
@@ -475,5 +480,43 @@ describe("playbackTickMs", () => {
 		expect(playbackTickMs(1)).toBe(750);
 		expect(playbackTickMs(2)).toBe(375);
 		expect(playbackTickMs(4)).toBe(187.5);
+	});
+});
+
+describe("playbackClutchTickMs", () => {
+	it("scales the featured clutch interval by the selected speed", () => {
+		expect(playbackClutchTickMs(1)).toBe(1400);
+		expect(playbackClutchTickMs(2)).toBe(700);
+		expect(playbackClutchTickMs(4)).toBe(350);
+	});
+});
+
+describe("playback speed persistence", () => {
+	it("parses only 1, 2, and 4", () => {
+		expect(parsePlaybackSpeed("1")).toBe(1);
+		expect(parsePlaybackSpeed("2")).toBe(2);
+		expect(parsePlaybackSpeed("4")).toBe(4);
+		expect(parsePlaybackSpeed("3")).toBe(1);
+		expect(parsePlaybackSpeed(null)).toBe(1);
+	});
+
+	it("round-trips through storage and ignores unavailable storage", () => {
+		const store = new Map<string, string>();
+		const storage = {
+			getItem: (key: string) => store.get(key) ?? null,
+			setItem: (key: string, value: string) => {
+				store.set(key, value);
+			},
+		};
+		savePlaybackSpeed(storage, 4);
+		expect(store.get(PLAYBACK_SPEED_STORAGE_KEY)).toBe("4");
+		expect(loadPlaybackSpeed(storage)).toBe(4);
+		expect(
+			loadPlaybackSpeed({
+				getItem: () => {
+					throw new Error("blocked");
+				},
+			}),
+		).toBe(1);
 	});
 });

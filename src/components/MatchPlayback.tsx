@@ -3,7 +3,6 @@ import type { Org, PlayerSeason, Role } from "../data";
 import {
 	applyGamePlan,
 	equipmentValue,
-	formatRoundSummary,
 	getMap,
 	type HighlightEvent,
 	initialMorale,
@@ -14,9 +13,7 @@ import {
 	playbackBanks,
 	playRound,
 	type RoundResult,
-	type RoundSummary,
 	resolveGamePlan,
-	resolveRoundSummary,
 	type SeriesResult,
 	type Side,
 	scoreboardRating,
@@ -66,6 +63,8 @@ type LiveLine = {
 
 const CONTROL_CLASS =
 	"rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition enabled:hover:border-white/30 enabled:hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-40";
+const SPEED_BUTTON_CLASS =
+	"min-w-11 flex-1 rounded-lg border px-3 py-2 text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300";
 
 const TEAM_TEXT = ["text-emerald-300", "text-amber-300"] as const;
 const FEED_BOX_CLASS = "flex h-44 flex-col overflow-hidden";
@@ -203,10 +202,39 @@ export function buildPlaybackTicks(maps: readonly MapResult[]): PlaybackTick[] {
 export const PLAYBACK_SPEEDS = [1, 2, 4] as const;
 export type PlaybackSpeed = (typeof PLAYBACK_SPEEDS)[number];
 export const PLAYBACK_TICK_MS = 750;
+export const PLAYBACK_CLUTCH_TICK_MS = 1_400;
+export const PLAYBACK_SPEED_STORAGE_KEY = "major-winners:playback-speed:v1";
 
 export function playbackTickMs(speed: PlaybackSpeed): number {
 	return PLAYBACK_TICK_MS / speed;
 }
+
+export function playbackClutchTickMs(speed: PlaybackSpeed): number {
+	return PLAYBACK_CLUTCH_TICK_MS / speed;
+}
+
+export function parsePlaybackSpeed(raw: string | null): PlaybackSpeed {
+	if (raw === "1" || raw === "2" || raw === "4") return Number(raw) as PlaybackSpeed;
+	return 1;
+}
+
+export function loadPlaybackSpeed(storage: Pick<Storage, "getItem">): PlaybackSpeed {
+	try {
+		return parsePlaybackSpeed(storage.getItem(PLAYBACK_SPEED_STORAGE_KEY));
+	} catch {
+		return 1;
+	}
+}
+
+export function savePlaybackSpeed(storage: Pick<Storage, "setItem">, speed: PlaybackSpeed): void {
+	try {
+		storage.setItem(PLAYBACK_SPEED_STORAGE_KEY, String(speed));
+	} catch {
+		// Unavailable storage must not block play.
+	}
+}
+
+let rememberedSpeed: PlaybackSpeed | null = null;
 
 export function latestRoundFeed(
 	cursor: PlaybackCursor,
@@ -304,7 +332,7 @@ export function shouldRevealBonusMoment(
 
 export const TIMEOUT_MOMENT_MS = 2_200;
 export const TIMEOUT_MOMENT_REDUCED_MS = 400;
-export const BONUS_MOMENT_MS = TIMEOUT_MOMENT_MS;
+export const BONUS_MOMENT_MS = 2_800;
 export const BONUS_MOMENT_REDUCED_MS = TIMEOUT_MOMENT_REDUCED_MS;
 
 export function formatMoralePercent(value: number): string {
@@ -703,10 +731,6 @@ function TeamLineup({
 	);
 }
 
-function resolvedSummary(round: RoundResult): RoundSummary {
-	return resolveRoundSummary(round);
-}
-
 function RoundFeedItem({
 	round,
 	kills,
@@ -950,7 +974,7 @@ export function MatchPlayback({
 	}, [mapArt]);
 	const [revealedCount, setRevealedCount] = useState(0);
 	const [playing, setPlaying] = useState(true);
-	const [speed, setSpeed] = useState<PlaybackSpeed>(1);
+	const [speed, setSpeed] = useState<PlaybackSpeed>(() => rememberedSpeed ?? 1);
 	const [settingsOpen, setSettingsOpen] = useState(false);
 	const [announcement, setAnnouncement] = useState("Replay playing.");
 	const [reducedMotion, setReducedMotion] = useState(false);
@@ -963,6 +987,16 @@ export function MatchPlayback({
 	const completionReported = useRef(false);
 	const shownMapWin = useRef<number | null>(null);
 	const awaitingNextReported = useRef(false);
+
+	useEffect(() => {
+		if (rememberedSpeed != null) {
+			setSpeed(rememberedSpeed);
+			return;
+		}
+		const stored = loadPlaybackSpeed(window.localStorage);
+		rememberedSpeed = stored;
+		setSpeed(stored);
+	}, []);
 
 	useEffect(() => {
 		const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -1083,7 +1117,7 @@ export function MatchPlayback({
 			() => {
 				setRevealedCount((count) => Math.min(playbackTicks.length, count + 1));
 			},
-			clutchSlow ? 1_400 : playbackTickMs(speed),
+			clutchSlow ? playbackClutchTickMs(speed) : playbackTickMs(speed),
 		);
 		return () => window.clearInterval(timer);
 	}, [
@@ -1301,33 +1335,6 @@ export function MatchPlayback({
 			: [];
 	const showClutchMoment = Boolean(clutchMomentActive && clutcher && momentClutch);
 
-	function announceTick(tick: PlaybackTick | undefined) {
-		if (!tick) {
-			setAnnouncement("Final result revealed.");
-			return;
-		}
-		if (tick.kind === "kill") {
-			const kill = maps[tick.mapIndex]?.rounds[tick.roundIndex]?.kills[tick.killIndex];
-			if (kill) {
-				setAnnouncement(
-					`${playerName(result as SeriesResult, kill.killerId)} killed ${playerName(result as SeriesResult, kill.victimId)}.`,
-				);
-				return;
-			}
-		}
-		const round = maps[tick.mapIndex]?.rounds[tick.roundIndex];
-		if (round) {
-			const summary = formatRoundSummary(resolvedSummary(round), shortLabels, (id) =>
-				playerName(result as SeriesResult, id),
-			);
-			setAnnouncement(
-				`Round ${round.round}: ${summary} ${round.scoreAfter[0]}–${round.scoreAfter[1]}.`,
-			);
-			return;
-		}
-		setAnnouncement("Replay advanced.");
-	}
-
 	function dismissTimeoutMoment() {
 		huddleDoneForTimeout.current = true;
 		setTimeoutMoment(false);
@@ -1360,19 +1367,11 @@ export function MatchPlayback({
 		setAnnouncement(playing ? "Replay paused." : "Replay playing.");
 	}
 
-	function step() {
-		setPlaying(false);
-		if (live && onLiveChange && !live.complete && live.current && caughtUp) {
-			const played = playRound(live);
-			if (played.ok) {
-				onLiveChange(played.value);
-				setRevealedCount((count) => count + 1);
-			}
-			return;
-		}
-		const next = playbackTicks[revealedCount];
-		setRevealedCount((count) => Math.min(playbackTicks.length, count + 1));
-		announceTick(next);
+	function chooseSpeed(option: PlaybackSpeed) {
+		rememberedSpeed = option;
+		setSpeed(option);
+		savePlaybackSpeed(window.localStorage, option);
+		setAnnouncement(`Replay speed ${option}×.`);
 	}
 
 	function restart() {
@@ -1462,6 +1461,7 @@ export function MatchPlayback({
 					}))}
 					against={momentClutch.against}
 					lines={momentLines}
+					speed={speed}
 					footer={
 						<fieldset className="flex flex-wrap justify-center gap-2">
 							<legend className="sr-only">Clutch replay controls</legend>
@@ -1472,14 +1472,6 @@ export function MatchPlayback({
 								className={CONTROL_CLASS}
 							>
 								{playing ? "Pause" : "Play"}
-							</button>
-							<button
-								type="button"
-								onClick={step}
-								disabled={complete || waitingForPlan || holdPlayback}
-								className={CONTROL_CLASS}
-							>
-								Next
 							</button>
 							<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
 								Skip to end
@@ -1587,14 +1579,6 @@ export function MatchPlayback({
 						>
 							{playing ? "Pause" : "Play"}
 						</button>
-						<button
-							type="button"
-							onClick={step}
-							disabled={complete || waitingForPlan || holdPlayback}
-							className={CONTROL_CLASS}
-						>
-							Next
-						</button>
 						<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
 							Skip to end
 						</button>
@@ -1606,7 +1590,7 @@ export function MatchPlayback({
 								onClick={() => setSettingsOpen((open) => !open)}
 								className={CONTROL_CLASS}
 							>
-								Settings
+								Settings · {speed}×
 							</button>
 							{settingsOpen ? (
 								<div
@@ -1630,14 +1614,11 @@ export function MatchPlayback({
 													key={option}
 													type="button"
 													aria-pressed={selected}
-													onClick={() => {
-														setSpeed(option);
-														setAnnouncement(`Replay speed ${option}×.`);
-													}}
-													className={`${CONTROL_CLASS} min-w-11 flex-1 ${
+													onClick={() => chooseSpeed(option)}
+													className={`${SPEED_BUTTON_CLASS} ${
 														selected
-															? "border-emerald-300/50 bg-emerald-300/15 text-emerald-100"
-															: ""
+															? "border-emerald-300 bg-emerald-300 text-zinc-950"
+															: "border-white/15 bg-white/5 text-zinc-200 hover:border-white/30 hover:bg-white/10"
 													}`}
 												>
 													{option}×
