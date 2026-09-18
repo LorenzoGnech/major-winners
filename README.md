@@ -42,3 +42,4 @@ Production is [major.lorenzognech.workers.dev](https://major.lorenzognech.worker
 
 Source code is marked MIT in `package.json`. The committed Liquipedia-derived data under
 `src/data/json/` is separately covered by [`DATA-LICENSE.md`](DATA-LICENSE.md).
+
