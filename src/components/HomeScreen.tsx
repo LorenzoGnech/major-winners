@@ -1,23 +1,18 @@
 import type { ReactNode } from "react";
-import type { DailyIdentity, DailyStats } from "../engine";
+import type { DailyStats } from "../engine";
 import { summarizeDailyStats } from "../engine";
 import { CUSTOM_SEED_MAX } from "./customSeed";
-import { TEAM_NAME_MAX } from "./teamName";
 
-export type HomeView = "menu" | "daily" | "free" | "custom" | "stats";
+export type HomeView = "menu" | "custom" | "stats";
 
 type HomeScreenProps = {
 	view: HomeView;
-	identity: DailyIdentity;
 	stats: DailyStats;
 	hasDailyAttempt: boolean;
 	hasFreePlaySave: boolean;
-	nameDraft: string;
-	nameError: string | null;
 	seedDraft: string;
 	seedError: string | null;
 	onView: (view: HomeView) => void;
-	onNameDraft: (value: string) => void;
 	onSeedDraft: (value: string) => void;
 	onChoose: (action: "daily" | "free" | "custom" | "stats") => void;
 	onStart: () => void;
@@ -159,32 +154,16 @@ export function DailyStatsPanel({ stats }: { stats: DailyStats }) {
 
 export function HomeScreen({
 	view,
-	identity,
 	stats,
 	hasDailyAttempt,
 	hasFreePlaySave,
-	nameDraft,
-	nameError,
 	seedDraft,
 	seedError,
 	onView,
-	onNameDraft,
 	onSeedDraft,
 	onChoose,
 	onStart,
 }: HomeScreenProps) {
-	const setupName = (
-		<HomeField
-			id="home-team-name"
-			label="Team name"
-			value={nameDraft}
-			onChange={onNameDraft}
-			error={nameError}
-			placeholder="e.g. Copenhagen Flames"
-			maxLength={TEAM_NAME_MAX}
-		/>
-	);
-
 	return (
 		<div className="flex min-h-dvh flex-col items-center justify-center bg-black px-6 py-12">
 			<div className="flex w-full max-w-sm flex-col items-center text-center">
@@ -213,28 +192,6 @@ export function HomeScreen({
 					</nav>
 				) : null}
 
-				{view === "daily" ? (
-					<SetupForm
-						title="Today's challenge"
-						detail={`${identity.day} UTC · same seed for everyone.`}
-						onBack={() => onView("menu")}
-						onSubmit={onStart}
-					>
-						{setupName}
-					</SetupForm>
-				) : null}
-
-				{view === "free" ? (
-					<SetupForm
-						title="Free play"
-						detail="A random draft, separate from today’s attempt."
-						onBack={() => onView("menu")}
-						onSubmit={onStart}
-					>
-						{setupName}
-					</SetupForm>
-				) : null}
-
 				{view === "custom" ? (
 					<SetupForm
 						title="Custom game"
@@ -251,7 +208,6 @@ export function HomeScreen({
 							placeholder="e.g. 2026 or my-share-code"
 							maxLength={CUSTOM_SEED_MAX}
 						/>
-						{setupName}
 					</SetupForm>
 				) : null}
 

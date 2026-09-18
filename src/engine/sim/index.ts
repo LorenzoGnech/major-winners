@@ -65,6 +65,15 @@ export {
 	scoreboard,
 	scoreboardRating,
 } from "./simulate";
+export {
+	coachTimeoutJudgment,
+	maybeQueueAutoTimeout,
+	shouldCallTimeout,
+	TIMEOUT_CALL_THRESHOLD,
+	type TimeoutCallContext,
+	timeoutCallValue,
+	timeoutContextFromMap,
+} from "./timeout";
 export type {
 	BuyType,
 	EconomyRound,

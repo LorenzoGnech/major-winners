@@ -7,6 +7,12 @@ export {
 	runNextMatch,
 	setLiveSeries,
 } from "./runner";
+export {
+	type RunPlayerStats,
+	summarizeTournamentRun,
+	type TournamentRunSummary,
+	tournamentFinishLabel,
+} from "./summary";
 export type {
 	HistoricalOpponent,
 	PlayoffRound,

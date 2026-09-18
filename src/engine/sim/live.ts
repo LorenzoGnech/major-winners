@@ -16,6 +16,7 @@ import { chooseSeriesMaps } from "./maps";
 import { applyTimeoutMorale, bumpMorale, initialMorale, resolveRoundMorale } from "./morale";
 import { chooseRoundSummary } from "./roundSummary";
 import { playbackMaps, roundWinProbability, scoreboard } from "./simulate";
+import { maybeQueueAutoTimeout } from "./timeout";
 import type {
 	BuyType,
 	EconomyState,
@@ -525,6 +526,9 @@ export function playRound(state: LiveSeriesState): LiveSeriesResult {
 		return { ok: true, value: closeMap(state, rng) };
 	}
 	current = playMapRound(current, state.teams, rng);
+	if (!current.complete) {
+		current = maybeQueueAutoTimeout(current, state.teams);
+	}
 	const withCurrent = attachRng(state, rng, current);
 	if (current.complete) {
 		return { ok: true, value: closeMap(withCurrent, rng) };
@@ -559,10 +563,7 @@ export function queueTimeout(state: LiveSeriesState): LiveSeriesResult {
 
 export function skipCurrentMap(state: LiveSeriesState): LiveSeriesState {
 	if (state.complete || !state.current) return state;
-	let next: LiveSeriesState = {
-		...state,
-		current: { ...state.current, pendingTimeout: false },
-	};
+	let next: LiveSeriesState = state;
 	while (!next.complete && next.current) {
 		const played = playRound(next);
 		if (!played.ok) break;
@@ -572,8 +573,7 @@ export function skipCurrentMap(state: LiveSeriesState): LiveSeriesState {
 }
 
 export function skipRemaining(state: LiveSeriesState): LiveSeriesState {
-	const current = state.current ? { ...state.current, pendingTimeout: false } : null;
-	let next: LiveSeriesState = { ...state, current };
+	let next: LiveSeriesState = state;
 	while (!next.complete) {
 		if (!next.current) {
 			const started = startNextMap(next, DEFAULT_GAME_PLAN);

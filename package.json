@@ -26,7 +26,9 @@
 		"roles:infer": "tsx scripts/roles-infer.ts",
 		"roles:apply": "tsx scripts/roles-apply.ts",
 		"calibrate": "tsx scripts/calibration-report.ts",
-		"sim:harness": "tsx scripts/sim-harness.ts"
+		"sim:harness": "tsx scripts/sim-harness.ts",
+		"optimize:maps": "tsx scripts/optimize-maps.ts",
+		"optimize:bonus-art": "tsx scripts/optimize-bonus-art.ts"
 	},
 	"dependencies": {
 		"@astrojs/react": "^6.0.5",
@@ -49,6 +51,7 @@
 		"got-scraping": "^3.2.15",
 		"hltv": "^3.5.0",
 		"patchright": "^1.63.0",
+		"sharp": "^0.35.4",
 		"tsx": "^4.23.13",
 		"typescript": "^5.9.3",
 		"vitest": "^5.0.1"

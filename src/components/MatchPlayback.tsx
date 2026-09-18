@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Org, PlayerSeason, Role } from "../data";
 import {
 	applyGamePlan,
-	canQueueTimeout,
 	equipmentValue,
 	formatRoundSummary,
 	getMap,
@@ -14,7 +13,6 @@ import {
 	type PlayerMapStats,
 	playbackBanks,
 	playRound,
-	queueTimeout,
 	type RoundResult,
 	type RoundSummary,
 	resolveGamePlan,
@@ -40,6 +38,7 @@ import {
 	clutchOpponents,
 } from "./clutchNarrative";
 import { MapWinMoment } from "./MapWinMoment";
+import { preloadMapArt } from "./mapArt";
 import { OrgCrest } from "./OrgCrest";
 import { PlayerCrest } from "./PlayerCrest";
 import { lineupDeadIds, liveCastLines } from "./roundCast";
@@ -272,6 +271,15 @@ export function shouldRevealTimeoutMoment(
 	mapOpen: boolean,
 ): boolean {
 	return armed && caughtUp && mapOpen;
+}
+
+export function shouldHoldForCoachTimeout(
+	pendingTimeout: boolean,
+	caughtUp: boolean,
+	mapOpen: boolean,
+	huddleDone: boolean,
+): boolean {
+	return pendingTimeout && caughtUp && mapOpen && !huddleDone;
 }
 
 export function upcomingBonusRound(
@@ -931,6 +939,15 @@ export function MatchPlayback({
 	const shortLabels = [teamLabels[0], opponentOrg?.name ?? teamLabels[1]] as const;
 	const maps = result?.maps ?? [];
 	const playbackTicks = useMemo(() => buildPlaybackTicks(maps), [maps]);
+	const mapArt = useMemo(() => {
+		const queued = live?.mapQueue.map((map) => map.background) ?? [];
+		const played = maps.map((map) => map.mapContext?.background).filter(Boolean) as string[];
+		return [...queued, ...played];
+	}, [live?.mapQueue, maps]);
+
+	useEffect(() => {
+		preloadMapArt(mapArt);
+	}, [mapArt]);
 	const [revealedCount, setRevealedCount] = useState(0);
 	const [playing, setPlaying] = useState(true);
 	const [speed, setSpeed] = useState<PlaybackSpeed>(1);
@@ -939,6 +956,7 @@ export function MatchPlayback({
 	const [reducedMotion, setReducedMotion] = useState(false);
 	const [timeoutMoment, setTimeoutMoment] = useState(false);
 	const [timeoutHuddleArmed, setTimeoutHuddleArmed] = useState(false);
+	const huddleDoneForTimeout = useRef(false);
 	const [bonusMoment, setBonusMoment] = useState(false);
 	const shownBonusKey = useRef<string | null>(null);
 	const [mapWinMoment, setMapWinMoment] = useState<MapWinReveal | null>(null);
@@ -961,14 +979,24 @@ export function MatchPlayback({
 	const waitingForPlan = isWaitingForNextMap(live, caughtUp);
 	const waitingForRound = Boolean(live && !live.complete && live.current && caughtUp);
 	const mapOpen = Boolean(live?.current && !live.current.complete);
+	const pendingTimeout = Boolean(live?.current?.pendingTimeout);
 	const upcomingBonus = upcomingBonusRound(maps, playbackTicks, revealedCount);
 	const holdPlayback = Boolean(
 		timeoutMoment ||
 			bonusMoment ||
 			mapWinMoment ||
 			shouldRevealTimeoutMoment(timeoutHuddleArmed, caughtUp, mapOpen) ||
+			shouldHoldForCoachTimeout(pendingTimeout, caughtUp, mapOpen, huddleDoneForTimeout.current) ||
 			shouldRevealBonusMoment(upcomingBonus, shownBonusKey.current),
 	);
+
+	useLayoutEffect(() => {
+		if (!pendingTimeout) {
+			huddleDoneForTimeout.current = false;
+			return;
+		}
+		if (!huddleDoneForTimeout.current) setTimeoutHuddleArmed(true);
+	}, [pendingTimeout]);
 
 	useEffect(() => {
 		if (
@@ -999,6 +1027,7 @@ export function MatchPlayback({
 		if (!timeoutMoment) return;
 		const hold = window.setTimeout(
 			() => {
+				huddleDoneForTimeout.current = true;
 				setTimeoutMoment(false);
 				setPlaying(true);
 			},
@@ -1130,6 +1159,7 @@ export function MatchPlayback({
 		setPlaying(false);
 		setTimeoutMoment(false);
 		setTimeoutHuddleArmed(false);
+		huddleDoneForTimeout.current = true;
 		setBonusMoment(false);
 		setMapWinMoment(null);
 		shownMapWin.current = null;
@@ -1299,6 +1329,7 @@ export function MatchPlayback({
 	}
 
 	function dismissTimeoutMoment() {
+		huddleDoneForTimeout.current = true;
 		setTimeoutMoment(false);
 		setPlaying(true);
 	}
@@ -1352,21 +1383,6 @@ export function MatchPlayback({
 		setBonusMoment(false);
 		setRevealedCount(0);
 		setAnnouncement("Replay restarted.");
-	}
-
-	function timeout() {
-		if (!live || !onLiveChange) return;
-		setSettingsOpen(false);
-		const queued = queueTimeout(live);
-		if (queued.ok) {
-			onLiveChange(queued.value);
-			setTimeoutHuddleArmed(true);
-			if (!caughtUp) {
-				setAnnouncement("Timeout queued for the next round.");
-			}
-			return;
-		}
-		setAnnouncement(queued.error.message);
 	}
 
 	const headingEyebrow = eyebrow ?? `${result.format} match`;
@@ -1579,18 +1595,6 @@ export function MatchPlayback({
 						>
 							Next
 						</button>
-						{live ? (
-							<button
-								type="button"
-								onClick={timeout}
-								disabled={!canQueueTimeout(live) || holdPlayback}
-								className={CONTROL_CLASS}
-							>
-								{live.current?.pendingTimeout
-									? "Timeout called"
-									: `Timeout (${live.current?.timeoutsRemaining ?? 0})`}
-							</button>
-						) : null}
 						<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
 							Skip to end
 						</button>

@@ -23,15 +23,15 @@ export type SimMap = {
 };
 
 export const MAP_POOL: readonly SimMap[] = [
-	{ id: "mirage", label: "Mirage", background: "/maps/mirage.png", style: "aim" },
-	{ id: "dust2", label: "Dust II", background: "/maps/dust2.jpg", style: "aim" },
-	{ id: "inferno", label: "Inferno", background: "/maps/inferno.png", style: "tactical" },
-	{ id: "nuke", label: "Nuke", background: "/maps/nuke.png", style: "tactical" },
-	{ id: "ancient", label: "Ancient", background: "/maps/ancient.png", style: "tactical" },
-	{ id: "anubis", label: "Anubis", background: "/maps/anubis.png", style: "hybrid" },
-	{ id: "overpass", label: "Overpass", background: "/maps/overpass.jpg", style: "hybrid" },
-	{ id: "cache", label: "Cache", background: "/maps/cache.jpg", style: "aim" },
-	{ id: "cobble", label: "Cobblestone", background: "/maps/cobble.jpg", style: "tactical" },
+	{ id: "mirage", label: "Mirage", background: "/maps/mirage.webp", style: "aim" },
+	{ id: "dust2", label: "Dust II", background: "/maps/dust2.webp", style: "aim" },
+	{ id: "inferno", label: "Inferno", background: "/maps/inferno.webp", style: "tactical" },
+	{ id: "nuke", label: "Nuke", background: "/maps/nuke.webp", style: "tactical" },
+	{ id: "ancient", label: "Ancient", background: "/maps/ancient.webp", style: "tactical" },
+	{ id: "anubis", label: "Anubis", background: "/maps/anubis.webp", style: "hybrid" },
+	{ id: "overpass", label: "Overpass", background: "/maps/overpass.webp", style: "hybrid" },
+	{ id: "cache", label: "Cache", background: "/maps/cache.webp", style: "aim" },
+	{ id: "cobble", label: "Cobblestone", background: "/maps/cobble.webp", style: "tactical" },
 ];
 
 const MAP_BY_ID = new Map(MAP_POOL.map((map) => [map.id, map]));

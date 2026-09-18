@@ -35,6 +35,8 @@ export function MapPicker({
 								<img
 									src={map.background}
 									alt=""
+									loading="lazy"
+									decoding="async"
 									className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
 								/>
 								<span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />

@@ -16,6 +16,7 @@ import {
 	resolvePlayback,
 	seriesRoundsWon,
 	settleWinner,
+	shouldHoldForCoachTimeout,
 	shouldRevealTimeoutMoment,
 	timeoutBoostVisible,
 	upcomingBonusRound,
@@ -427,6 +428,15 @@ describe("shouldRevealTimeoutMoment", () => {
 		expect(shouldRevealTimeoutMoment(true, true, true)).toBe(true);
 		expect(shouldRevealTimeoutMoment(true, true, false)).toBe(false);
 		expect(shouldRevealTimeoutMoment(false, true, true)).toBe(false);
+	});
+});
+
+describe("shouldHoldForCoachTimeout", () => {
+	it("holds playback until the huddle has finished for a queued coach timeout", () => {
+		expect(shouldHoldForCoachTimeout(true, true, true, false)).toBe(true);
+		expect(shouldHoldForCoachTimeout(true, false, true, false)).toBe(false);
+		expect(shouldHoldForCoachTimeout(true, true, true, true)).toBe(false);
+		expect(shouldHoldForCoachTimeout(false, true, true, false)).toBe(false);
 	});
 });
 

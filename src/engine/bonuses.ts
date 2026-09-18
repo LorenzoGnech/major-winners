@@ -22,11 +22,12 @@ export const BONUS_IDS = [
 	"pregnant",
 	"vac-ban",
 	"save",
-	"god-hunden",
 	"tactical-genius",
 	"na-player",
 	"jacked",
 	"one-more-star",
+	"new-porsche",
+	"duk",
 ] as const;
 
 export type BonusId = (typeof BONUS_IDS)[number];
@@ -49,6 +50,7 @@ export type BonusDefinition = {
 	name: string;
 	blurb: string;
 	icon: string;
+	art: string;
 	effects: readonly BonusEffect[];
 	linger?: { type: "map" } | { type: "rounds"; count: number };
 };
@@ -64,7 +66,16 @@ function def(
 	effects: readonly BonusEffect[],
 	linger?: BonusDefinition["linger"],
 ): BonusDefinition {
-	return { id, polarity, name, blurb, icon: `/bonuses/${id}.svg`, effects, linger };
+	return {
+		id,
+		polarity,
+		name,
+		blurb,
+		icon: `/bonuses/${id}.svg`,
+		art: `/bonuses/art/${id}.webp`,
+		effects,
+		linger,
+	};
 }
 
 export const BONUS_CATALOG: readonly BonusDefinition[] = [
@@ -151,14 +162,6 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		{ kind: "exclude-killer" },
 	]),
 	def(
-		"god-hunden",
-		"bonus",
-		"God Hunden",
-		"Doubles this player's power for 3 rounds",
-		[{ kind: "combat", scale: 2 }],
-		{ type: "rounds", count: 3 },
-	),
-	def(
 		"tactical-genius",
 		"bonus",
 		"Tactical Genius",
@@ -176,6 +179,14 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 	def("one-more-star", "malus", "Just one more star", "Team morale −20", [
 		{ kind: "morale", self: -20 },
 	]),
+	def(
+		"new-porsche",
+		"malus",
+		"New Porsche",
+		"Halves this player's power this round; he's busy trying out the new Porsche",
+		[{ kind: "combat", scale: 0.5 }],
+	),
+	def("duk", "malus", "Duk", "Too many chickens. Team morale −10", [{ kind: "morale", self: -10 }]),
 ];
 
 const byId = new Map(BONUS_CATALOG.map((row) => [row.id, row]));

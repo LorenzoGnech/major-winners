@@ -99,7 +99,7 @@ function TeamNameField({
 				onChange={(event) => onChange(event.target.value)}
 				className="mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 			/>
-			<p className="mt-1.5 text-[11px] text-zinc-500">Used on the draft board and every match.</p>
+			<p className="mt-1.5 text-[11px] text-zinc-500">Used on the Major board and every match.</p>
 			{error ? (
 				<p role="alert" className="mt-1.5 text-xs text-red-200">
 					{error}
@@ -408,15 +408,12 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		} catch {
 			stats = markDailyPlayed(fallbackDailyStats(), today.day);
 		}
-		const name = attempt?.teamName ?? parseTeamName(nameDraft);
-		if (!attempt && !name) {
-			setNameError("Name your team to start today’s challenge.");
-			setHomeView("daily");
-			return;
-		}
 		setIdentity(today);
 		setDailyStats(stats);
-		setTeamName(name ?? DEFAULT_TEAM_NAME);
+		setTeamName(attempt?.teamName ?? DEFAULT_TEAM_NAME);
+		setNameDraft(
+			attempt?.teamName && attempt.teamName !== DEFAULT_TEAM_NAME ? attempt.teamName : "",
+		);
 		setNameError(null);
 		const draft = attempt?.draft ?? startDraft(dataset, today.seed);
 		setState(draft);
@@ -442,6 +439,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			if (persisted) {
 				const draft = persisted.draft;
 				setTeamName(persisted.teamName ?? DEFAULT_TEAM_NAME);
+				setNameDraft(
+					persisted.teamName && persisted.teamName !== DEFAULT_TEAM_NAME ? persisted.teamName : "",
+				);
 				setNameError(null);
 				setState({
 					...draft,
@@ -455,12 +455,8 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				return;
 			}
 		}
-		const name = parseTeamName(nameDraft);
-		if (!name) {
-			setNameError("Name your team to start this run.");
-			return;
-		}
-		setTeamName(name);
+		setTeamName(DEFAULT_TEAM_NAME);
+		setNameDraft("");
 		setNameError(null);
 		setSeedError(null);
 		try {
@@ -482,29 +478,24 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			setHomeView("stats");
 			return;
 		}
-		if (action === "daily" && hasDailyAttempt) {
+		if (action === "daily") {
 			beginDaily();
 			return;
 		}
-		if (action === "free" && hasFreePlaySave) {
-			beginFree({ restore: true });
+		if (action === "free") {
+			beginFree({ restore: hasFreePlaySave });
 			return;
 		}
 		setHomeView(action);
 	}
 
 	function confirmHomeStart() {
-		if (homeView === "custom") {
-			const seed = parseCustomSeed(seedDraft);
-			const name = parseTeamName(nameDraft);
-			if (seed === null) setSeedError("Enter a seed to start a custom game.");
-			if (!name) setNameError("Name your team to start this run.");
-			if (seed === null || !name) return;
-			beginFree({ seed });
+		const seed = parseCustomSeed(seedDraft);
+		if (seed === null) {
+			setSeedError("Enter a seed to start a custom game.");
 			return;
 		}
-		if (homeView === "daily") beginDaily();
-		if (homeView === "free") beginFree();
+		beginFree({ seed });
 	}
 
 	function goHome() {
@@ -533,17 +524,12 @@ export function DraftGame({ dataset }: DraftGameProps) {
 
 	function requestNewDraft() {
 		setPendingRestart(true);
-		setNameDraft(teamName === DEFAULT_TEAM_NAME ? "" : teamName);
 		setNameError(null);
 	}
 
 	function confirmNewDraft() {
-		const name = parseTeamName(nameDraft);
-		if (!name) {
-			setNameError("Name your team to start a new draft.");
-			return;
-		}
-		setTeamName(name);
+		setTeamName(DEFAULT_TEAM_NAME);
+		setNameDraft("");
 		setNameError(null);
 		setPendingRestart(false);
 		setState(startDraft(dataset, mode === "daily" ? identity.seed : freePlaySeed()));
@@ -641,6 +627,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 
 	function startMajor() {
 		if (!completedDraft || !teamProfile) return;
+		const name = parseTeamName(nameDraft);
+		if (!name) {
+			setNameError("Name your team to start the Major.");
+			return;
+		}
+		setTeamName(name);
+		setNameError(null);
 		setTournament(
 			createTournament({
 				rootSeed: completedDraft.seed,
@@ -721,19 +714,12 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		return (
 			<HomeScreen
 				view={homeView}
-				identity={identity}
 				stats={dailyStats}
 				hasDailyAttempt={hasDailyAttempt}
 				hasFreePlaySave={hasFreePlaySave}
-				nameDraft={nameDraft}
-				nameError={nameError}
 				seedDraft={seedDraft}
 				seedError={seedError}
 				onView={setHomeView}
-				onNameDraft={(value) => {
-					setNameDraft(value);
-					setNameError(null);
-				}}
 				onSeedDraft={(value) => {
 					setSeedDraft(value);
 					setSeedError(null);
@@ -787,19 +773,8 @@ export function DraftGame({ dataset }: DraftGameProps) {
 
 						{pendingRestart && (
 							<section className="mb-5 rounded-2xl border border-emerald-300/30 bg-emerald-300/8 p-5">
-								<h2 className="text-xl font-semibold text-white">Name the new draft</h2>
+								<h2 className="text-xl font-semibold text-white">Start a new draft?</h2>
 								<p className="mt-1 text-sm text-zinc-400">This replaces the current run.</p>
-								<div className="mt-4 max-w-md">
-									<TeamNameField
-										id="restart-team-name"
-										value={nameDraft}
-										onChange={(value) => {
-											setNameDraft(value);
-											setNameError(null);
-										}}
-										error={nameError}
-									/>
-								</div>
 								<div className="mt-4 flex flex-wrap gap-2">
 									<button
 										type="button"
@@ -1033,7 +1008,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										id="complete-heading"
 										className="mt-1 text-3xl font-semibold tracking-tight text-white"
 									>
-										{teamName} is locked in
+										Name the squad
 									</h2>
 									<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-300">
 										Five players and {chosenCoach.nick} are locked in. You can still swap roles on
@@ -1041,6 +1016,17 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										fit, teammate and nationality chemistry, communication, structure, and coaching.
 									</p>
 									<TeamProfilePanel profile={teamProfile} />
+									<div className="mt-5 max-w-md">
+										<TeamNameField
+											id="major-team-name"
+											value={nameDraft}
+											onChange={(value) => {
+												setNameDraft(value);
+												setNameError(null);
+											}}
+											error={nameError}
+										/>
+									</div>
 									<div className="mt-5 flex flex-wrap gap-2">
 										<button
 											type="button"

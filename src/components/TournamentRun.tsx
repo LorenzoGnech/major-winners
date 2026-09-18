@@ -1,17 +1,20 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import type { Org, PlayerSeason } from "../data";
 import type { HistoricalOpponent, LiveSeriesState, TeamProfile, TournamentState } from "../engine";
 import {
 	beginNextMatch,
 	commitLiveMatch,
 	DEFAULT_GAME_PLAN,
+	MAP_POOL,
 	needsGamePlan,
 	setLiveSeries,
 	startNextMap,
 } from "../engine";
 import { MatchPlayback } from "./MatchPlayback";
+import { preloadMapArt } from "./mapArt";
 import { OpponentPreview } from "./OpponentPreview";
 import { OrgCrest } from "./OrgCrest";
+import { RunSummary } from "./RunSummary";
 import { visibleTournamentBoard } from "./tournamentBoard";
 
 const STAGE_LABELS = {
@@ -88,6 +91,10 @@ export function TournamentRun({
 		? resolveOpponentOrg(state.nextMatch.opponent, orgsById)
 		: undefined;
 
+	useEffect(() => {
+		preloadMapArt(MAP_POOL.map((map) => map.background));
+	}, []);
+
 	function playNext() {
 		const result = beginNextMatch(state, playerTeam, opponents);
 		if (!result.ok) {
@@ -135,43 +142,56 @@ export function TournamentRun({
 		onAbandon();
 	}
 
-	const terminalHeading =
-		board.status === "champion"
-			? "Major champions"
-			: board.status === "eliminated"
-				? "Run over"
-				: null;
+	const terminal = !liveSeries && state.status !== "active";
 
 	return (
-		<section aria-labelledby="tournament-heading">
-			<div className="rounded-2xl border border-emerald-300/25 bg-zinc-900/65 p-4 sm:p-6">
-				<div className="flex flex-wrap items-start justify-between gap-4">
-					<div>
-						<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-							Classic fantasy Major
-						</p>
-						<h2
-							id="tournament-heading"
-							className="mt-1 text-3xl font-semibold tracking-tight text-white"
-						>
-							{terminalHeading ?? STAGE_LABELS[board.stage]}
-						</h2>
-						<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
-							Two Swiss stages, then three playoff series. A flawless championship is 9–0.
-						</p>
+		<section
+			aria-labelledby={terminal ? undefined : "tournament-heading"}
+			aria-label={terminal ? "Major run" : undefined}
+		>
+			{terminal ? (
+				<RunSummary
+					state={state}
+					playerTeam={playerTeam}
+					playerTeamName={playerTeamName}
+					playersById={playersById}
+				/>
+			) : null}
+			<div
+				className={`${terminal ? "mt-5 " : ""}rounded-2xl border border-emerald-300/25 bg-zinc-900/65 p-4 sm:p-6`}
+			>
+				{terminal ? null : (
+					<div className="flex flex-wrap items-start justify-between gap-4">
+						<div>
+							<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+								Classic fantasy Major
+							</p>
+							<h2
+								id="tournament-heading"
+								className="mt-1 text-3xl font-semibold tracking-tight text-white"
+							>
+								{STAGE_LABELS[board.stage]}
+							</h2>
+							<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+								Two Swiss stages, then three playoff series. A flawless championship is 9–0.
+							</p>
+						</div>
+						<div className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-right">
+							<span className="block text-[10px] uppercase tracking-wider text-zinc-500">
+								Run record
+							</span>
+							<strong className="text-2xl tabular-nums text-white">
+								{board.history.filter((match) => match.won).length}–
+								{board.history.filter((match) => !match.won).length}
+							</strong>
+						</div>
 					</div>
-					<div className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-right">
-						<span className="block text-[10px] uppercase tracking-wider text-zinc-500">
-							Run record
-						</span>
-						<strong className="text-2xl tabular-nums text-white">
-							{board.history.filter((match) => match.won).length}–
-							{board.history.filter((match) => !match.won).length}
-						</strong>
-					</div>
-				</div>
+				)}
 
-				<div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-5">
+				{terminal ? (
+					<p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Path</p>
+				) : null}
+				<div className={`${terminal ? "mt-0" : "mt-5"} grid grid-cols-2 gap-2 sm:grid-cols-5`}>
 					<RecordCard
 						label="Challengers"
 						record={board.challengers}
@@ -233,22 +253,7 @@ export function TournamentRun({
 					</div>
 				)}
 
-				{!liveSeries && state.status !== "active" && (
-					<>
-						<div className="mt-5 rounded-xl border border-white/10 bg-black/25 p-4">
-							<p className="text-lg font-semibold text-white">
-								{state.status === "champion"
-									? "You won the Major."
-									: `Eliminated in ${STAGE_LABELS[state.stage]}.`}
-							</p>
-							<p className="mt-1 text-sm text-zinc-400">
-								Final record: {state.history.filter((match) => match.won).length}–
-								{state.history.filter((match) => !match.won).length}.
-							</p>
-						</div>
-						{terminalExtras}
-					</>
-				)}
+				{terminal ? terminalExtras : null}
 
 				{error && (
 					<p role="alert" className="mt-4 text-sm text-red-200">

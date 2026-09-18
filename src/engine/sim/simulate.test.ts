@@ -22,6 +22,7 @@ import { MAP_POOL } from "./maps";
 import { TIMEOUT_MORALE } from "./morale";
 import { formatRoundSummary } from "./roundSummary";
 import { roundWinProbability, scoreboardRating } from "./simulate";
+import { maybeQueueAutoTimeout } from "./timeout";
 import { isWeaponLegalForBuy } from "./weapons";
 
 const attributes: Attributes = {
@@ -485,6 +486,74 @@ describe("live series", () => {
 		expect(second.error.code).toBe("NO_TIMEOUTS");
 	});
 
+	it("applies at most one automatic timeout per map", () => {
+		const map = simulateSeries({ teams: equalTeams, seed: 21, format: "BO1" }).maps[0];
+		const timed = map?.rounds.filter((round) => round.timeout) ?? [];
+		expect(timed.length).toBeLessThanOrEqual(1);
+		if (timed[0]) {
+			expect(map?.highlights.some((highlight) => highlight.type === "player-timeout")).toBe(true);
+		}
+	});
+
+	it("lets a strong coach auto-queue a timeout on a trailing rifle streak", () => {
+		const started = startLiveSeries({
+			teams: equalTeams,
+			seed: 21,
+			format: "BO1",
+			playerMapId: "mirage",
+		});
+		const current = started.current;
+		expect(current).toBeTruthy();
+		if (!current) return;
+		const stubRound = {
+			round: 1,
+			phase: "regulation" as const,
+			sides: ["T", "CT"] as const,
+			winner: 1 as const,
+			winProbabilityTeamA: 0.5,
+			scoreAfter: [0, 1] as [number, number],
+			economy: [
+				{
+					buy: "full-buy" as const,
+					bankBefore: 6_000,
+					bankAfter: 4_000,
+					lossBonusBefore: 1_400,
+					lossBonusAfter: 1_400,
+				},
+				{
+					buy: "full-buy" as const,
+					bankBefore: 6_000,
+					bankAfter: 4_000,
+					lossBonusBefore: 1_400,
+					lossBonusAfter: 1_400,
+				},
+			] as const,
+			kills: [],
+			moraleAfter: [36, 62] as [number, number],
+			timeout: false,
+			summary: { kind: "default" as const, team: 1 as const },
+		};
+		const trailing = maybeQueueAutoTimeout(
+			{
+				...current,
+				score: [4, 7],
+				morale: [34, 62],
+				economies: [
+					{ bank: 6_000, lossBonus: 2_400, losses: 3 },
+					{ bank: 6_000, lossBonus: 1_400, losses: 0 },
+				],
+				rounds: Array.from({ length: 11 }, (_, index) => ({
+					...stubRound,
+					round: index + 1,
+					winner: (index < 4 ? 0 : 1) as 0 | 1,
+				})),
+			},
+			equalTeams,
+		);
+		expect(trailing.pendingTimeout).toBe(true);
+		expect(trailing.timeoutsRemaining).toBe(0);
+	});
+
 	it("skipCurrentMap finishes only the open map", () => {
 		const live = startLiveSeries({
 			teams: equalTeams,
@@ -535,15 +604,15 @@ describe("live series", () => {
 			"cobble",
 		]);
 		expect(MAP_POOL.map((map) => map.background)).toEqual([
-			"/maps/mirage.png",
-			"/maps/dust2.jpg",
-			"/maps/inferno.png",
-			"/maps/nuke.png",
-			"/maps/ancient.png",
-			"/maps/anubis.png",
-			"/maps/overpass.jpg",
-			"/maps/cache.jpg",
-			"/maps/cobble.jpg",
+			"/maps/mirage.webp",
+			"/maps/dust2.webp",
+			"/maps/inferno.webp",
+			"/maps/nuke.webp",
+			"/maps/ancient.webp",
+			"/maps/anubis.webp",
+			"/maps/overpass.webp",
+			"/maps/cache.webp",
+			"/maps/cobble.webp",
 		]);
 	});
 });

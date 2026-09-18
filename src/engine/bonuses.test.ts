@@ -103,6 +103,24 @@ describe("trait catalog", () => {
 		expect(eligibleTraits("allu-2021-ence")).toEqual([]);
 	});
 
+	it("gives every ropz season New Porsche", () => {
+		expect(eligibleTraits("ropz-2025-vitality")).toEqual(["new-porsche"]);
+		expect(eligibleTraits("ropz-2017-mouz")).toEqual(["new-porsche"]);
+		expect(bonusById("new-porsche")).toMatchObject({
+			polarity: "malus",
+			effects: [{ kind: "combat", scale: 0.5 }],
+		});
+	});
+
+	it("gives pashaBiceps both Brother and Duk", () => {
+		expect(eligibleTraits("pashabiceps-2014-virtus-pro")).toEqual(["brother", "duk"]);
+		expect(eligibleTraits("pashabiceps-2021-liquid")).toEqual(["brother", "duk"]);
+		expect(bonusById("duk")).toMatchObject({
+			polarity: "malus",
+			effects: [{ kind: "morale", self: -10 }],
+		});
+	});
+
 	it("reveals traits independently from a derived seed", () => {
 		const first = revealTraits(7, 0, 0, "s1mple-2018-navi");
 		const again = revealTraits(7, 0, 0, "s1mple-2018-navi");
@@ -112,18 +130,17 @@ describe("trait catalog", () => {
 });
 
 describe("resolveTraitRound", () => {
-	const member = profile("alpha", ["god-hunden"]).members[0];
+	const member = profile("alpha", ["mastermind"]).members[0];
 
-	it("applies God Hunden for three rounds then expires", () => {
-		const proc = resolveTraitRound({
-			lingering: [],
-			hits: [{ member, bonusId: "god-hunden" }],
-			buy: "full-buy",
-			pistol: false,
-		});
-		expect(proc.proc?.bonusId).toBe("god-hunden");
-		expect(proc.modifiers.combatScale.get(member.id)).toBe(2);
-		let lingering = tickLingering(proc.lingering);
+	it("expires round-limited lingering after the remaining ticks", () => {
+		let lingering = [
+			{
+				bonusId: "jacked" as const,
+				seasonId: member.id,
+				until: { type: "rounds" as const, remaining: 3 },
+			},
+		];
+		lingering = tickLingering(lingering);
 		expect(lingering[0]?.until).toEqual({ type: "rounds", remaining: 2 });
 		lingering = tickLingering(lingering);
 		expect(lingering[0]?.until).toEqual({ type: "rounds", remaining: 1 });
@@ -229,5 +246,10 @@ describe("bonusById", () => {
 	it("marks maluses distinctly", () => {
 		expect(bonusById("choke").polarity).toBe("malus");
 		expect(bonusById("mastermind").polarity).toBe("bonus");
+	});
+
+	it("points overlay art at public/bonuses/art/{id}.webp", () => {
+		expect(bonusById("new-porsche").art).toBe("/bonuses/art/new-porsche.webp");
+		expect(bonusById("choke").icon).toBe("/bonuses/choke.svg");
 	});
 });

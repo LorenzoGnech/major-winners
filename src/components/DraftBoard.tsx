@@ -177,13 +177,13 @@ export function PlayerDraftCard({
 			onPointerDown={onPointerDown}
 			onKeyDown={onKeyDown}
 			onDragStart={(event) => event.preventDefault()}
-			className={`flex min-h-[8.25rem] w-full touch-none overflow-hidden rounded-2xl bg-zinc-900 text-left outline-offset-2 focus-visible:outline-2 focus-visible:outline-emerald-300 ${
+			className={`flex min-h-[8.25rem] w-full touch-none rounded-2xl bg-zinc-900 text-left outline-offset-2 focus-visible:outline-2 focus-visible:outline-emerald-300 ${
 				dragging ? "opacity-40" : "cursor-grab"
 			}`}
 		>
 			<div
 				aria-hidden
-				className="relative w-[5.75rem] min-h-[8.25rem] shrink-0 self-stretch sm:w-[7.25rem]"
+				className="relative w-[5.75rem] min-h-[8.25rem] shrink-0 self-stretch overflow-hidden rounded-l-2xl sm:w-[7.25rem]"
 				style={photo ? undefined : tone}
 			>
 				{photo ? (

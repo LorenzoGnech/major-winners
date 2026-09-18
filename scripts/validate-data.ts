@@ -2,6 +2,7 @@ import { access, readFile } from "node:fs/promises";
 import { DatasetValidationError, loadDataset, playerBonusesFileSchema } from "../src/data";
 import { parseRoleOverrides } from "../src/data/roles";
 import { BONUS_CATALOG, isBonusId } from "../src/engine/bonuses";
+import { MAP_POOL } from "../src/engine/sim/maps";
 
 const PUBLIC_DIR = new URL("../public/", import.meta.url);
 
@@ -49,6 +50,11 @@ try {
 		} catch {
 			missingBonusIcons.push(`bonuses.${trait.id}: missing file public${trait.icon}`);
 		}
+		try {
+			await access(new URL(`.${trait.art}`, PUBLIC_DIR));
+		} catch {
+			missingBonusIcons.push(`bonuses.${trait.id}: missing file public${trait.art}`);
+		}
 	}
 	const missingLogos: string[] = [];
 	for (const org of dataset.orgs) {
@@ -76,8 +82,21 @@ try {
 			missingPhotos.push(`playerSeasons.${season.id}.photo: missing file public${season.photo}`);
 		}
 	}
-	if (missingLogos.length > 0 || missingPhotos.length > 0 || missingBonusIcons.length > 0) {
-		for (const issue of [...missingLogos, ...missingPhotos, ...missingBonusIcons]) {
+	const missingMaps: string[] = [];
+	for (const map of MAP_POOL) {
+		try {
+			await access(new URL(`.${map.background}`, PUBLIC_DIR));
+		} catch {
+			missingMaps.push(`maps.${map.id}: missing file public${map.background}`);
+		}
+	}
+	if (
+		missingLogos.length > 0 ||
+		missingPhotos.length > 0 ||
+		missingBonusIcons.length > 0 ||
+		missingMaps.length > 0
+	) {
+		for (const issue of [...missingLogos, ...missingPhotos, ...missingBonusIcons, ...missingMaps]) {
 			console.error(issue);
 		}
 		process.exit(1);
@@ -90,6 +109,7 @@ try {
 		`org-years       ${dataset.orgYears.length}`,
 		`player-seasons  ${dataset.playerSeasons.length}`,
 		`player photos   ${dataset.playerSeasons.filter((season) => season.photo).length}`,
+		`map art         ${MAP_POOL.length}`,
 		`role-overrides  ${Object.keys(overrides).length}`,
 		`player-bonuses  ${Object.keys(playerBonuses).length}`,
 		`coaches         ${dataset.coaches.length}`,
