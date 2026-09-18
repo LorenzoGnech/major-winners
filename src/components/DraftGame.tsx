@@ -6,14 +6,13 @@ import {
 	DUEL_POLL_MS,
 	DUEL_STORAGE_VERSION,
 	type DuelKind,
-	type DuelResultSnapshot,
 	type DuelRoom,
 	type DuelSide,
 	fetchBestRuns,
 	fetchDuel,
 	fetchEloLeaderboard,
-	fetchMyDuelResults,
 	fetchMyProfile,
+	fetchMyPublishedRuns,
 	fetchSavedTeams,
 	getSession,
 	isCommunityEnabled,
@@ -360,7 +359,15 @@ function TeamProfilePanel({ profile }: { profile: TeamProfile }) {
 	);
 }
 
-function DailySharePanel({ result, stats }: { result: DailyResult; stats: DailyStats }) {
+function DailySharePanel({
+	result,
+	stats,
+	dataset,
+}: {
+	result: DailyResult;
+	stats: DailyStats;
+	dataset: Dataset;
+}) {
 	const [status, setStatus] = useState("");
 	const url =
 		typeof window === "undefined"
@@ -428,7 +435,7 @@ function DailySharePanel({ result, stats }: { result: DailyResult; stats: DailyS
 					{status}
 				</p>
 			</section>
-			<DailyStatsPanel stats={stats} />
+			<DailyStatsPanel stats={stats} dataset={dataset} />
 		</div>
 	);
 }
@@ -458,7 +465,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [duelRoom, setDuelRoom] = useState<DuelRoom | null>(null);
 	const [duelLive, setDuelLive] = useState<LiveSeriesState | null>(null);
 	const [duelRecap, setDuelRecap] = useState(false);
-	const [duelResults, setDuelResults] = useState<DuelResultSnapshot[]>([]);
 	const [rankedResult, setRankedResult] = useState<RankedResult | null>(null);
 	const [rankedProfile, setRankedProfile] = useState<RankedProfile | null>(null);
 	const [eloBoard, setEloBoard] = useState<RankedProfile[]>([]);
@@ -480,6 +486,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const selectedPlayerIdRef = useRef<string | null>(null);
 	selectedPlayerIdRef.current = selectedPlayerId;
 	const [communityRuns, setCommunityRuns] = useState<PublishedRunSnapshot[]>([]);
+	const [myRuns, setMyRuns] = useState<PublishedRunSnapshot[]>([]);
 	const [communityTeams, setCommunityTeams] = useState<SavedTeamSnapshot[]>([]);
 	const [userEmail, setUserEmail] = useState<string | null>(null);
 	const [userId, setUserId] = useState<string | null>(null);
@@ -595,15 +602,15 @@ export function DraftGame({ dataset }: DraftGameProps) {
 
 	useEffect(() => {
 		if (!communityEnabled || !userId) {
-			setDuelResults([]);
+			setMyRuns([]);
 			setRankedProfile(null);
 			return;
 		}
 		let cancelled = false;
-		void Promise.all([fetchMyDuelResults(userId), fetchMyProfile(userId)]).then(
-			([results, profile]) => {
+		void Promise.all([fetchMyPublishedRuns(userId), fetchMyProfile(userId)]).then(
+			([runs, profile]) => {
 				if (cancelled) return;
-				setDuelResults(results);
+				setMyRuns(runs);
 				setRankedProfile(profile);
 			},
 		);
@@ -964,7 +971,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 
 	async function submitSignOut() {
 		await signOutCommunity();
-		setDuelResults([]);
+		setMyRuns([]);
 		setHomeView("menu");
 	}
 
@@ -1288,7 +1295,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	}, [identity, mode, state, teamName, tournament]);
 	useEffect(() => {
 		if (mode !== "daily" || !tournament) return;
-		const result = dailyResultFromTournament(identity.day, tournament);
+		const result = dailyResultFromTournament(identity.day, tournament, getCompletedDraft(state));
 		if (!result) return;
 		setDailyStats((stats) => {
 			const next = recordDailyResult(stats, result);
@@ -1297,7 +1304,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			} catch {}
 			return next;
 		});
-	}, [identity.day, mode, tournament]);
+	}, [identity.day, mode, state, tournament]);
 	useEffect(() => {
 		if (mode !== "duel" || !userId || !duelCode || !duelLive?.complete) return;
 		const viewer = sideIndex(duelSide);
@@ -1324,7 +1331,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				if (cancelled || !result.ok) return;
 				setRankedResult(result.value);
 				if (result.value.eloApplied) {
-					void fetchMyDuelResults(userId).then(setDuelResults);
 					void fetchMyProfile(userId).then(setRankedProfile);
 					void fetchEloLeaderboard().then(setEloBoard);
 				}
@@ -1354,11 +1360,12 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				duelStatsRecorded.current = null;
 				return;
 			}
-			void fetchMyDuelResults(userId).then(setDuelResults);
 		});
 	}, [duelCode, duelKind, duelLive, duelSecret, duelSide, mode, rankedResult, userId]);
 	const dailyResult =
-		mode === "daily" && tournament ? dailyResultFromTournament(identity.day, tournament) : null;
+		mode === "daily" && tournament
+			? dailyResultFromTournament(identity.day, tournament, completedDraft)
+			: null;
 	const runSummary =
 		tournament && teamProfile && tournament.status !== "active"
 			? summarizeTournamentRun(tournament, teamProfile)
@@ -1444,6 +1451,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		}
 		void fetchBestRuns().then(setCommunityRuns);
 		void fetchSavedTeams().then(setCommunityTeams);
+		if (userId) void fetchMyPublishedRuns(userId).then(setMyRuns);
 	}
 	const simulating = Boolean(
 		!pendingRestart && ((tournament && teamProfile) || (mode === "duel" && duelLive && !duelRecap)),
@@ -1524,7 +1532,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					onSignOut: () => {
 						void submitSignOut();
 					},
-					duelResults,
+					myRuns,
 					profile: rankedProfile,
 					eloBoard,
 					handleDraft,
@@ -1699,11 +1707,15 @@ export function DraftGame({ dataset }: DraftGameProps) {
 												}}
 											/>
 											{dailyResult ? (
-												<DailySharePanel result={dailyResult} stats={dailyStats} />
+												<DailySharePanel
+													result={dailyResult}
+													stats={dailyStats}
+													dataset={dataset}
+												/>
 											) : null}
 										</div>
 									) : dailyResult ? (
-										<DailySharePanel result={dailyResult} stats={dailyStats} />
+										<DailySharePanel result={dailyResult} stats={dailyStats} dataset={dataset} />
 									) : undefined
 								}
 							/>
@@ -1738,78 +1750,78 @@ export function DraftGame({ dataset }: DraftGameProps) {
 											Player round {state.phase.round + 1} of 5
 										</p>
 										<div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-2 sm:gap-5">
-												<div className="flex min-w-0 items-start gap-2.5 sm:gap-4">
-													<CrestRerollColumn crest={<OrgCrest org={org} size="xl" />}>
-														<button
-															type="button"
-															disabled={state.rerolls.teamRemaining <= 0}
-															onClick={() => reroll("rerollTeam")}
-															className={`${REROLL_BUTTON_CLASS} enabled:hover:border-emerald-300/50 enabled:hover:bg-emerald-300/10`}
-														>
-															{state.rerolls.teamRemaining > 0
-																? `Reroll team · ${state.rerolls.teamRemaining}`
-																: "Team rerolls used"}
-														</button>
-													</CrestRerollColumn>
-													<div className="min-w-0 pt-1">
-														<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-															Team
-														</p>
-														<h2
-															id="round-heading"
-															className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-4xl"
-														>
-															{org.name} <span className="text-zinc-500">{orgYear.year}</span>
-														</h2>
-														<p className="mt-1 text-sm text-zinc-400">
-															{GAME_LABELS[orgYear.game]}
-															{major ? ` · placed #${orgYear.placement}` : " · pre-Major legend"}
-														</p>
-													</div>
-												</div>
-												<div className="flex min-w-0 items-start gap-2.5 sm:gap-4">
-													<CrestRerollColumn
-														crest={
-															<MajorCrest
-																major={
-																	major ?? {
-																		id: LEGACY_MAJOR_REEL_ID,
-																		shortName: "Legacy wildcard",
-																		logo: LEGACY_MAJOR_LOGO,
-																	}
-																}
-																size="xl"
-															/>
-														}
+											<div className="flex min-w-0 items-start gap-2.5 sm:gap-4">
+												<CrestRerollColumn crest={<OrgCrest org={org} size="xl" />}>
+													<button
+														type="button"
+														disabled={state.rerolls.teamRemaining <= 0}
+														onClick={() => reroll("rerollTeam")}
+														className={`${REROLL_BUTTON_CLASS} enabled:hover:border-emerald-300/50 enabled:hover:bg-emerald-300/10`}
 													>
-														<button
-															type="button"
-															disabled={majorRerollDisabled}
-															onClick={() => reroll("rerollMajor")}
-															className={`${REROLL_BUTTON_CLASS} enabled:hover:border-sky-300/50 enabled:hover:bg-sky-300/10`}
-														>
-															{state.rerolls.majorRemaining <= 0
-																? "Major rerolls used"
-																: hasOtherMajor
-																	? `Reroll Major · ${state.rerolls.majorRemaining}`
-																	: "Only Major for this team"}
-														</button>
-													</CrestRerollColumn>
-													<div className="min-w-0 pt-1">
-														<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-															Major
-														</p>
-														<p className="mt-1 break-words text-2xl font-semibold tracking-tight text-white sm:text-4xl">
-															{major ? visibleLabel(major.shortName) : "Legacy wildcard"}
-														</p>
-														<p className="mt-1 text-sm text-zinc-400">
-															{major
-																? `${visibleLabel(major.location)} · ${major.year}`
-																: "Pre-2013 legend card"}
-														</p>
-													</div>
+														{state.rerolls.teamRemaining > 0
+															? `Reroll team · ${state.rerolls.teamRemaining}`
+															: "Team rerolls used"}
+													</button>
+												</CrestRerollColumn>
+												<div className="min-w-0 pt-1">
+													<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+														Team
+													</p>
+													<h2
+														id="round-heading"
+														className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-4xl"
+													>
+														{org.name} <span className="text-zinc-500">{orgYear.year}</span>
+													</h2>
+													<p className="mt-1 text-sm text-zinc-400">
+														{GAME_LABELS[orgYear.game]}
+														{major ? ` · placed #${orgYear.placement}` : " · pre-Major legend"}
+													</p>
 												</div>
 											</div>
+											<div className="flex min-w-0 items-start gap-2.5 sm:gap-4">
+												<CrestRerollColumn
+													crest={
+														<MajorCrest
+															major={
+																major ?? {
+																	id: LEGACY_MAJOR_REEL_ID,
+																	shortName: "Legacy wildcard",
+																	logo: LEGACY_MAJOR_LOGO,
+																}
+															}
+															size="xl"
+														/>
+													}
+												>
+													<button
+														type="button"
+														disabled={majorRerollDisabled}
+														onClick={() => reroll("rerollMajor")}
+														className={`${REROLL_BUTTON_CLASS} enabled:hover:border-sky-300/50 enabled:hover:bg-sky-300/10`}
+													>
+														{state.rerolls.majorRemaining <= 0
+															? "Major rerolls used"
+															: hasOtherMajor
+																? `Reroll Major · ${state.rerolls.majorRemaining}`
+																: "Only Major for this team"}
+													</button>
+												</CrestRerollColumn>
+												<div className="min-w-0 pt-1">
+													<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+														Major
+													</p>
+													<p className="mt-1 break-words text-2xl font-semibold tracking-tight text-white sm:text-4xl">
+														{major ? visibleLabel(major.shortName) : "Legacy wildcard"}
+													</p>
+													<p className="mt-1 text-sm text-zinc-400">
+														{major
+															? `${visibleLabel(major.location)} · ${major.year}`
+															: "Pre-2013 legend card"}
+													</p>
+												</div>
+											</div>
+										</div>
 									</div>
 
 									<div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start">

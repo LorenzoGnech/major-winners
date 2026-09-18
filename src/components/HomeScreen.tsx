@@ -2,19 +2,20 @@ import type { ReactNode } from "react";
 import {
 	DISPLAY_NAME_MAX,
 	type DuelKind,
-	type DuelResultSnapshot,
 	ELO_START,
+	PROFILE_BEST_TEAMS,
 	type PublishedRunSnapshot,
 	type RankedProfile,
+	rankedWinRate,
 	type SavedTeamSnapshot,
-	summarizeDuelStats,
+	uniqueBestPublishedRuns,
 } from "../community";
 import type { Dataset } from "../data";
 import type { DailyStats, RatedPlayer } from "../engine";
 import { summarizeDailyStats } from "../engine";
 import { CUSTOM_SEED_MAX } from "./customSeed";
 import { HomeHighlightReel } from "./HomeHighlightReel";
-import { HomeLeaderboards } from "./HomeLeaderboards";
+import { formatSavedAt, HomeLeaderboards, RosterStrip } from "./HomeLeaderboards";
 import { HOME_HIGHLIGHTS } from "./homeHighlights";
 
 export type HomeView =
@@ -51,7 +52,7 @@ export type HomeCommunityProps = {
 	onEmailDraft: (value: string) => void;
 	onSignIn: () => void;
 	onSignOut: () => void;
-	duelResults: readonly DuelResultSnapshot[];
+	myRuns: readonly PublishedRunSnapshot[];
 	profile: RankedProfile | null;
 	eloBoard: readonly RankedProfile[];
 	handleDraft: string;
@@ -188,18 +189,23 @@ function SetupForm({
 }
 
 export function RankedStatsPanel({ profile }: { profile: RankedProfile | null }) {
+	const winRate = profile ? rankedWinRate(profile.wins, profile.losses) : null;
 	const rows = profile
 		? ([
 				["Handle", profile.displayName],
 				["Elo", profile.elo],
 				["Wins", profile.wins],
 				["Losses", profile.losses],
+				["Win rate", winRate === null ? "—" : `${winRate}%`],
+				["Win streak", profile.streak],
 			] as const)
 		: ([
 				["Handle", "—"],
 				["Elo", ELO_START],
 				["Wins", 0],
 				["Losses", 0],
+				["Win rate", "—"],
+				["Win streak", 0],
 			] as const);
 	return (
 		<section aria-labelledby="ranked-stats-heading" className="w-full">
@@ -226,47 +232,75 @@ export function RankedStatsPanel({ profile }: { profile: RankedProfile | null })
 	);
 }
 
-export function DuelStatsPanel({ results }: { results: readonly DuelResultSnapshot[] }) {
-	const summary = summarizeDuelStats(results);
-	const rows = [
-		["Played", summary.played],
-		["Wins", summary.wins],
-		["Losses", summary.losses],
-		["Win rate", `${summary.winRate}%`],
-		["Maps", `${summary.mapsWon}–${summary.mapsLost}`],
-		["Rounds", `${summary.roundsWon}–${summary.roundsLost}`],
-	] as const;
+export function BestTeamsPanel({
+	runs,
+	dataset,
+}: {
+	runs: readonly PublishedRunSnapshot[];
+	dataset: Dataset;
+}) {
+	const best = uniqueBestPublishedRuns(runs, PROFILE_BEST_TEAMS);
+	const nicks = new Map(dataset.playerSeasons.map((player) => [player.id, player.nick]));
+	const photos = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
 	return (
-		<section aria-labelledby="duel-stats-heading" className="w-full">
+		<section aria-labelledby="best-teams-heading" className="w-full">
 			<h2
-				id="duel-stats-heading"
+				id="best-teams-heading"
 				className="text-sm font-semibold uppercase tracking-[0.2em] text-white"
 			>
-				Private match stats
+				Best teams
 			</h2>
-			<p className="mt-1 text-xs text-zinc-500">Saved to your account after a finished 1v1.</p>
-			<dl className="mt-5 grid grid-cols-2 gap-2">
-				{rows.map(([label, value]) => (
-					<div key={label} className="border border-white/10 px-3 py-3">
-						<dt className="text-[10px] uppercase tracking-[0.14em] text-zinc-500">{label}</dt>
-						<dd className="mt-1 font-bold tabular-nums text-white">{value}</dd>
-					</div>
-				))}
-			</dl>
+			<p className="mt-1 text-xs text-zinc-500">Your top published Major results.</p>
+			{best.length > 0 ? (
+				<ol className="mt-5 space-y-2">
+					{best.map((run, index) => {
+						const saved = formatSavedAt(run.createdAt);
+						return (
+							<li key={run.id} className="border border-white/10 px-2.5 py-2">
+								<div className="flex items-start justify-between gap-3">
+									<div className="min-w-0">
+										<p className="truncate text-sm font-semibold text-white">
+											<span className="mr-2 tabular-nums text-zinc-500">{index + 1}</span>
+											{run.team.teamName}
+										</p>
+										<p className="truncate text-[11px] text-zinc-500">
+											{run.finish}
+											{saved ? ` · ${saved}` : ""}
+										</p>
+									</div>
+									<p className="shrink-0 text-right text-xs tabular-nums text-zinc-300">
+										{run.wins}–{run.losses}
+										<span className="mt-0.5 block text-[10px] text-zinc-500">
+											maps {run.mapsWon}–{run.mapsLost}
+										</span>
+									</p>
+								</div>
+								<RosterStrip roster={run.team.roster} nicks={nicks} photos={photos} />
+							</li>
+						);
+					})}
+				</ol>
+			) : (
+				<p className="mt-5 text-sm text-zinc-500">
+					Finish a Major and save your team to rank it here.
+				</p>
+			)}
 		</section>
 	);
 }
 
-export function DailyStatsPanel({ stats }: { stats: DailyStats }) {
-	const summary = summarizeDailyStats(stats);
+export function DailyStatsPanel({ stats, dataset }: { stats: DailyStats; dataset: Dataset }) {
+	const seasons = new Map(
+		dataset.playerSeasons.map((player) => [
+			player.id,
+			{ playerId: player.playerId, nick: player.nick },
+		]),
+	);
+	const summary = summarizeDailyStats(stats, undefined, seasons);
 	const rows = [
-		["Days played", summary.playedDays],
-		["Completed", summary.completedRuns],
-		["Championships", summary.championships],
+		["Daily runs completed", summary.completedRuns],
 		["Perfect 9–0s", summary.perfectRuns],
-		["Current streak", summary.currentStreak],
-		["Max streak", summary.maxStreak],
-		["Win rate", `${summary.winRate}%`],
+		["Most used player", summary.mostUsedPlayer],
 		["Best finish", summary.bestFinish],
 	] as const;
 	return (
@@ -275,7 +309,7 @@ export function DailyStatsPanel({ stats }: { stats: DailyStats }) {
 				id="stats-heading"
 				className="text-sm font-semibold uppercase tracking-[0.2em] text-white"
 			>
-				Daily challenge stats
+				Daily
 			</h2>
 			<p className="mt-1 text-xs text-zinc-500">Stored only in this browser.</p>
 			<dl className="mt-5 grid grid-cols-2 gap-2">
@@ -311,13 +345,13 @@ export function HomeScreen({
 				className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.45)_62%,rgba(0,0,0,0.78)_100%)]"
 				aria-hidden
 			/>
-			{view !== "signin" && view !== "profile" ? (
+			{view !== "signin" && view !== "profile" && community.enabled && !community.userEmail ? (
 				<button
 					type="button"
-					onClick={() => onView(community.enabled && !community.userEmail ? "signin" : "profile")}
+					onClick={() => onView("signin")}
 					className={`fixed top-[max(1rem,var(--safe-top))] right-[max(1rem,var(--safe-right))] z-20 ${AUTH_BUTTON}`}
 				>
-					{community.enabled && !community.userEmail ? "Sign in" : "My profile"}
+					Sign in
 				</button>
 			) : null}
 			<div
@@ -356,14 +390,27 @@ export function HomeScreen({
 							</button>
 						) : null}
 						{community.enabled ? (
-							<button
-								type="button"
-								onClick={() => onView("leaderboards")}
-								className={SECONDARY_BUTTON}
-							>
-								Leaderboards
+							<div className="grid w-full grid-cols-2 gap-3">
+								<button
+									type="button"
+									onClick={() => onView("profile")}
+									className={SECONDARY_BUTTON}
+								>
+									My profile
+								</button>
+								<button
+									type="button"
+									onClick={() => onView("leaderboards")}
+									className={SECONDARY_BUTTON}
+								>
+									Leaderboards
+								</button>
+							</div>
+						) : (
+							<button type="button" onClick={() => onView("profile")} className={SECONDARY_BUTTON}>
+								My profile
 							</button>
-						) : null}
+						)}
 					</nav>
 				) : null}
 
@@ -391,7 +438,11 @@ export function HomeScreen({
 								? "Continue private match"
 								: "Private match"}
 						</button>
-						<button type="button" onClick={() => onChoose("community")} className={SECONDARY_BUTTON}>
+						<button
+							type="button"
+							onClick={() => onChoose("community")}
+							className={SECONDARY_BUTTON}
+						>
 							{community.hasSave
 								? "Continue free play with community teams"
 								: "Free play with community teams"}
@@ -546,21 +597,21 @@ export function HomeScreen({
 									: "w-full max-w-lg"
 							}
 						>
-							<DailyStatsPanel stats={stats} />
+							<DailyStatsPanel stats={stats} dataset={community.dataset} />
 							{community.enabled && community.userEmail ? (
 								<RankedStatsPanel profile={community.profile} />
 							) : null}
 							{community.enabled && community.userEmail ? (
-								<DuelStatsPanel results={community.duelResults} />
+								<BestTeamsPanel runs={community.myRuns} dataset={community.dataset} />
 							) : null}
 						</div>
-						<div className="flex w-full max-w-md flex-col gap-3">
+						<div className="flex w-full max-w-md flex-row gap-3">
 							{community.userEmail ? (
-								<button type="button" onClick={community.onSignOut} className={SECONDARY_BUTTON}>
+								<button type="button" onClick={community.onSignOut} className={`flex-1 ${PRIMARY_BUTTON}`}>
 									Sign out
 								</button>
 							) : null}
-							<button type="button" onClick={() => onView("menu")} className={SECONDARY_BUTTON}>
+							<button type="button" onClick={() => onView("menu")} className={`flex-1 ${SECONDARY_BUTTON}`}>
 								Back
 							</button>
 						</div>

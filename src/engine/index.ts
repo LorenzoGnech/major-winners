@@ -20,6 +20,7 @@ export {
 	DAILY_STATS_VERSION,
 	type DailyIdentity,
 	type DailyResult,
+	type DailyRoster,
 	type DailyStats,
 	dailyFinish,
 	dailyIdentity,
@@ -29,6 +30,8 @@ export {
 	markDailyPlayed,
 	parseDailyStats,
 	recordDailyResult,
+	rosterFromCompletedDraft,
+	type SeasonIdentity,
 	summarizeDailyStats,
 } from "./daily";
 export {

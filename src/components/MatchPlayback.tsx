@@ -97,7 +97,7 @@ function mapPickCaption(
 	if (context.homePick) return viewer === 0 ? " · your pick" : ` · ${labels[0]} pick`;
 	return "";
 }
-const FEED_BOX_CLASS = "flex h-32 flex-col overflow-hidden sm:h-40 lg:h-44";
+const FEED_BOX_CLASS = "flex h-60 flex-col overflow-hidden sm:h-64 lg:h-44";
 
 const ROLE_LABELS: Record<Role, string> = {
 	awp: "AWP",
@@ -1808,10 +1808,6 @@ export function MatchPlayback({
 								</strong>
 							</span>
 						</section>
-						<p className="mt-2 text-center text-xs text-zinc-500 lg:hidden">
-							Round {Math.max(1, cursor.settledRoundCount)}
-							{feed ? ` · ${feed.round.scoreAfter[0]}–${feed.round.scoreAfter[1]}` : ""}
-						</p>
 
 						<CompactMatchLineups
 							leftLabel={viewLabels[0]}
@@ -1830,117 +1826,125 @@ export function MatchPlayback({
 							teamLabels={shortLabels}
 						/>
 
-						<EconomyBars
-							roundValues={displayRoundValues}
-							totals={displayTotals}
-							buys={displayBuys}
-							labels={viewLabels}
-						/>
-						<MoraleBars
-							values={displayMorale}
-							labels={viewLabels}
-							boosted={timeoutBoostVisible(
-								caughtUp,
-								Boolean(live?.current?.pendingTimeout && timeoutTeam === viewerSide),
-								timeoutMoment && timeoutTeam === viewerSide,
-							)}
-						/>
+						<div className="flex flex-col">
+							<div className="order-2 lg:order-1">
+								<EconomyBars
+									roundValues={displayRoundValues}
+									totals={displayTotals}
+									buys={displayBuys}
+									labels={viewLabels}
+								/>
+								<MoraleBars
+									values={displayMorale}
+									labels={viewLabels}
+									boosted={timeoutBoostVisible(
+										caughtUp,
+										Boolean(live?.current?.pendingTimeout && timeoutTeam === viewerSide),
+										timeoutMoment && timeoutTeam === viewerSide,
+									)}
+								/>
 
-						<fieldset className="mt-5 hidden flex-wrap items-start justify-center gap-2 lg:flex">
-							<legend className="sr-only">Replay controls</legend>
-							<button
-								type="button"
-								onClick={playPause}
-								disabled={complete || waitingForPlan || holdPlayback}
-								className={CONTROL_CLASS}
-							>
-								{playing ? "Pause" : "Play"}
-							</button>
-							<button type="button" onClick={skip} disabled={complete} className={CONTROL_CLASS}>
-								Skip to end
-							</button>
-							<div className="relative">
-								<button
-									type="button"
-									aria-expanded={settingsOpen}
-									aria-controls="playback-settings"
-									onClick={() => setSettingsOpen((open) => !open)}
-									className={CONTROL_CLASS}
-								>
-									Settings · {speed}×
-								</button>
-								{settingsOpen ? (
-									<div
-										id="playback-settings"
-										className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-white/15 bg-zinc-950/95 p-2 shadow-xl"
+								<fieldset className="mt-5 hidden flex-wrap items-start justify-center gap-2 lg:flex">
+									<legend className="sr-only">Replay controls</legend>
+									<button
+										type="button"
+										onClick={playPause}
+										disabled={complete || waitingForPlan || holdPlayback}
+										className={CONTROL_CLASS}
 									>
+										{playing ? "Pause" : "Play"}
+									</button>
+									<button
+										type="button"
+										onClick={skip}
+										disabled={complete}
+										className={CONTROL_CLASS}
+									>
+										Skip to end
+									</button>
+									<div className="relative">
 										<button
 											type="button"
-											onClick={restart}
-											disabled={revealedCount === 0}
-											className={`${CONTROL_CLASS} w-full`}
+											aria-expanded={settingsOpen}
+											aria-controls="playback-settings"
+											onClick={() => setSettingsOpen((open) => !open)}
+											className={CONTROL_CLASS}
 										>
-											Restart replay
+											Settings · {speed}×
 										</button>
-										<fieldset className="mt-2 flex gap-1.5">
-											<legend className="sr-only">Replay speed</legend>
-											{PLAYBACK_SPEEDS.map((option) => {
-												const selected = option === speed;
-												return (
-													<button
-														key={option}
-														type="button"
-														aria-pressed={selected}
-														onClick={() => chooseSpeed(option)}
-														className={`${SPEED_BUTTON_CLASS} ${
-															selected
-																? "border-emerald-300 bg-emerald-300 text-zinc-950"
-																: "border-white/15 bg-white/5 text-zinc-200 hover:border-white/30 hover:bg-white/10"
-														}`}
-													>
-														{option}×
-													</button>
-												);
-											})}
-										</fieldset>
+										{settingsOpen ? (
+											<div
+												id="playback-settings"
+												className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-white/15 bg-zinc-950/95 p-2 shadow-xl"
+											>
+												<button
+													type="button"
+													onClick={restart}
+													disabled={revealedCount === 0}
+													className={`${CONTROL_CLASS} w-full`}
+												>
+													Restart replay
+												</button>
+												<fieldset className="mt-2 flex gap-1.5">
+													<legend className="sr-only">Replay speed</legend>
+													{PLAYBACK_SPEEDS.map((option) => {
+														const selected = option === speed;
+														return (
+															<button
+																key={option}
+																type="button"
+																aria-pressed={selected}
+																onClick={() => chooseSpeed(option)}
+																className={`${SPEED_BUTTON_CLASS} ${
+																	selected
+																		? "border-emerald-300 bg-emerald-300 text-zinc-950"
+																		: "border-white/15 bg-white/5 text-zinc-200 hover:border-white/30 hover:bg-white/10"
+																}`}
+															>
+																{option}×
+															</button>
+														);
+													})}
+												</fieldset>
+											</div>
+										) : null}
 									</div>
-								) : null}
+								</fieldset>
 							</div>
-						</fieldset>
-						<p className="sr-only" aria-live="polite" aria-atomic="true">
-							{announcement}
-						</p>
-
-						<div className="mt-5">
-							<h4 className="text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
-								Play-by-play
-							</h4>
-							<div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
-								{feed ? (
-									<ol>
-										<RoundFeedItem
-											key={feed.round.round}
-											round={feed.round}
-											kills={feed.kills}
-											settled={feed.settled}
-											result={result}
-											shortLabels={shortLabels}
-											viewerSide={viewerSide}
-											castLine={castLines.at(-1)}
-										/>
-									</ol>
-								) : (
-									<div
-										className={`${FEED_BOX_CLASS} items-center justify-center rounded-xl border border-white/12 bg-zinc-950/70 px-3 py-2.5`}
-									>
-										<p className="text-center text-sm text-zinc-600">Replay starting.</p>
+							<div className="order-1 mt-4 lg:order-2 lg:mt-5">
+								<h4 className="text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
+									Play-by-play
+								</h4>
+								<div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
+									{feed ? (
+										<ol>
+											<RoundFeedItem
+												key={feed.round.round}
+												round={feed.round}
+												kills={feed.kills}
+												settled={feed.settled}
+												result={result}
+												shortLabels={shortLabels}
+												viewerSide={viewerSide}
+												castLine={castLines.at(-1)}
+											/>
+										</ol>
+									) : (
+										<div
+											className={`${FEED_BOX_CLASS} items-center justify-center rounded-xl border border-white/12 bg-zinc-950/70 px-3 py-2.5`}
+										>
+											<p className="text-center text-sm text-zinc-600">Replay starting.</p>
+										</div>
+									)}
+									<div className="hidden lg:block">
+										<RoundCast lines={castLines} />
 									</div>
-								)}
-								<div className="hidden lg:block">
-									<RoundCast lines={castLines} />
 								</div>
 							</div>
 						</div>
+						<p className="sr-only" aria-live="polite" aria-atomic="true">
+							{announcement}
+						</p>
 					</div>
 
 					<div className="hidden lg:block">

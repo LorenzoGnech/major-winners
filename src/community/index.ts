@@ -1,8 +1,8 @@
 export {
 	fetchBestRuns,
 	fetchEloLeaderboard,
-	fetchMyDuelResults,
 	fetchMyProfile,
+	fetchMyPublishedRuns,
 	fetchSavedTeams,
 	getSession,
 	getSupabase,
@@ -57,7 +57,6 @@ export {
 	submitDuelVeto,
 	submitRankedResult,
 } from "./duelClient";
-export { type DuelStatsSummary, EMPTY_DUEL_STATS, summarizeDuelStats } from "./duelStats";
 export {
 	DISPLAY_NAME_MAX,
 	ELO_START,
@@ -66,6 +65,7 @@ export {
 	nextElo,
 	parseDisplayName,
 	rankedSearchWindow,
+	rankedWinRate,
 } from "./elo";
 export { loadPublishedFingerprints, rememberPublishedFingerprint } from "./local";
 export {
@@ -73,7 +73,13 @@ export {
 	mergeOpponentPools,
 	teamOverallFromSnapshot,
 } from "./opponents";
-export { compareBestRuns, compareHighestRated, uniqueTeamsByRoster } from "./ranking";
+export {
+	compareBestRuns,
+	compareHighestRated,
+	topPublishedRuns,
+	uniqueBestPublishedRuns,
+	uniqueTeamsByRoster,
+} from "./ranking";
 export {
 	AUTHOR_NAME_MAX,
 	COMMUNITY_BOARD_SIZE,
@@ -81,6 +87,7 @@ export {
 	communityModeSchema,
 	DEFAULT_AUTHOR_NAME,
 	type DuelResultSnapshot,
+	PROFILE_BEST_TEAMS,
 	type PublishedRunSnapshot,
 	parseAuthorName,
 	type RankedProfile,

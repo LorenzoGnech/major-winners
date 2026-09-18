@@ -2,12 +2,18 @@ import { describe, expect, it } from "vitest";
 import { loadDataset, ROLES } from "../data";
 import { ratePlayers } from "../engine";
 import { completedDraftFromSnapshot } from "./draft";
-import { summarizeDuelStats } from "./duelStats";
-import { eloDelta, nextElo, parseDisplayName, rankedSearchWindow } from "./elo";
+import { eloDelta, nextElo, parseDisplayName, rankedSearchWindow, rankedWinRate } from "./elo";
 import { buildCommunityOpponents, mergeOpponentPools } from "./opponents";
-import { compareBestRuns, compareHighestRated, uniqueTeamsByRoster } from "./ranking";
+import {
+	compareBestRuns,
+	compareHighestRated,
+	topPublishedRuns,
+	uniqueBestPublishedRuns,
+	uniqueTeamsByRoster,
+} from "./ranking";
 import {
 	DEFAULT_AUTHOR_NAME,
+	type PublishedRunSnapshot,
 	parseAuthorName,
 	runFingerprint,
 	type SavedTeamSnapshot,
@@ -115,6 +121,40 @@ describe("community ranking", () => {
 	it("dedupes identical roster signatures", () => {
 		expect(uniqueTeamsByRoster([snapshot(), snapshot({ id: "team-2" })])).toHaveLength(1);
 	});
+
+	it("keeps the top published runs by result", () => {
+		const team = snapshot();
+		const run = (id: string, wins: number, losses: number): PublishedRunSnapshot => ({
+			id,
+			team,
+			mode: "free",
+			wins,
+			losses,
+			mapsWon: wins,
+			mapsLost: losses,
+			roundsWon: wins * 13,
+			roundsLost: losses * 13,
+			finish: wins === 9 ? "Champion" : "Legends Swiss",
+			perfect: wins === 9 && losses === 0,
+			fingerprint: id,
+			createdAt: "2026-01-01T00:00:00.000Z",
+		});
+		expect(
+			topPublishedRuns([run("a", 3, 3), run("b", 9, 0), run("c", 8, 1), run("d", 6, 3)], 3).map(
+				(row) => row.id,
+			),
+		).toEqual(["b", "c", "d"]);
+		const other = snapshot({
+			id: "team-2",
+			roster: { ...team.roster, awp: team.roster.entry },
+		});
+		expect(
+			uniqueBestPublishedRuns(
+				[run("b", 9, 0), { ...run("c", 8, 1), team: other }, run("dup", 7, 2)],
+				3,
+			).map((row) => row.id),
+		).toEqual(["b", "c"]);
+	});
 });
 
 describe("community opponents", () => {
@@ -192,40 +232,10 @@ describe("ranked elo", () => {
 		expect(parseDisplayName("Lore_2018")).toBe("Lore_2018");
 		expect(parseDisplayName("not a name")).toBeNull();
 	});
-});
 
-describe("duel profile stats", () => {
-	it("summarizes wins, maps, and win rate", () => {
-		expect(
-			summarizeDuelStats([
-				{
-					roomCode: "K7M2QX",
-					won: true,
-					mapsWon: 3,
-					mapsLost: 1,
-					roundsWon: 48,
-					roundsLost: 36,
-					createdAt: "2026-09-18T00:00:00.000Z",
-				},
-				{
-					roomCode: "AB23CD",
-					won: false,
-					mapsWon: 1,
-					mapsLost: 3,
-					roundsWon: 30,
-					roundsLost: 45,
-					createdAt: "2026-09-17T00:00:00.000Z",
-				},
-			]),
-		).toEqual({
-			played: 2,
-			wins: 1,
-			losses: 1,
-			winRate: 50,
-			mapsWon: 4,
-			mapsLost: 4,
-			roundsWon: 78,
-			roundsLost: 81,
-		});
+	it("computes ranked win rate only after a match", () => {
+		expect(rankedWinRate(0, 0)).toBeNull();
+		expect(rankedWinRate(1, 1)).toBe(50);
+		expect(rankedWinRate(2, 1)).toBe(67);
 	});
 });

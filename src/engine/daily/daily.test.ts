@@ -38,7 +38,46 @@ describe("daily challenge", () => {
 		expect(summarizeDailyStats(stats, "2026-01-04")).toMatchObject({
 			currentStreak: 1,
 			maxStreak: 3,
+			totalWins: 16,
+			completedRuns: 4,
+			mostUsedPlayer: "—",
 		});
+	});
+	it("counts the most used player across completed rosters", () => {
+		const seasons = new Map([
+			["s1mple-2018-navi", { playerId: "s1mple", nick: "s1mple" }],
+			["s1mple-2021-navi", { playerId: "s1mple", nick: "s1mple" }],
+			["device-2018-astralis", { playerId: "device", nick: "device" }],
+			["zywoo-2023-vitality", { playerId: "zywoo", nick: "ZywOo" }],
+		]);
+		const roster = (awp: string, igl: string, entry: string, support: string, lurker: string) => ({
+			awp,
+			igl,
+			entry,
+			support,
+			lurker,
+		});
+		let stats = recordDailyResult(EMPTY_DAILY_STATS, {
+			...result("2026-09-15"),
+			roster: roster(
+				"s1mple-2018-navi",
+				"device-2018-astralis",
+				"zywoo-2023-vitality",
+				"device-2018-astralis",
+				"device-2018-astralis",
+			),
+		});
+		stats = recordDailyResult(stats, {
+			...result("2026-09-16"),
+			roster: roster(
+				"s1mple-2021-navi",
+				"device-2018-astralis",
+				"zywoo-2023-vitality",
+				"device-2018-astralis",
+				"zywoo-2023-vitality",
+			),
+		});
+		expect(summarizeDailyStats(stats, "2026-09-16", seasons).mostUsedPlayer).toBe("device");
 	});
 	it("ignores duplicate results and corrupt storage", () => {
 		const once = recordDailyResult(EMPTY_DAILY_STATS, result("2026-09-15"));

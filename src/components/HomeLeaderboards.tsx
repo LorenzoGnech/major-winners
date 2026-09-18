@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import {
 	COMMUNITY_BOARD_SIZE,
-	compareBestRuns,
 	compareHighestRated,
 	type PublishedRunSnapshot,
 	type RankedProfile,
 	type SavedTeamSnapshot,
 	teamOverallFromSnapshot,
+	topPublishedRuns,
 	uniqueTeamsByRoster,
 } from "../community";
 import { type Dataset, ROLES } from "../data";
@@ -14,7 +14,7 @@ import type { RatedPlayer } from "../engine";
 import { PlayerCrest } from "./PlayerCrest";
 
 export function rankedBestRuns(runs: readonly PublishedRunSnapshot[]): PublishedRunSnapshot[] {
-	return [...runs].sort(compareBestRuns).slice(0, COMMUNITY_BOARD_SIZE);
+	return topPublishedRuns(runs, COMMUNITY_BOARD_SIZE);
 }
 
 export function rankedTopTeams(
@@ -70,7 +70,7 @@ function BoardShell({ title, children }: { title: string; children: ReactNode })
 	);
 }
 
-function RosterStrip({
+export function RosterStrip({
 	roster,
 	nicks,
 	photos,

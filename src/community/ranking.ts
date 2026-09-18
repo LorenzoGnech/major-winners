@@ -28,6 +28,29 @@ export function compareHighestRated(
 	);
 }
 
+export function topPublishedRuns(
+	runs: readonly PublishedRunSnapshot[],
+	limit: number,
+): PublishedRunSnapshot[] {
+	return [...runs].sort(compareBestRuns).slice(0, limit);
+}
+
+export function uniqueBestPublishedRuns(
+	runs: readonly PublishedRunSnapshot[],
+	limit: number,
+): PublishedRunSnapshot[] {
+	const seen = new Set<string>();
+	const unique: PublishedRunSnapshot[] = [];
+	for (const run of [...runs].sort(compareBestRuns)) {
+		const key = `${run.team.roster.awp}:${run.team.roster.igl}:${run.team.roster.entry}:${run.team.roster.support}:${run.team.roster.lurker}:${run.team.coachId}`;
+		if (seen.has(key)) continue;
+		seen.add(key);
+		unique.push(run);
+		if (unique.length >= limit) break;
+	}
+	return unique;
+}
+
 export function uniqueTeamsByRoster(teams: readonly SavedTeamSnapshot[]): SavedTeamSnapshot[] {
 	const seen = new Set<string>();
 	const unique: SavedTeamSnapshot[] = [];

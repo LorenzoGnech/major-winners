@@ -1,8 +1,11 @@
+import { ROLES, type Role } from "../../data/schema";
+import type { CompletedDraft } from "../draft";
 import { seedFromUtcDate, utcDateKey } from "../rng";
 import type { TournamentStage, TournamentState } from "../tournament";
 
 export const DAILY_STATS_VERSION = 1;
 export type DailyIdentity = { day: string; id: string; seed: number };
+export type DailyRoster = Record<Role, string>;
 export type DailyResult = {
 	day: string;
 	status: "champion" | "eliminated";
@@ -10,7 +13,9 @@ export type DailyResult = {
 	wins: number;
 	losses: number;
 	matches: readonly { stage: TournamentStage; won: boolean }[];
+	roster?: DailyRoster;
 };
+export type SeasonIdentity = { playerId: string; nick: string };
 export type DailyStats = {
 	version: typeof DAILY_STATS_VERSION;
 	playedDays: readonly string[];
@@ -29,6 +34,12 @@ const isStage = (value: unknown): value is TournamentStage =>
 	value === "challengers" || value === "legends" || value === "champions";
 const uniqueDays = (days: readonly string[]) => [...new Set(days)].sort();
 
+function isRoster(value: unknown): value is DailyRoster {
+	return (
+		isObject(value) &&
+		ROLES.every((role) => typeof value[role] === "string" && value[role].length > 0)
+	);
+}
 function isResult(value: unknown): value is DailyResult {
 	return (
 		isObject(value) &&
@@ -42,8 +53,14 @@ function isResult(value: unknown): value is DailyResult {
 		Array.isArray(value.matches) &&
 		value.matches.every(
 			(match) => isObject(match) && isStage(match.stage) && typeof match.won === "boolean",
-		)
+		) &&
+		(value.roster === undefined || isRoster(value.roster))
 	);
+}
+export function rosterFromCompletedDraft(draft: CompletedDraft): DailyRoster {
+	return Object.fromEntries(
+		ROLES.map((role) => [role, draft.roster[role].playerSeasonId]),
+	) as DailyRoster;
 }
 export function dailyIdentity(date = new Date()): DailyIdentity {
 	const day = utcDateKey(date);
@@ -53,7 +70,11 @@ export function markDailyPlayed(stats: DailyStats, day: string): DailyStats {
 	if (!isDay(day) || stats.playedDays.includes(day)) return stats;
 	return { ...stats, playedDays: uniqueDays([...stats.playedDays, day]) };
 }
-export function dailyResultFromTournament(day: string, state: TournamentState): DailyResult | null {
+export function dailyResultFromTournament(
+	day: string,
+	state: TournamentState,
+	draft?: CompletedDraft | null,
+): DailyResult | null {
 	if (!isDay(day) || state.status === "active") return null;
 	const wins = state.history.filter((match) => match.won).length;
 	return {
@@ -63,11 +84,20 @@ export function dailyResultFromTournament(day: string, state: TournamentState): 
 		wins,
 		losses: state.history.length - wins,
 		matches: state.history.map(({ stage, won }) => ({ stage, won })),
+		...(draft ? { roster: rosterFromCompletedDraft(draft) } : {}),
 	};
 }
 export function recordDailyResult(stats: DailyStats, result: DailyResult): DailyStats {
-	if (stats.results.some(({ day }) => day === result.day))
-		return markDailyPlayed(stats, result.day);
+	const existing = stats.results.find(({ day }) => day === result.day);
+	if (existing) {
+		if (existing.roster || !result.roster) return markDailyPlayed(stats, result.day);
+		return {
+			...markDailyPlayed(stats, result.day),
+			results: stats.results.map((row) =>
+				row.day === result.day ? { ...row, roster: result.roster } : row,
+			),
+		};
+	}
 	const played = markDailyPlayed(stats, result.day);
 	return {
 		...played,
@@ -102,7 +132,39 @@ export function dailyFinish(result: DailyResult): string {
 	const count = result.matches.filter(({ stage }) => stage === "champions").length;
 	return ["Quarterfinal", "Semifinal", "Final"][Math.max(0, count - 1)] ?? "Quarterfinal";
 }
-export function summarizeDailyStats(stats: DailyStats, today = utcDateKey()) {
+function mostUsedPlayerNick(
+	results: readonly DailyResult[],
+	seasons?: ReadonlyMap<string, SeasonIdentity>,
+): string {
+	if (!seasons) return "—";
+	const counts = new Map<string, { count: number; nick: string }>();
+	for (const result of results) {
+		if (!result.roster) continue;
+		for (const role of ROLES) {
+			const identity = seasons.get(result.roster[role]);
+			if (!identity) continue;
+			const current = counts.get(identity.playerId);
+			if (current) current.count += 1;
+			else counts.set(identity.playerId, { count: 1, nick: identity.nick });
+		}
+	}
+	let best: { count: number; nick: string } | null = null;
+	for (const row of counts.values()) {
+		if (
+			!best ||
+			row.count > best.count ||
+			(row.count === best.count && row.nick.localeCompare(best.nick) < 0)
+		) {
+			best = row;
+		}
+	}
+	return best?.nick ?? "—";
+}
+export function summarizeDailyStats(
+	stats: DailyStats,
+	today = utcDateKey(),
+	seasons?: ReadonlyMap<string, SeasonIdentity>,
+) {
 	const days = uniqueDays(stats.results.map(({ day }) => day));
 	const wins = stats.results.reduce((sum, result) => sum + result.wins, 0);
 	const matches = stats.results.reduce((sum, result) => sum + result.wins + result.losses, 0);
@@ -121,10 +183,12 @@ export function summarizeDailyStats(stats: DailyStats, today = utcDateKey()) {
 		cursor = offsetDay(cursor, -1);
 	}
 	const finishes = stats.results.map(dailyFinish);
+	const championships = stats.results.filter(({ status }) => status === "champion").length;
 	return {
 		playedDays: uniqueDays(stats.playedDays).length,
 		completedRuns: stats.results.length,
-		championships: stats.results.filter(({ status }) => status === "champion").length,
+		totalWins: wins,
+		championships,
 		perfectRuns: stats.results.filter(
 			({ status, wins, losses }) => status === "champion" && wins === 9 && losses === 0,
 		).length,
@@ -136,6 +200,7 @@ export function summarizeDailyStats(stats: DailyStats, today = utcDateKey()) {
 					ranks.indexOf(finish) > ranks.indexOf(best) ? finish : best,
 				)
 			: "—",
+		mostUsedPlayer: mostUsedPlayerNick(stats.results, seasons),
 	};
 }
 export function parseDailyStats(raw: string): DailyStats {

@@ -40,3 +40,9 @@ export function formatEloDelta(delta: number): string {
 	if (delta > 0) return `+${delta}`;
 	return `${delta}`;
 }
+
+export function rankedWinRate(wins: number, losses: number): number | null {
+	const played = wins + losses;
+	if (played <= 0) return null;
+	return Math.round((wins / played) * 100);
+}

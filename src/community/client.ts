@@ -142,6 +142,30 @@ export async function fetchBestRuns(): Promise<PublishedRunSnapshot[]> {
 	});
 }
 
+export async function fetchMyPublishedRuns(userId: string): Promise<PublishedRunSnapshot[]> {
+	const supabase = getSupabase();
+	if (!supabase) return [];
+	const { data, error } = await supabase
+		.from("published_runs")
+		.select(
+			"id, mode, wins, losses, maps_won, maps_lost, rounds_won, rounds_lost, finish, perfect, fingerprint, created_at, saved_teams!inner (id, user_id, author_name, team_name, seed, roster, coach_id, traits, created_at)",
+		)
+		.eq("saved_teams.user_id", userId)
+		.order("wins", { ascending: false })
+		.order("losses", { ascending: true })
+		.order("maps_lost", { ascending: true })
+		.order("rounds_lost", { ascending: true })
+		.order("maps_won", { ascending: false })
+		.order("rounds_won", { ascending: false })
+		.order("created_at", { ascending: true })
+		.limit(COMMUNITY_FETCH_RUNS);
+	if (error || !data) return [];
+	return (data as PublishedRunRow[]).flatMap((row) => {
+		const parsed = parseRunRow(row);
+		return parsed ? [parsed] : [];
+	});
+}
+
 export async function fetchSavedTeams(): Promise<SavedTeamSnapshot[]> {
 	const supabase = getSupabase();
 	if (!supabase) return [];
@@ -299,6 +323,7 @@ type ProfileRow = {
 	elo: number;
 	wins: number;
 	losses: number;
+	streak?: number;
 };
 
 function parseProfileRow(row: ProfileRow): RankedProfile | null {
@@ -308,6 +333,7 @@ function parseProfileRow(row: ProfileRow): RankedProfile | null {
 		elo: row.elo,
 		wins: row.wins,
 		losses: row.losses,
+		streak: row.streak ?? 0,
 	});
 	return parsed.success ? parsed.data : null;
 }
@@ -317,7 +343,7 @@ export async function fetchMyProfile(userId: string): Promise<RankedProfile | nu
 	if (!supabase) return null;
 	const { data, error } = await supabase
 		.from("profiles")
-		.select("user_id, display_name, elo, wins, losses")
+		.select("user_id, display_name, elo, wins, losses, streak")
 		.eq("user_id", userId)
 		.maybeSingle();
 	if (error || !data) return null;
@@ -329,7 +355,7 @@ export async function fetchEloLeaderboard(): Promise<RankedProfile[]> {
 	if (!supabase) return [];
 	const { data, error } = await supabase
 		.from("profiles")
-		.select("user_id, display_name, elo, wins, losses")
+		.select("user_id, display_name, elo, wins, losses, streak")
 		.order("elo", { ascending: false })
 		.order("display_name", { ascending: true })
 		.limit(COMMUNITY_BOARD_SIZE);

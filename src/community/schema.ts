@@ -8,6 +8,7 @@ export const AUTHOR_NAME_MAX = TEAM_NAME_MAX;
 export const COMMUNITY_FETCH_RUNS = 25;
 export const COMMUNITY_FETCH_TEAMS = 100;
 export const COMMUNITY_BOARD_SIZE = 10;
+export const PROFILE_BEST_TEAMS = 3;
 
 export const communityModeSchema = z.enum(["daily", "free", "community"]);
 export type CommunityGameMode = z.infer<typeof communityModeSchema>;
@@ -111,6 +112,7 @@ export const rankedProfileSchema = z.object({
 	elo: z.number().int().min(100),
 	wins: z.number().int().min(0),
 	losses: z.number().int().min(0),
+	streak: z.number().int().min(0).default(0),
 });
 export type RankedProfile = z.infer<typeof rankedProfileSchema>;
 
