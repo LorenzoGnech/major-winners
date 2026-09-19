@@ -2060,8 +2060,8 @@
 		"orgId": "nip",
 		"photo": "/photos/players/allu/2015.png",
 		"game": "csgo",
-		"roles": ["entry", "lurker"],
-		"primaryRole": "entry",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -2096,8 +2096,8 @@
 		"roles": ["awp", "entry"],
 		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -2132,8 +2132,8 @@
 		"roles": ["awp", "entry"],
 		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -2168,8 +2168,8 @@
 		"roles": ["awp", "entry"],
 		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "fallback",
 		"ratingProvenance": {
@@ -2858,8 +2858,8 @@
 		"orgId": "team-ldlc-com",
 		"photo": "/photos/players/apex/2014.png",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["entry", "lurker"],
+		"primaryRole": "entry",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -2891,8 +2891,8 @@
 		"orgId": "team-envyus",
 		"photo": "/photos/players/apex/2015.png",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["entry", "lurker"],
+		"primaryRole": "entry",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -2957,8 +2957,8 @@
 		"orgId": "team-envyus",
 		"photo": "/photos/players/apex/2016.png",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["entry", "lurker"],
+		"primaryRole": "entry",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -2993,11 +2993,11 @@
 		"orgId": "g2",
 		"photo": "/photos/players/apex/2017.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -3029,8 +3029,8 @@
 		"orgId": "team-envyus",
 		"photo": "/photos/players/apex/2017.png",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["entry", "lurker"],
+		"primaryRole": "entry",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -16932,11 +16932,11 @@
 		"orgId": "nip",
 		"photo": "/photos/players/es3tag/2022.png",
 		"game": "csgo",
-		"roles": ["support", "lurker"],
-		"primaryRole": "support",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -20939,11 +20939,11 @@
 		"orgId": "nip",
 		"photo": "/photos/players/forest/2015.png",
 		"game": "csgo",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["entry", "lurker"],
+		"primaryRole": "entry",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "partial",
 		"ratingProvenance": {
@@ -24544,8 +24544,8 @@
 		"orgId": "nip",
 		"photo": "/photos/players/hampus/2022.png",
 		"game": "csgo",
-		"roles": ["awp", "igl"],
-		"primaryRole": "awp",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -24616,8 +24616,8 @@
 		"orgId": "recursive-esports",
 		"photo": "/photos/players/happy/2013.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -24649,8 +24649,8 @@
 		"orgId": "team-ldlc-com",
 		"photo": "/photos/players/happy/2014.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -24682,8 +24682,8 @@
 		"orgId": "team-envyus",
 		"photo": "/photos/players/happy/2015.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -24715,8 +24715,8 @@
 		"orgId": "team-envyus",
 		"photo": "/photos/players/happy/2016.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -24751,8 +24751,8 @@
 		"orgId": "team-envyus",
 		"photo": "/photos/players/happy/2017.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -24787,8 +24787,8 @@
 		"orgId": "team-envy",
 		"photo": "/photos/players/happy/2018.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -40263,8 +40263,8 @@
 		"orgId": "recursive-esports",
 		"photo": "/photos/players/maniac/2013.jpg",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -54286,8 +54286,8 @@
 		"orgId": "team-envy",
 		"photo": "/photos/players/scream/2018.png",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["entry", "lurker"],
+		"primaryRole": "entry",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"

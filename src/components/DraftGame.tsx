@@ -174,7 +174,14 @@ function TeamNameField({
 				autoComplete="off"
 				placeholder="e.g. Copenhagen Flames"
 				onChange={(event) => onChange(event.target.value)}
-				onBlur={() => resetMobileViewport()}
+				onBlur={() => {
+					// Blur runs before Start Major / Lock in. A sync viewport reset
+					// scrolls and reflows, so the first press never becomes a click.
+					window.setTimeout(() => {
+						if (document.activeElement instanceof HTMLButtonElement) return;
+						resetMobileViewport();
+					}, 0);
+				}}
 				className="mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-base text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 			/>
 			<p className="mt-1.5 text-[11px] text-zinc-500">Shows on the bracket and in matches.</p>
@@ -2122,6 +2129,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										{mode === "duel" ? (
 											<button
 												type="button"
+												onMouseDown={(event) => event.preventDefault()}
 												onClick={() => {
 													void lockDuelRoster();
 												}}
@@ -2133,6 +2141,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										) : (
 											<button
 												type="button"
+												onMouseDown={(event) => event.preventDefault()}
 												onClick={startMajor}
 												className="rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 											>
@@ -2142,6 +2151,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										{mode !== "duel" ? (
 											<button
 												type="button"
+												onMouseDown={(event) => event.preventDefault()}
 												onClick={requestNewDraft}
 												className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 											>

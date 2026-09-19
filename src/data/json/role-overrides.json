@@ -20,6 +20,22 @@
 		"roles": ["igl", "support"]
 	},
 	"allu-2015-nip": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"allu-2017-faze": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"allu-2019-ence": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"allu-2021-ence": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"forest-2015-nip": {
 		"primaryRole": "entry",
 		"roles": ["entry", "lurker"]
 	},
@@ -300,8 +316,8 @@
 		"roles": ["awp", "lurker"]
 	},
 	"hampus-2022-nip": {
-		"primaryRole": "awp",
-		"roles": ["awp", "igl"]
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
 	},
 	"heaton-2003-sk": {
 		"primaryRole": "awp",
@@ -776,12 +792,12 @@
 		"roles": ["support", "lurker"]
 	},
 	"happy-2013-recursive-esports": {
-		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
-	},
-	"maniac-2013-recursive-esports": {
 		"primaryRole": "igl",
 		"roles": ["igl", "support"]
+	},
+	"maniac-2013-recursive-esports": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
 	},
 	"hiko-2014-complexity": {
 		"primaryRole": "lurker",
@@ -816,12 +832,12 @@
 		"roles": ["entry", "lurker"]
 	},
 	"apex-2014-team-ldlc-com": {
-		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
 	},
 	"happy-2014-team-ldlc-com": {
-		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
 	},
 	"kqly-2014-team-ldlc-com": {
 		"primaryRole": "awp",
@@ -932,8 +948,8 @@
 		"roles": ["support"]
 	},
 	"happy-2015-team-envyus": {
-		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
 	},
 	"nbk-2015-team-envyus": {
 		"primaryRole": "support",
@@ -976,8 +992,8 @@
 		"roles": ["support"]
 	},
 	"apex-2015-team-envyus": {
-		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
 	},
 	"nex-2015-mouz": {
 		"primaryRole": "entry",
@@ -1056,12 +1072,12 @@
 		"roles": ["support"]
 	},
 	"apex-2016-team-envyus": {
-		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
 	},
 	"happy-2016-team-envyus": {
-		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
 	},
 	"nbk-2016-team-envyus": {
 		"primaryRole": "entry",
@@ -1224,12 +1240,16 @@
 		"roles": ["lurker", "entry"]
 	},
 	"apex-2017-team-envyus": {
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
+	},
+	"apex-2017-g2": {
 		"primaryRole": "igl",
 		"roles": ["igl", "support"]
 	},
 	"happy-2017-team-envyus": {
-		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
 	},
 	"nbk-2017-team-envyus": {
 		"primaryRole": "support",
@@ -1392,12 +1412,12 @@
 		"roles": ["awp", "entry"]
 	},
 	"happy-2018-team-envy": {
-		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
-	},
-	"scream-2018-team-envy": {
 		"primaryRole": "igl",
 		"roles": ["igl", "support"]
+	},
+	"scream-2018-team-envy": {
+		"primaryRole": "entry",
+		"roles": ["entry", "lurker"]
 	},
 	"xms-2018-team-envy": {
 		"primaryRole": "entry",
@@ -1866,6 +1886,10 @@
 	"plopski-2022-nip": {
 		"primaryRole": "lurker",
 		"roles": ["lurker", "entry"]
+	},
+	"es3tag-2022-nip": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
 	},
 	"dycha-2022-ence": {
 		"primaryRole": "support",
