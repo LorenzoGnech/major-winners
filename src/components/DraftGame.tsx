@@ -111,6 +111,7 @@ import { HomeLogo } from "./HomeLogo";
 import { DailyStatsPanel, type HomeAction, HomeScreen, type HomeView } from "./HomeScreen";
 import { MajorCrest } from "./MajorCrest";
 import { MatchPlayback } from "./MatchPlayback";
+import { resetMobileViewport } from "./mobileViewport";
 import { OrgCrest } from "./OrgCrest";
 import { SaveTeamPanel, saveResultMessage } from "./SaveTeam";
 import { TournamentRun } from "./TournamentRun";
@@ -173,7 +174,8 @@ function TeamNameField({
 				autoComplete="off"
 				placeholder="e.g. Copenhagen Flames"
 				onChange={(event) => onChange(event.target.value)}
-				className="mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+				onBlur={() => resetMobileViewport()}
+				className="mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-base text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 			/>
 			<p className="mt-1.5 text-[11px] text-zinc-500">Used on the Major board and every match.</p>
 			{error ? (
@@ -1237,6 +1239,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		}
 		setTeamName(name);
 		setNameError(null);
+		resetMobileViewport();
 		setTournament(
 			createTournament({
 				rootSeed: completedDraft.seed,
