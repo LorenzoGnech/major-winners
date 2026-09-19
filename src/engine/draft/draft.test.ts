@@ -63,7 +63,7 @@ describe("roleFit", () => {
 
 describe("sampleOrgYears", () => {
 	it("never repeats an org-year and honors documented tier weights", () => {
-		expect(TIER_WEIGHTS).toEqual({ legendary: 5, strong: 3, cult: 1 });
+		expect(TIER_WEIGHTS).toEqual({ legendary: 4, strong: 3, cult: 1 });
 		const pool: SampleableOrgYear[] = [
 			{ id: "cult-a", tier: "cult" },
 			{ id: "strong-a", tier: "strong" },

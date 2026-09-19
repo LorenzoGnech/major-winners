@@ -33,7 +33,7 @@ Path alias: `@/` maps to `src/`.
 
 ## Draft
 
-Six rounds. Each of the first five rolls a distinct completed Valve Major, then samples one of its participating five-player rosters with integer tier weights: `legendary` 5, `strong` 3, `cult` 1 (`TIER_WEIGHTS`). A 5% roll may replace one Major with a pre-2013 Legacy wildcard. The sixth round picks one coach from five sampled from the full pool (`COACH_CANDIDATE_COUNT`). Optional `tier: "legendary"` coaches have a 1-in-20 chance (`LEGENDARY_COACH_ODDS`) to appear in that slate (sorted before the sampled remainder) and are shown with gold legendary chrome.
+Six rounds. Each of the first five rolls a distinct completed Valve Major, then samples one of its participating five-player rosters with integer tier weights: `legendary` 4, `strong` 3, `cult` 1 (`TIER_WEIGHTS`). A 5% roll may replace one Major with a pre-2013 Legacy wildcard. The sixth round picks one coach from five sampled from the full pool (`COACH_CANDIDATE_COUNT`). Optional `tier: "legendary"` coaches have a 1-in-20 chance (`LEGENDARY_COACH_ODDS`) to appear in that slate (sorted before the sampled remainder) and are shown with gold legendary chrome.
 
 - A draft has two Major rerolls and two team rerolls. The Major reroll keeps the current org and samples a different Major appearance of that org; the team reroll keeps the current event. A Major reroll is illegal (and the UI disables it) when that org has no other unused Major appearance. Both are legal only before the current player pick, exclude already shown cards, and derive from the root seed, round, action type, and which of the two uses.
 - `RolledOrgYearCard` snapshots its Major/Legacy identity and five players. `applyAction` needs the committed dataset only for reroll actions.

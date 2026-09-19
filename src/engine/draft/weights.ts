@@ -17,7 +17,7 @@ export const REROLL_BUDGET = 2;
  * Legendary cards show up more often than cult cards when the pool is mixed.
  */
 export const TIER_WEIGHTS: Record<OrgTier, number> = {
-	legendary: 5,
+	legendary: 4,
 	strong: 3,
 	cult: 1,
 };
