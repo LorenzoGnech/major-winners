@@ -1,9 +1,10 @@
-import type { ReactNode } from "react";
-import { donateUrl } from "./donate";
+import { type ReactNode, useState } from "react";
+import { DonateModal } from "./DonateModal";
 
 type AppNavProps = {
-	onGoHome: () => void;
+	onGoHome?: () => void;
 	action?: ReactNode;
+	showLegal?: boolean;
 };
 
 function CoffeeIcon() {
@@ -17,8 +18,8 @@ function CoffeeIcon() {
 	);
 }
 
-export function AppNav({ onGoHome, action }: AppNavProps) {
-	const donate = donateUrl();
+export function AppNav({ onGoHome, action, showLegal = true }: AppNavProps) {
+	const [donateOpen, setDonateOpen] = useState(false);
 
 	return (
 		<>
@@ -32,6 +33,7 @@ export function AppNav({ onGoHome, action }: AppNavProps) {
 						aria-label="Major Winners home"
 						className="flex size-10 items-center justify-center sm:size-11"
 						onClick={(event) => {
+							if (!onGoHome) return;
 							event.preventDefault();
 							onGoHome();
 						}}
@@ -45,27 +47,29 @@ export function AppNav({ onGoHome, action }: AppNavProps) {
 						/>
 					</a>
 					<div className="flex min-w-0 items-center gap-2">
-						<a
-							href="/legal"
-							className="px-1.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400 transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400"
-						>
-							Legal
-						</a>
-						<a
-							href={donate}
-							target="_blank"
-							rel="noopener noreferrer"
+						{showLegal ? (
+							<a
+								href="/legal"
+								className="px-1.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400 transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400"
+							>
+								Legal
+							</a>
+						) : null}
+						<button
+							type="button"
+							onClick={() => setDonateOpen(true)}
 							className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200/25 bg-amber-300/10 px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-100 transition hover:border-amber-200/45 hover:bg-amber-300/16 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
 						>
 							<CoffeeIcon />
 							<span className="hidden sm:inline">Buy me a coffee</span>
 							<span className="sm:hidden">Coffee</span>
-						</a>
+						</button>
 						{action}
 					</div>
 				</div>
 			</nav>
 			<div className="h-[var(--app-nav-height)] shrink-0" aria-hidden />
+			<DonateModal open={donateOpen} onClose={() => setDonateOpen(false)} />
 		</>
 	);
 }
