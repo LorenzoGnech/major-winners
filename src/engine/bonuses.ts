@@ -161,7 +161,7 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"brother",
 		"bonus",
 		"You're not my friend, you're my brother my friend",
-		"The team are not brothers for three rounds, improving morale",
+		"The team are now brothers for three rounds, improving morale",
 		[
 			{ kind: "win-prob", amount: 0.04 },
 			{ kind: "morale", self: 30 },
@@ -259,7 +259,7 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 
 export function traitDraftHint(blurb: string): string {
 	const rest = /^[A-Za-z]/.test(blurb) ? blurb.charAt(0).toLowerCase() + blurb.slice(1) : blurb;
-	return `Each round has a small chance to ${rest}`;
+	return `Each round has a small chance to... ${rest}`;
 }
 
 const byId = new Map(BONUS_CATALOG.map((row) => [row.id, row]));
