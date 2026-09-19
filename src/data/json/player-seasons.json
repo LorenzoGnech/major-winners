@@ -4689,8 +4689,8 @@
 		"orgId": "dat-team",
 		"photo": "/photos/players/b1ad3/2014.jpg",
 		"game": "csgo",
-		"roles": ["entry", "lurker"],
-		"primaryRole": "entry",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -4722,8 +4722,8 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/b1ad3/2015.jpg",
 		"game": "csgo",
-		"roles": ["support", "lurker"],
-		"primaryRole": "support",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -4755,8 +4755,8 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/b1ad3/2016.jpg",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -4794,8 +4794,8 @@
 		"roles": ["igl", "support"],
 		"primaryRole": "igl",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -4827,8 +4827,8 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/b1ad3/2018.jpg",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -6520,8 +6520,8 @@
 		"orgId": "dat-team",
 		"photo": "/photos/players/bondik/2014.png",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -6553,8 +6553,8 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/bondik/2015.png",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -6586,8 +6586,8 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/bondik/2016.png",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -36449,11 +36449,11 @@
 		"orgId": "winstrike-team",
 		"photo": "/photos/players/kvik/2019.png",
 		"game": "csgo",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["lurker", "entry"],
+		"primaryRole": "lurker",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -40500,11 +40500,11 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/markeloff/2015.jpg",
 		"game": "csgo",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "partial",
 		"ratingProvenance": {
@@ -40533,11 +40533,11 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/markeloff/2016.jpg",
 		"game": "csgo",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -40569,11 +40569,11 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/markeloff/2017.jpg",
 		"game": "csgo",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -40605,11 +40605,11 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/markeloff/2018.jpg",
 		"game": "csgo",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "fallback",
 		"ratingProvenance": {
@@ -54733,8 +54733,8 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/seized/2018.png",
 		"game": "csgo",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["lurker", "entry"],
+		"primaryRole": "lurker",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -67437,8 +67437,8 @@
 		"roles": ["awp", "entry"],
 		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "fallback",
 		"ratingProvenance": {
@@ -67467,11 +67467,11 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/worldedit/2015.png",
 		"game": "csgo",
-		"roles": ["entry", "lurker"],
-		"primaryRole": "entry",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "partial",
 		"ratingProvenance": {
@@ -67500,11 +67500,11 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/worldedit/2016.png",
 		"game": "csgo",
-		"roles": ["entry", "lurker"],
-		"primaryRole": "entry",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -67536,11 +67536,11 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/worldedit/2017.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -67572,11 +67572,11 @@
 		"orgId": "flipsid3-tactics",
 		"photo": "/photos/players/worldedit/2018.png",
 		"game": "csgo",
-		"roles": ["entry", "lurker"],
-		"primaryRole": "entry",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -67608,11 +67608,11 @@
 		"orgId": "winstrike-team",
 		"photo": "/photos/players/worldedit/2019.png",
 		"game": "csgo",
-		"roles": ["support", "lurker"],
-		"primaryRole": "support",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {

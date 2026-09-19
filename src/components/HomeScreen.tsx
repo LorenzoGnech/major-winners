@@ -85,12 +85,20 @@ type HomeScreenProps = {
 
 const MENU_BUTTON_BASE =
 	"w-full border font-semibold uppercase transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e53935]";
-const MENU_BUTTON = `${MENU_BUTTON_BASE} px-5 py-3.5 text-sm tracking-[0.22em]`;
+const MENU_BUTTON = `${MENU_BUTTON_BASE} px-5 py-3.5 text-sm tracking-[0.22em] lg:py-3`;
 const PRIMARY_BUTTON = `${MENU_BUTTON} border-transparent bg-[#e53935] text-white hover:bg-[#f04848]`;
 const SECONDARY_BUTTON = `${MENU_BUTTON} border-white/20 bg-transparent text-white hover:border-white/50 hover:bg-white/5`;
-const SPLIT_BUTTON = `${MENU_BUTTON_BASE} min-w-0 border-white/20 bg-transparent px-2 py-3.5 text-[11px] tracking-[0.08em] text-white hover:border-white/50 hover:bg-white/5 sm:px-4 sm:text-xs sm:tracking-[0.14em]`;
+const SPLIT_BUTTON = `${MENU_BUTTON_BASE} min-w-0 border-white/20 bg-transparent px-2 py-3.5 text-[11px] tracking-[0.08em] text-white hover:border-white/50 hover:bg-white/5 sm:px-4 sm:text-xs sm:tracking-[0.14em] lg:py-3`;
 const FIELD_CLASS =
 	"mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-center text-sm uppercase tracking-[0.18em] text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e53935]";
+
+function BetaChip() {
+	return (
+		<span className="inline-flex items-center rounded-full border border-white/22 bg-white/10 px-1.5 py-px text-[8px] font-bold uppercase tracking-[0.16em] text-zinc-300">
+			Beta
+		</span>
+	);
+}
 
 function BrandMark({ size }: { size: "lg" | "sm" }) {
 	return (
@@ -101,7 +109,11 @@ function BrandMark({ size }: { size: "lg" | "sm" }) {
 				alt=""
 				width={size === "lg" ? 220 : 120}
 				height={size === "lg" ? 220 : 120}
-				className={size === "lg" ? "relative size-44 sm:size-52" : "relative size-24"}
+				className={
+					size === "lg"
+						? "relative size-44 sm:size-52 lg:size-[clamp(8rem,20vh,13rem)]"
+						: "relative size-24"
+				}
 			/>
 		</div>
 	);
@@ -351,7 +363,7 @@ export function HomeScreen({
 	onStart,
 }: HomeScreenProps) {
 	return (
-		<div className="relative isolate flex min-h-dvh flex-col bg-black">
+		<div className="relative isolate flex min-h-dvh flex-col bg-black lg:h-dvh lg:overflow-hidden">
 			<HomeHighlightReel clips={HOME_HIGHLIGHTS} />
 			<div className="pointer-events-none fixed inset-0 bg-black/35" aria-hidden />
 			<div
@@ -359,19 +371,19 @@ export function HomeScreen({
 				aria-hidden
 			/>
 			<AppNav onGoHome={() => onView("menu")} />
-			<div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-8 sm:py-12">
+			<div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-8 sm:py-12 lg:py-4">
 				<div
-					className={`flex w-full flex-col items-center border border-white/10 bg-black/55 px-4 py-6 text-center backdrop-blur-xl sm:px-6 sm:py-8 ${
+					className={`flex w-full flex-col items-center border border-white/10 bg-black/55 px-4 py-6 text-center backdrop-blur-xl sm:px-6 sm:py-8 lg:py-[clamp(1rem,2.5vh,2rem)] ${
 						view === "leaderboards" || view === "profile"
 							? "max-h-[calc(100dvh-var(--app-nav-height)-2rem)] max-w-6xl overflow-y-auto overscroll-contain"
 							: "max-w-md"
 					}`}
 				>
 					<BrandMark size={view === "menu" ? "lg" : "sm"} />
-					<p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-400">
+					<p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-400 lg:mt-[clamp(0.75rem,2vh,1.5rem)]">
 						Counter-Strike fantasy draft
 					</p>
-					<h1 className="mt-2 text-4xl font-bold uppercase tracking-[0.16em] text-white sm:text-5xl">
+					<h1 className="mt-2 text-4xl font-bold uppercase tracking-[0.16em] text-white sm:text-5xl lg:text-[clamp(1.875rem,4.5vh,3rem)]">
 						Major Winners
 					</h1>
 					{view === "menu" ? (
@@ -381,7 +393,7 @@ export function HomeScreen({
 					) : null}
 
 					{view === "menu" ? (
-						<nav aria-label="Game modes" className="mt-10 flex w-full flex-col gap-3">
+						<nav aria-label="Game modes" className="mt-10 flex w-full flex-col gap-3 lg:mt-[clamp(1rem,3vh,2.5rem)]">
 							<button type="button" onClick={() => onChoose("daily")} className={PRIMARY_BUTTON}>
 								{hasDailyAttempt ? "Continue today's challenge" : "Today's challenge"}
 							</button>
@@ -395,9 +407,10 @@ export function HomeScreen({
 								<button
 									type="button"
 									onClick={() => onView("community")}
-									className={SECONDARY_BUTTON}
+									className={`${SECONDARY_BUTTON} inline-flex items-center justify-center gap-2`}
 								>
 									Community
+									<BetaChip />
 								</button>
 							) : null}
 							{community.enabled ? (
@@ -444,8 +457,9 @@ export function HomeScreen({
 					{view === "community" ? (
 						<div className="mt-8 flex w-full flex-col items-center gap-3">
 							<div>
-								<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
+								<h2 className="inline-flex items-center justify-center gap-2 text-lg font-semibold uppercase tracking-[0.18em] text-white">
 									Community
+									<BetaChip />
 								</h2>
 								<p className="mt-2 text-sm text-zinc-400">
 									Ranked 1v1, private BO5, or a Major vs published teams.

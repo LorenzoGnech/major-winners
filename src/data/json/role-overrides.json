@@ -864,12 +864,12 @@
 		"roles": ["support", "lurker"]
 	},
 	"bondik-2014-dat-team": {
-		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
 	},
 	"b1ad3-2014-dat-team": {
-		"primaryRole": "entry",
-		"roles": ["entry", "lurker"]
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
 	},
 	"fxy0-2014-epsilon-esports": {
 		"primaryRole": "awp",
@@ -956,12 +956,12 @@
 		"roles": ["lurker", "entry"]
 	},
 	"bondik-2015-flipsid3-tactics": {
-		"primaryRole": "igl",
-		"roles": ["igl", "support"]
-	},
-	"b1ad3-2015-flipsid3-tactics": {
 		"primaryRole": "support",
 		"roles": ["support", "lurker"]
+	},
+	"b1ad3-2015-flipsid3-tactics": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
 	},
 	"steel_lucas_lopes-2015-keyd-stars": {
 		"primaryRole": "support",
@@ -1116,12 +1116,16 @@
 		"roles": ["support", "lurker"]
 	},
 	"bondik-2016-flipsid3-tactics": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
+	},
+	"b1ad3-2016-flipsid3-tactics": {
 		"primaryRole": "igl",
 		"roles": ["igl", "support"]
 	},
-	"b1ad3-2016-flipsid3-tactics": {
-		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+	"b1ad3-2017-flipsid3-tactics": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
 	},
 	"hiko-2016-liquid": {
 		"primaryRole": "lurker",
@@ -1336,12 +1340,12 @@
 		"roles": ["support", "lurker"]
 	},
 	"seized-2018-flipsid3-tactics": {
-		"primaryRole": "igl",
-		"roles": ["igl", "support"]
-	},
-	"b1ad3-2018-flipsid3-tactics": {
 		"primaryRole": "lurker",
 		"roles": ["lurker", "entry"]
+	},
+	"b1ad3-2018-flipsid3-tactics": {
+		"primaryRole": "igl",
+		"roles": ["igl", "support"]
 	},
 	"apex-2018-g2": {
 		"primaryRole": "igl",
@@ -2042,6 +2046,50 @@
 	"sdy-2023-monte": {
 		"primaryRole": "igl",
 		"roles": ["igl", "support"]
+	},
+	"worldedit-2014-dat-team": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"worldedit-2015-flipsid3-tactics": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"worldedit-2016-flipsid3-tactics": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"worldedit-2017-flipsid3-tactics": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"worldedit-2018-flipsid3-tactics": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"worldedit-2019-winstrike-team": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"markeloff-2015-flipsid3-tactics": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
+	},
+	"markeloff-2016-flipsid3-tactics": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
+	},
+	"markeloff-2017-flipsid3-tactics": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
+	},
+	"markeloff-2018-flipsid3-tactics": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
+	},
+	"kvik-2019-winstrike-team": {
+		"primaryRole": "lurker",
+		"roles": ["lurker", "entry"]
 	},
 	"woro2k-2023-monte": {
 		"primaryRole": "awp",
