@@ -168,7 +168,7 @@ export function TournamentRun({
 					<div className="flex flex-wrap items-start justify-between gap-4">
 						<div>
 							<p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-								Classic fantasy Major
+								Major run
 							</p>
 							<h2
 								id="tournament-heading"
@@ -177,7 +177,7 @@ export function TournamentRun({
 								{STAGE_LABELS[board.stage]}
 							</h2>
 							<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
-								Two Swiss stages, then three playoff series. A flawless championship is 9–0.
+								Challengers Swiss, Legends Swiss, then the playoffs. A perfect title is 9–0.
 							</p>
 						</div>
 						<div className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-right">

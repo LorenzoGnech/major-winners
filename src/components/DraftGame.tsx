@@ -177,7 +177,7 @@ function TeamNameField({
 				onBlur={() => resetMobileViewport()}
 				className="mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-base text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
 			/>
-			<p className="mt-1.5 text-[11px] text-zinc-500">Used on the Major board and every match.</p>
+			<p className="mt-1.5 text-[11px] text-zinc-500">Shows on the bracket and in matches.</p>
 			{error ? (
 				<p role="alert" className="mt-1.5 text-xs text-red-200">
 					{error}
@@ -334,7 +334,7 @@ function TeamProfilePanel({ profile }: { profile: TeamProfile }) {
 							))}
 						</ul>
 					) : (
-						<p className="mt-2 text-sm text-zinc-500">No major structural weakness.</p>
+						<p className="mt-2 text-sm text-zinc-500">No obvious weak spot.</p>
 					)}
 				</div>
 			</div>
@@ -1018,7 +1018,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			setAuthError(error);
 			return;
 		}
-		setAuthMessage("Check your email for the sign-in link.");
+		setAuthMessage("Link sent. Check your email.");
 	}
 
 	async function submitUsername() {
@@ -1690,7 +1690,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								{teamName}
 							</h1>
 							<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
-								Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
+								Five picks from Major history, one coach, then the full bracket.
 							</p>
 						</div>
 						{!tournament && !pendingRestart && mode !== "duel" && (
@@ -1722,7 +1722,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 						detail={
 							duelKind === "ranked"
 								? duelRoom?.status === "veto"
-									? "Both rosters are in. Ban two, pick two, then two more bans and picks."
+									? "Both sides locked in. Veto maps next."
 									: duelLocked
 										? `Locked in. Waiting for ${
 												(duelRoom
@@ -1731,9 +1731,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 											}.`
 										: "Draft five players and a coach, then lock in."
 								: duelRoom?.status === "open"
-									? "Share this code. Draft while you wait for your opponent."
+									? "Share the code. Draft while you wait."
 									: duelRoom?.status === "veto"
-										? "Both rosters are in. Ban two, pick two, then two more bans and picks."
+										? "Both sides locked in. Veto maps next."
 										: duelLocked
 											? `Locked in. Waiting for ${
 													(duelRoom
@@ -1947,11 +1947,11 @@ export function DraftGame({ dataset }: DraftGameProps) {
 												);
 											})}
 											<p className="px-1 text-[11px] text-zinc-500 max-lg:hidden">
-												Drag onto a role, or drag a placed player to move or swap. Keyboard: focus a
-												card or roster player, then press 1–5.
+												Drag to a role, or drag to move or swap. Press 1–5 with a card or roster
+												player focused.
 											</p>
 											<p className="px-1 text-[11px] text-zinc-500 lg:hidden">
-												Tap a player, then tap a role. You can also drag onto the roster bar.
+												Tap a player, then tap a role—or drag to the roster bar.
 											</p>
 										</div>
 									</div>
@@ -1973,7 +1973,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 									Choose your sixth
 								</h2>
 								<p className="mt-2 text-sm text-zinc-400">
-									Five coaches were drafted. Their modifiers shape the run in the next phase.
+									Pick one coach. Comeback, economy, and anti-strat modifiers carry into the run.
 								</p>
 								<div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
 									{state.coachIds.map((coachId) => {
@@ -2102,9 +2102,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										Name the squad
 									</h2>
 									<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-300">
-										Five players and {chosenCoach.nick} are locked in. You can still swap roles on
-										the live roster before starting. This profile combines individual quality, role
-										fit, teammate and nationality chemistry, communication, structure, and coaching.
+										Five players and {chosenCoach.nick} are in. Swap roles on the live roster
+										anytime before you start. Team OVR blends player quality, role fit, chemistry,
+										comms, structure, and coaching.
 									</p>
 									<TeamProfilePanel profile={teamProfile} />
 									<div className="mt-5 max-w-md">

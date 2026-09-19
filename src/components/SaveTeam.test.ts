@@ -9,13 +9,13 @@ describe("saveAuthorHint", () => {
 
 	it("points signed-in players without a username at their profile", () => {
 		expect(saveAuthorHint(true, DEFAULT_AUTHOR_NAME)).toBe(
-			`Saves as ${DEFAULT_AUTHOR_NAME}. Pick a username on your profile to attach your name.`,
+			`Saves as ${DEFAULT_AUTHOR_NAME}. Set a username in My profile to show your name.`,
 		);
 	});
 
 	it("keeps anonymous saves available without a session", () => {
 		expect(saveAuthorHint(false, DEFAULT_AUTHOR_NAME)).toBe(
-			`Saves as ${DEFAULT_AUTHOR_NAME}. Sign in from Home to use your username.`,
+			`Saves as ${DEFAULT_AUTHOR_NAME}. Sign in to attach your username.`,
 		);
 	});
 });

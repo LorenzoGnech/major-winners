@@ -153,7 +153,7 @@ export function HomeLeaderboards({
 					</ol>
 				) : (
 					<p className="text-sm text-zinc-500">
-						No published runs yet. Finish a Major and save your team.
+						Nothing here yet. Finish a Major and save your team.
 					</p>
 				)}
 			</BoardShell>

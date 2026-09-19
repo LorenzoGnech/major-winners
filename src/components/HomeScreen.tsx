@@ -220,8 +220,8 @@ export function RankedStatsPanel({ profile }: { profile: RankedProfile | null })
 			</h2>
 			<p className="mt-1 text-xs text-zinc-500">
 				{profile
-					? "Elo moves after both players report the same BO5."
-					: "Sign in, pick a username, and queue for a nearby opponent."}
+					? "Elo updates once both players report the same BO5 result."
+					: "Sign in with a username to queue ranked."}
 			</p>
 			<dl className="mt-5 grid grid-cols-2 gap-2">
 				{rows.map(([label, value]) => (
@@ -258,7 +258,7 @@ export function BestTeamsPanel({
 			>
 				Best teams
 			</h2>
-			<p className="mt-1 text-xs text-zinc-500">Your top published Major results.</p>
+			<p className="mt-1 text-xs text-zinc-500">Your best saved Major runs.</p>
 			{best.length > 0 ? (
 				<ol className="mt-5 space-y-2">
 					{best.map((run, index) => {
@@ -369,11 +369,16 @@ export function HomeScreen({
 				>
 					<BrandMark size={view === "menu" ? "lg" : "sm"} />
 					<p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-400">
-						Counter-Strike legends draft
+						Counter-Strike fantasy draft
 					</p>
 					<h1 className="mt-2 text-4xl font-bold uppercase tracking-[0.16em] text-white sm:text-5xl">
 						Major Winners
 					</h1>
+					{view === "menu" ? (
+						<p className="mt-3 text-sm leading-6 text-zinc-400">
+							Create your own major-winning team
+						</p>
+					) : null}
 
 					{view === "menu" ? (
 						<nav aria-label="Game modes" className="mt-10 flex w-full flex-col gap-3">
@@ -427,6 +432,12 @@ export function HomeScreen({
 									My profile
 								</button>
 							)}
+							<a
+								href="/legal"
+								className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 underline decoration-zinc-500/40 underline-offset-4 transition hover:text-zinc-300 hover:decoration-zinc-300"
+							>
+								Legal & privacy
+							</a>
 						</nav>
 					) : null}
 
@@ -437,7 +448,7 @@ export function HomeScreen({
 									Community
 								</h2>
 								<p className="mt-2 text-sm text-zinc-400">
-									Queue a ranked 1v1, host a private BO5, or play a Major against published teams.
+									Ranked 1v1, private BO5, or a Major vs published teams.
 								</p>
 							</div>
 							<button type="button" onClick={community.onRanked} className={PRIMARY_BUTTON}>
@@ -475,9 +486,7 @@ export function HomeScreen({
 								<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
 									Private match
 								</h2>
-								<p className="mt-2 text-sm text-zinc-400">
-									Create a lobby and share the code, or join one.
-								</p>
+								<p className="mt-2 text-sm text-zinc-400">Host a lobby or join with a code.</p>
 							</div>
 							<button type="button" onClick={() => onChoose("duel")} className={PRIMARY_BUTTON}>
 								Create a lobby
@@ -502,7 +511,7 @@ export function HomeScreen({
 					{view === "ranked-handle" ? (
 						<SetupForm
 							title="Username"
-							detail="This name appears on saved teams and ranked matches. Letters, numbers, and underscore."
+							detail="Shown on saved teams and ranked matches. 3–16 letters, numbers, or underscore."
 							onBack={() => onView("community")}
 							onSubmit={community.onSubmitHandle}
 							submitLabel="Find match"
@@ -544,7 +553,7 @@ export function HomeScreen({
 					{view === "duel-join" ? (
 						<SetupForm
 							title="Join a lobby"
-							detail="Enter the 6-character room code. You each draft, then veto maps for a BO5."
+							detail="Enter the room code. You both draft, then veto maps for a BO5."
 							onBack={() => onView("private")}
 							onSubmit={community.onJoinDuel}
 							submitLabel="Join lobby"
@@ -564,7 +573,7 @@ export function HomeScreen({
 					{view === "custom" ? (
 						<SetupForm
 							title="Custom game seed"
-							detail="Same seed always produces the same draft and opponents."
+							detail="Same seed, same draft and opponents."
 							onBack={() => onView("menu")}
 							onSubmit={onStart}
 						>
@@ -583,7 +592,7 @@ export function HomeScreen({
 					{view === "signin" ? (
 						<SetupForm
 							title="Sign in"
-							detail="Optional. Publishing still works anonymously. A username is used on saved teams and ranked matches."
+							detail="Play stays in this browser. Sign in only if you want teams and scores on other devices. You can still publish without an account."
 							onBack={() => onView("menu")}
 							onSubmit={community.onSignIn}
 							submitLabel={community.authBusy ? "Sending…" : "Send magic link"}
@@ -610,6 +619,12 @@ export function HomeScreen({
 							{community.authMessage ? (
 								<p className="text-sm text-emerald-200">{community.authMessage}</p>
 							) : null}
+							<a
+								href="/legal"
+								className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500 underline decoration-zinc-500/40 underline-offset-4 transition hover:text-zinc-300 hover:decoration-zinc-300"
+							>
+								Legal & privacy
+							</a>
 						</SetupForm>
 					) : null}
 
@@ -641,7 +656,7 @@ export function HomeScreen({
 										maxLength={DISPLAY_NAME_MAX}
 									/>
 									<p className="text-xs text-zinc-500">
-										Used on saved teams and ranked matches. Letters, numbers, and underscore.
+										Shown on saved teams and ranked matches. 3–16 letters, numbers, or underscore.
 									</p>
 									<button
 										type="submit"

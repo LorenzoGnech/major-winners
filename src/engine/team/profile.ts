@@ -292,24 +292,24 @@ function labels(
 	const strengths: string[] = [];
 	const weaknesses: string[] = [];
 
-	if (baseStrength >= 88) strengths.push("Elite individual firepower");
-	else if (baseStrength >= 82) strengths.push("Strong individual quality");
-	else if (baseStrength < 74) weaknesses.push("Limited fit-adjusted firepower");
+	if (baseStrength >= 88) strengths.push("Stacked individually");
+	else if (baseStrength >= 82) strengths.push("Strong on paper");
+	else if (baseStrength < 74) weaknesses.push("Light firepower for the roles");
 
-	if (chemistryScore >= 75) strengths.push("Proven teammate chemistry");
+	if (chemistryScore >= 75) strengths.push("Played together before");
 	else if (chemistryScore === TEAM_PROFILE_BASELINES.chemistry)
-		weaknesses.push("No shared history or nationality");
+		weaknesses.push("Strangers on the server");
 
-	if (communicationScore >= 88) strengths.push("Clear communication bridge");
-	else if (communicationScore < 75) weaknesses.push("Communication may need adaptation");
+	if (communicationScore >= 88) strengths.push("Comms should hold");
+	else if (communicationScore < 75) weaknesses.push("Comms could be rough");
 
-	if (structureDetail.naturalRoleCount === ROLES.length) strengths.push("Natural role coverage");
-	if (structureDetail.offRoleCount >= 2) weaknesses.push("Multiple off-role assignments");
-	if (structureDetail.iglFit === "missing") weaknesses.push("No proven caller in the IGL slot");
-	if (structureDetail.primaryAwpCount > 1) weaknesses.push("Overlapping primary AWP roles");
+	if (structureDetail.naturalRoleCount === ROLES.length) strengths.push("Everyone on-role");
+	if (structureDetail.offRoleCount >= 2) weaknesses.push("Too many off-role picks");
+	if (structureDetail.iglFit === "missing") weaknesses.push("No real IGL");
+	if (structureDetail.primaryAwpCount > 1) weaknesses.push("Two primary AWPs");
 
-	if (coachingDetail.score >= 70) strengths.push("High-impact tactical coaching");
-	else if (coachingDetail.score <= 35) weaknesses.push("Limited coaching modifiers");
+	if (coachingDetail.score >= 70) strengths.push("Strong coach");
+	else if (coachingDetail.score <= 35) weaknesses.push("Weak coach on paper");
 
 	return { strengths, weaknesses };
 }

@@ -77,7 +77,7 @@ describe("buildTeamProfile", () => {
 		expect(result.details.chemistry.sharedOrgYearPairs).toBe(10);
 		expect(result.details.chemistry.sharedTeamPairs).toBe(10);
 		expect(result.details.chemistry.sharedNationalityPairs).toBeGreaterThan(0);
-		expect(result.strengths).toContain("Natural role coverage");
+		expect(result.strengths).toContain("Everyone on-role");
 		expect(Object.values(result.attributes)).toHaveLength(6);
 		expect(result.overall).toBeGreaterThan(80);
 	});
@@ -91,7 +91,7 @@ describe("buildTeamProfile", () => {
 		expect(result.components.chemistry).toBeLessThan(
 			TEAM_PROFILE_BASELINES.chemistry + CHEMISTRY_BONUS_CAP,
 		);
-		expect(result.weaknesses).not.toContain("No shared history or nationality");
+		expect(result.weaknesses).not.toContain("Strangers on the server");
 	});
 
 	it("credits pairs that shared a roster even on different drafted org-years", () => {
@@ -143,7 +143,7 @@ describe("buildTeamProfile", () => {
 		expect(offRole.details.structure.iglFit).toBe("missing");
 		expect(natural.components.structure - offRole.components.structure).toBeGreaterThanOrEqual(40);
 		expect(natural.overall - offRole.overall).toBeGreaterThan(4);
-		expect(offRole.weaknesses).toContain("No proven caller in the IGL slot");
+		expect(offRole.weaknesses).toContain("No real IGL");
 	});
 
 	it("caps pair-based chemistry so an intact five cannot run away", () => {

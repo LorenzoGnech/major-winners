@@ -9,6 +9,7 @@ import {
 	simulateSeries,
 	type TeamProfile,
 } from "../engine";
+import { DEFAULT_TEAM_NAME } from "./teamName";
 
 export type ExhibitionMatch = {
 	result: ReturnType<typeof simulateSeries>;
@@ -128,6 +129,6 @@ export function createExhibitionMatch({
 			format: "BO1",
 			playerMapId: "mirage",
 		}),
-		teamLabels: ["Your legends", opponentLabel],
+		teamLabels: [DEFAULT_TEAM_NAME, opponentLabel],
 	};
 }

@@ -512,7 +512,7 @@ export function LiveRoster({
 				})}
 			</div>
 			<p className="mt-3 text-[11px] leading-4 text-zinc-500">
-				Preview = average player OVR × role fit. Drag a placed player to move or swap roles.
+				Draft OVR = average player OVR × role fit. Drag placed players to move or swap.
 			</p>
 			<p className="mt-1 text-[10px] tabular-nums text-zinc-600">{seedLabel}</p>
 		</section>

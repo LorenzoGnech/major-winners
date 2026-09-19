@@ -689,7 +689,7 @@ function Scoreboard({
 									.map((player) => (
 										<tr key={player.playerId} className="bg-black/15 text-zinc-300">
 											<th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-100">
-												<span className="inline-flex items-center gap-1.5">
+												<span className="inline-flex items-center gap-2.5">
 													{player.nick}
 													<TraitIcons ids={traitsByPlayer.get(player.playerId) ?? []} size="xs" />
 												</span>
@@ -800,12 +800,12 @@ function TeamLineup({
 										? `${member.nick}, eliminated this round`
 										: undefined
 							}
-							className={`flex items-center gap-2 rounded-xl px-1.5 py-1.5 motion-safe:transition-[opacity,filter,background-color] ${
+							className={`relative isolate flex items-center gap-2 overflow-hidden rounded-xl px-1.5 py-1.5 motion-safe:transition-[opacity,filter,background-color] ${
 								isRight ? "flex-row-reverse" : ""
 							} ${dead ? "" : hot ? "bg-white/8 ring-1 ring-white/15" : ""}`}
 						>
-							<div className={`relative shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
-								{aura ? <TraitAuraFx polarity={aura.polarity} /> : null}
+							{aura ? <TraitAuraFx polarity={aura.polarity} /> : null}
+							<div className={`shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
 								<PlayerCrest player={crestFor(member, playersById)} size="md" />
 							</div>
 							<div
@@ -819,13 +819,15 @@ function TeamLineup({
 								</p>
 							</div>
 							<span
-								className={`flex shrink-0 items-center gap-1 ${isRight ? "flex-row-reverse" : ""}`}
+								className={`flex shrink-0 items-center gap-3 ${isRight ? "flex-row-reverse" : ""}`}
 							>
-								<TraitIcons
-									ids={member.bonusIds ?? []}
-									size="xs"
-									tip={isRight ? "center" : "start"}
-								/>
+								{(member.bonusIds?.length ?? 0) > 0 ? (
+									<TraitIcons
+										ids={member.bonusIds ?? []}
+										size="xs"
+										tip={isRight ? "center" : "start"}
+									/>
+								) : null}
 								<span
 									className={`text-xs font-semibold tabular-nums text-zinc-300 ${
 										dead ? "opacity-40 grayscale" : ""
@@ -889,10 +891,12 @@ function CompactMatchLineups({
 						return (
 							<li
 								key={member.id}
-								className={`flex items-center gap-1 rounded-md px-0.5 py-0 ${hot ? "bg-white/8" : ""}`}
+								className={`relative isolate flex items-center gap-1 overflow-hidden rounded-md px-0.5 py-0.5 ${
+									hot ? "bg-white/8" : ""
+								}`}
 							>
-								<div className={`relative shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
-									{aura ? <TraitAuraFx polarity={aura.polarity} compact /> : null}
+								{aura ? <TraitAuraFx polarity={aura.polarity} compact /> : null}
+								<div className={`shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
 									<PlayerCrest player={crestFor(member, playersById)} size="xs" />
 								</div>
 								<p
@@ -902,7 +906,11 @@ function CompactMatchLineups({
 								>
 									{member.nick}
 								</p>
-								<TraitIcons ids={member.bonusIds ?? []} size="xs" />
+								{(member.bonusIds?.length ?? 0) > 0 ? (
+									<span className="mx-2.5 shrink-0">
+										<TraitIcons ids={member.bonusIds ?? []} size="xs" />
+									</span>
+								) : null}
 								<span
 									className={`shrink-0 text-[11px] font-semibold tabular-nums text-zinc-300 ${
 										dead ? "opacity-40 grayscale" : ""

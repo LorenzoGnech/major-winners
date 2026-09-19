@@ -78,8 +78,8 @@ export function DuelVeto({
 						: `Waiting for ${theirs?.teamName ?? "opponent"}`}
 			</h3>
 			<p className="mx-auto mt-2 max-w-lg text-center text-sm text-zinc-400">
-				Ban, ban, pick, pick, then two more bans and picks. Your picks get the home boost. The
-				leftover map is the decider.
+				Ban two, pick two, ban two, pick two. Your picks get a small home edge. Last map is the
+				decider.
 			</p>
 			<p className="mt-3 text-center text-xs text-zinc-500">
 				{yours?.teamName ?? "You"} vs {theirs?.teamName ?? "Opponent"} · room {room.code}

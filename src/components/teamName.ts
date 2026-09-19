@@ -1,4 +1,4 @@
-export const DEFAULT_TEAM_NAME = "Your legends";
+export const DEFAULT_TEAM_NAME = "Your team";
 export const TEAM_NAME_MAX = 32;
 
 export function parseTeamName(value: unknown): string | null {

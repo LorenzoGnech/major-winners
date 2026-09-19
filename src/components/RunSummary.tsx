@@ -108,7 +108,7 @@ export function RunSummary({
 						champion ? "text-amber-200" : "text-zinc-500"
 					}`}
 				>
-					{champion ? "Classic fantasy Major" : "Major run"}
+					Major run
 				</p>
 				<h2
 					id="run-summary-heading"
@@ -118,13 +118,13 @@ export function RunSummary({
 							: "text-3xl text-white sm:text-4xl"
 					}`}
 				>
-					{champion ? "MAJOR CHAMPIONS" : "RUN OVER"}
+					{champion ? "Major champions" : "Run over"}
 				</h2>
 				<p className="mt-2 text-lg font-semibold text-white">{playerTeamName}</p>
 				<p className="mt-1 text-sm text-zinc-400">
 					{champion
 						? summary.perfect
-							? "Perfect 9–0. You took every series."
+							? "9–0. You won every series."
 							: `You won the Major · ${summary.wins}–${summary.losses}.`
 						: `Eliminated · ${summary.finish} · ${summary.wins}–${summary.losses}.`}
 				</p>

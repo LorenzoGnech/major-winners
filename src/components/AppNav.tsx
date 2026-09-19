@@ -46,6 +46,12 @@ export function AppNav({ onGoHome, action }: AppNavProps) {
 					</a>
 					<div className="flex min-w-0 items-center gap-2">
 						<a
+							href="/legal"
+							className="px-1.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400 transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-400"
+						>
+							Legal
+						</a>
+						<a
 							href={donate}
 							target="_blank"
 							rel="noopener noreferrer"

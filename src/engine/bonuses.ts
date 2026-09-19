@@ -126,21 +126,21 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 			{ kind: "morale", self: 20 },
 		],
 	),
-	def("olofboost", "bonus", "Olofboost", "Steal eco or force rounds for a stretch of three", [
+	def("olofboost", "bonus", "Olofboost", "Eco or force buys are stronger for three rounds", [
 		{ kind: "win-prob", amount: 0.12, when: "eco-force" },
 	]),
-	def("clutch-minister", "bonus", "Clutch Minister", "Stay last alive and snatch three rounds", [
+	def("clutch-minister", "bonus", "Clutch Minister", "Higher probability of a clutch win for three rounds", [
 		{ kind: "win-prob", amount: 0.03 },
 		{ kind: "clutch", scale: 2.5 },
 	]),
-	def("god-cs", "bonus", "God CS", "Take over three rounds like nobody else is on the server", [
+	def("god-cs", "bonus", "God CS", "The gods of CS are on your side for three rounds", [
 		{ kind: "combat", scale: 2 },
 	]),
 	def(
 		"inhuman-reactions",
 		"bonus",
 		"Inhuman Reactions",
-		"Win the opener, clutch harder, and take three rounds",
+		"Faster reactions and better clutching for three rounds",
 		[
 			{ kind: "opener", scale: 3 },
 			{ kind: "clutch", scale: 2 },
@@ -151,7 +151,7 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"one-tap-master",
 		"bonus",
 		"One Tap Master",
-		"Pop off for three rounds, and even harder on pistols",
+		"one taps everyone for three rounds",
 		[
 			{ kind: "combat", scale: 2 },
 			{ kind: "win-prob", amount: 0.08, when: "pistol" },
@@ -161,16 +161,16 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"brother",
 		"bonus",
 		"You're not my friend, you're my brother my friend",
-		"Bind the squad together and take three rounds",
+		"The team are not brothers for three rounds, improving morale",
 		[
 			{ kind: "win-prob", amount: 0.04 },
 			{ kind: "morale", self: 30 },
 		],
 	),
-	def("god-denis", "bonus", "God Denis", "Go superhuman and take three rounds", [
+	def("god-denis", "bonus", "God Denis", "the_denis is on your side for three rounds", [
 		{ kind: "combat", scale: 2 },
 	]),
-	def("ez4ence", "bonus", "EZ4ENCE", "Send the crowd into a frenzy and take three rounds", [
+	def("ez4ence", "bonus", "EZ4ENCE", "The next three rounds are EZ4ENCE", [
 		{ kind: "win-prob", amount: 0.03 },
 		{ kind: "morale", self: 20 },
 	]),
@@ -178,25 +178,25 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"guardian-flick",
 		"bonus",
 		"I remember a Guardian flick",
-		"Pull the AWP, win the opener, and take over three rounds",
+		"Flicks will be smoother for three rounds",
 		[{ kind: "force-awp" }, { kind: "opener", scale: 3 }, { kind: "combat", scale: 2 }],
 	),
-	def("choke", "malus", "Choke", "Freeze up and throw winnable rounds for a stretch of three", [
+	def("choke", "malus", "Choke", "A failed deagle shot from behind will hunt you for three rounds", [
 		{ kind: "combat", scale: 0.4 },
 		{ kind: "clutch", scale: 0.2 },
 		{ kind: "win-prob", amount: -0.03 },
 	]),
-	def("in-jail", "malus", "In jail", "Play three rounds at half strength", [
+	def("in-jail", "malus", "In jail", "Check HLTV, for three round he's stuck in jail", [
 		{ kind: "combat", scale: 0.5 },
 	]),
-	def("pregnant", "malus", "Pregnant", "Play a step slow and lose a bit of bite for three rounds", [
+	def("pregnant", "malus", "Pregnant", "Check HLTV, performance will be affected for three rounds", [
 		{ kind: "combat", scale: 0.5 },
 	]),
 	def(
 		"vac-ban",
 		"malus",
 		"VAC ban",
-		"Play the rest of the map at a quarter strength",
+		"The rest of the map will be played at a quarter strength, if he can access the server",
 		[{ kind: "combat", scale: 0.25 }],
 		{ type: "map" },
 	),
@@ -204,14 +204,14 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"save",
 		"malus",
 		"Save",
-		"Sit out the fights for three rounds and leave the team a man short",
+		"Save time for the next three round, but at least he'll keep the AWP",
 		[{ kind: "combat", scale: 0.05 }, { kind: "exclude-killer" }],
 	),
 	def(
 		"tactical-genius",
 		"bonus",
 		"Tactical Genius",
-		"Draw up the rest of the map and lift the squad",
+		"It's time for the signature tactic go A, but then go B",
 		[
 			{ kind: "win-prob", amount: 0.03 },
 			{ kind: "morale", self: 15 },
@@ -222,13 +222,13 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"na-player",
 		"malus",
 		"The North American Player",
-		"Have a classic three-round dip and play at half strength",
+		"But Titan he's the french star",
 		[{ kind: "combat", scale: 0.5 }],
 	),
-	def("jacked", "bonus", "Jacked", "Play three rounds much stronger", [
+	def("jacked", "bonus", "Jacked", "U wouldnt say this shit to him at lan", [
 		{ kind: "combat", scale: 1.5 },
 	]),
-	def("one-more-star", "malus", "Just one more star", "Tilt the squad and leak three rounds", [
+	def("one-more-star", "malus", "Just one more star", "Since you're short of one more superstar, morale is down", [
 		{ kind: "win-prob", amount: -0.04 },
 		{ kind: "morale", self: -20 },
 	]),
@@ -236,10 +236,10 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"new-porsche",
 		"malus",
 		"New Porsche",
-		"Admire the new ride and play three rounds at half strength",
+		"The new Porsche distracts him from the game, he's playing at half strength for three rounds",
 		[{ kind: "combat", scale: 0.5 }],
 	),
-	def("duk", "malus", "Duk", "Get lost in the chickens and sag for three rounds", [
+	def("duk", "malus", "Duk", "We have a chicken problem here", [
 		{ kind: "win-prob", amount: -0.025 },
 		{ kind: "morale", self: -10 },
 	]),

@@ -6,9 +6,9 @@ export function saveAuthorHint(signedIn: boolean, authorName: string): string {
 		return `Saves as ${authorName}.`;
 	}
 	if (signedIn) {
-		return `Saves as ${DEFAULT_AUTHOR_NAME}. Pick a username on your profile to attach your name.`;
+		return `Saves as ${DEFAULT_AUTHOR_NAME}. Set a username in My profile to show your name.`;
 	}
-	return `Saves as ${DEFAULT_AUTHOR_NAME}. Sign in from Home to use your username.`;
+	return `Saves as ${DEFAULT_AUTHOR_NAME}. Sign in to attach your username.`;
 }
 
 export function SaveTeamPanel({
@@ -51,7 +51,7 @@ export function SaveTeamPanel({
 		>
 			<p className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">Save team</p>
 			<p className="mt-1 text-sm text-zinc-400">
-				Publish {savedName} to the home leaderboards and the Versus community pool.
+				Save {savedName} to the leaderboards and the Versus pool.
 			</p>
 			<p className="mt-3 text-sm text-zinc-400">{saveAuthorHint(signedIn, authorName)}</p>
 			<button
@@ -73,5 +73,5 @@ export function SaveTeamPanel({
 
 export function saveResultMessage(result: PublishResult): string | null {
 	if (!result.ok) return null;
-	return result.duplicate ? "This run was already published." : "Saved to the community boards.";
+	return result.duplicate ? "This run was already saved." : "Saved to the boards.";
 }
