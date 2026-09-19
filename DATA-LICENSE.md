@@ -18,7 +18,7 @@ Changes made by Major Winners include:
   listing order only as a weak prior, a committed curated overlay for exceptions, and
   conservative placement-based ratings where verified individual statistics are unavailable;
 - deriving coach modifiers from Major placement (champion through field-floor) so every
-  coach card grants at least one tactical bonus, while preserving a few hand-tuned rows;
+  coach card grants at least two tactical bonuses, while preserving a few hand-tuned rows;
 - transcribing individual season statistics from HLTV year-filtered player pages
   (those numbers are not Liquipedia material); and
 - adding two independently curated pre-Major Legacy cards.

@@ -27,6 +27,7 @@ export type {
 } from "./types";
 export {
 	COACH_CANDIDATE_COUNT,
+	LEGENDARY_COACH_ODDS,
 	orgYearWeight,
 	PLAYER_CARD_COUNT,
 	REROLL_BUDGET,

@@ -45,7 +45,7 @@ Org logos are committed image files under `public/logos/`, referenced by `org.lo
 3. Parse the five players who actually played, coach, registered non-playing substitutes, and final placement. Prize-pool ties use the start of the range (3 for 3rd–4th). Replaced source cards and non-team placeholders are discarded before field-size validation.
 4. Preserve already verified player ratings and any curated or inferred roles. Generate an explicit `fallback` row for every remaining player-org-season, using TeamCard order only when that season has no role lock.
 5. Require 24 revision-pinned Majors and exactly 511 played roster appearances before writing.
-6. Fill coach modifiers from each coach's best roster placement unless the existing row is hand-tuned (it does not match the placement formula). Champion 4, finalist 3, top four 2, everyone else 1.
+6. Fill coach modifiers from each coach's best roster placement unless the existing row is hand-tuned (it does not match the placement formula). Champion 5, finalist 4, top eight 3, everyone else 2.
 7. Run `npm run validate-data`, `npm run calibrate`, and the full test suite.
 
 This majors importer does not call HLTV. The shipped app never talks to HLTV either.

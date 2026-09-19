@@ -1,14 +1,15 @@
-import { useState } from "react";
-import {
-	AUTHOR_NAME_MAX,
-	DEFAULT_AUTHOR_NAME,
-	type PublishResult,
-	parseAuthorName,
-} from "../community";
+import { DEFAULT_AUTHOR_NAME, type PublishResult } from "../community";
 import { parseTeamName } from "./teamName";
 
-const FIELD_CLASS =
-	"mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300";
+export function saveAuthorHint(signedIn: boolean, authorName: string): string {
+	if (signedIn && authorName !== DEFAULT_AUTHOR_NAME) {
+		return `Saves as ${authorName}.`;
+	}
+	if (signedIn) {
+		return `Saves as ${DEFAULT_AUTHOR_NAME}. Pick a username on your profile to attach your name.`;
+	}
+	return `Saves as ${DEFAULT_AUTHOR_NAME}. Sign in from Home to use your username.`;
+}
 
 export function SaveTeamPanel({
 	teamName,
@@ -16,6 +17,8 @@ export function SaveTeamPanel({
 	busy,
 	message,
 	error,
+	authorName,
+	signedIn,
 	onSave,
 }: {
 	teamName: string;
@@ -23,9 +26,10 @@ export function SaveTeamPanel({
 	busy: boolean;
 	message: string | null;
 	error: string | null;
-	onSave: (authorName: string) => void;
+	authorName: string;
+	signedIn: boolean;
+	onSave: () => void;
 }) {
-	const [authorDraft, setAuthorDraft] = useState("");
 	const savedName = parseTeamName(teamName) ?? teamName;
 
 	if (alreadySaved) {
@@ -42,28 +46,14 @@ export function SaveTeamPanel({
 			className="rounded-2xl border border-white/10 bg-black/25 p-4"
 			onSubmit={(event) => {
 				event.preventDefault();
-				onSave(parseAuthorName(authorDraft));
+				onSave();
 			}}
 		>
 			<p className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">Save team</p>
 			<p className="mt-1 text-sm text-zinc-400">
 				Publish {savedName} to the home leaderboards and the Versus community pool.
 			</p>
-			<label
-				htmlFor="save-author"
-				className="mt-3 block text-xs uppercase tracking-wider text-zinc-500"
-			>
-				Your name
-			</label>
-			<input
-				id="save-author"
-				value={authorDraft}
-				maxLength={AUTHOR_NAME_MAX}
-				autoComplete="nickname"
-				placeholder={DEFAULT_AUTHOR_NAME}
-				onChange={(event) => setAuthorDraft(event.target.value)}
-				className={FIELD_CLASS}
-			/>
+			<p className="mt-3 text-sm text-zinc-400">{saveAuthorHint(signedIn, authorName)}</p>
 			<button
 				type="submit"
 				disabled={busy}

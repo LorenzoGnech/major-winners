@@ -37,6 +37,7 @@ import {
 } from "./clutchNarrative";
 import { MapWinMoment } from "./MapWinMoment";
 import { preloadMapArt } from "./mapArt";
+import { resetMobileViewport } from "./mobileViewport";
 import { OrgCrest } from "./OrgCrest";
 import { PlayerCrest } from "./PlayerCrest";
 import { lineupDeadIds, liveCastLines } from "./roundCast";
@@ -97,7 +98,8 @@ function mapPickCaption(
 	if (context.homePick) return viewer === 0 ? " · your pick" : ` · ${labels[0]} pick`;
 	return "";
 }
-const FEED_BOX_CLASS = "flex h-60 flex-col overflow-hidden sm:h-64 lg:h-44";
+const FEED_BOX_CLASS =
+	"flex h-32 min-h-28 flex-col overflow-hidden sm:h-64 lg:h-44 max-lg:min-h-28 max-lg:flex-1";
 
 const ROLE_LABELS: Record<Role, string> = {
 	awp: "AWP",
@@ -847,7 +849,7 @@ function CompactMatchLineups({
 				>
 					{label}
 				</p>
-				<ul className="mt-1.5 space-y-1">
+				<ul className="mt-1 space-y-0.5">
 					{members.map((member) => {
 						const line = stats.get(member.id) ?? { kills: 0, deaths: 0, assists: 0 };
 						const dead = deadIds.has(member.id);
@@ -855,13 +857,13 @@ function CompactMatchLineups({
 						return (
 							<li
 								key={member.id}
-								className={`flex items-center gap-1.5 rounded-lg px-1 py-0.5 ${hot ? "bg-white/8" : ""}`}
+								className={`flex items-center gap-1 rounded-md px-0.5 py-0 ${hot ? "bg-white/8" : ""}`}
 							>
 								<div className={`shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
-									<PlayerCrest player={crestFor(member, playersById)} size="sm" />
+									<PlayerCrest player={crestFor(member, playersById)} size="xs" />
 								</div>
 								<p
-									className={`min-w-0 flex-1 truncate text-xs font-semibold text-zinc-100 ${
+									className={`min-w-0 flex-1 truncate text-[11px] font-semibold text-zinc-100 ${
 										dead ? "opacity-40 grayscale" : ""
 									}`}
 								>
@@ -883,7 +885,10 @@ function CompactMatchLineups({
 		);
 	}
 	return (
-		<section aria-label="Lineups" className="mt-4 grid grid-cols-2 gap-2 lg:hidden">
+		<section
+			aria-label="Lineups"
+			className="mt-2 grid shrink-0 grid-cols-2 gap-2 sm:mt-4 lg:hidden"
+		>
 			{column(leftLabel, leftMembers, "player")}
 			{column(rightLabel, rightMembers, "opponent")}
 		</section>
@@ -1020,9 +1025,9 @@ function CompareBar({
 			<p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
 				{label}
 			</p>
-			<div className="mb-1 flex justify-between gap-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-				<span className="text-emerald-200/90">{leftCaption}</span>
-				<span className="text-right text-amber-200/90">{rightCaption}</span>
+			<div className="mb-1 flex justify-between gap-2 text-[10px] font-semibold uppercase tracking-wide text-zinc-500 sm:tracking-wider">
+				<span className="min-w-0 truncate text-emerald-200/90">{leftCaption}</span>
+				<span className="min-w-0 truncate text-right text-amber-200/90">{rightCaption}</span>
 			</div>
 			<div className="h-2 overflow-hidden rounded-full bg-amber-300/80">
 				<div
@@ -1046,7 +1051,7 @@ function EconomyBars({
 	labels: readonly [string, string];
 }) {
 	return (
-		<section className="mt-4 space-y-3" aria-label="Team economy">
+		<section className="mt-4 space-y-3 max-lg:mt-2 max-lg:space-y-2" aria-label="Team economy">
 			<CompareBar
 				label="This round"
 				left={roundValues[0]}
@@ -1146,7 +1151,7 @@ function MoraleBars({
 	boosted?: boolean;
 }) {
 	return (
-		<section className="mt-4 space-y-3" aria-label="Team morale">
+		<section className="mt-4 space-y-3 max-lg:mt-2 max-lg:space-y-2" aria-label="Team morale">
 			<p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">Morale</p>
 			<MoraleMeter value={values[0]} label={labels[0]} tone="player" boosted={boosted} />
 			<MoraleMeter value={values[1]} label={labels[1]} tone="opponent" />
@@ -1188,6 +1193,9 @@ export function MatchPlayback({
 	useEffect(() => {
 		preloadMapArt(mapArt);
 	}, [mapArt]);
+	useEffect(() => {
+		resetMobileViewport();
+	}, []);
 	const [revealedCount, setRevealedCount] = useState(0);
 	const [playing, setPlaying] = useState(true);
 	const [speed, setSpeed] = useState<PlaybackSpeed>(() => rememberedSpeed ?? 1);
@@ -1632,10 +1640,10 @@ export function MatchPlayback({
 	const showContinueMatch = Boolean(complete && !mapWinMoment && onContinueMatch);
 
 	return (
-		<div className="mt-5 space-y-4">
+		<div className="mt-5 space-y-4 max-lg:mt-0">
 			<section
 				aria-labelledby="match-heading"
-				className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 p-4 max-lg:pb-32 sm:p-6 sm:max-lg:pb-32"
+				className="relative overflow-x-clip overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950/70 p-4 max-lg:flex max-lg:max-h-[calc(100svh-var(--safe-top)-5rem)] max-lg:flex-col max-lg:p-3 max-lg:pb-24 max-lg:touch-manipulation sm:p-6 sm:max-lg:pb-24"
 				style={
 					background
 						? {
@@ -1737,22 +1745,25 @@ export function MatchPlayback({
 				) : null}
 
 				<div
-					className={`relative z-20 text-center ${showContinueMatch ? "max-sm:pt-14 sm:px-28" : ""}`}
+					className={`relative z-20 shrink-0 text-center ${showContinueMatch ? "max-sm:pt-14 sm:px-28" : ""}`}
 				>
 					<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
 						{headingEyebrow}
 					</p>
-					<h3 id="match-heading" className="mt-1 text-xl font-semibold tracking-tight text-white">
+					<h3
+						id="match-heading"
+						className="mt-0.5 text-lg font-semibold tracking-tight text-white sm:text-xl"
+					>
 						{viewLabels[0]} <span className="text-zinc-600">vs</span> {viewLabels[1]}
 					</h3>
-					<p className="mt-1 text-xs text-zinc-500">
+					<p className="mt-0.5 text-[11px] text-zinc-500 sm:text-xs">
 						Series {displaySeries[0]}–{displaySeries[1]} · {activeMap.label}
 						{mapPickCaption(activeMap.mapContext, viewerSide, simLabels)}
 						{activeMap.overtimeBlocks > 0 ? ` · ${activeMap.overtimeBlocks}× OT` : ""}
 					</p>
 				</div>
 
-				<div className="mt-5 grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)_minmax(15rem,18rem)]">
+				<div className="mt-3 grid min-h-0 grid-cols-1 items-start gap-4 sm:mt-5 sm:grid-cols-2 lg:grid-cols-[minmax(15rem,18rem)_minmax(0,1fr)_minmax(15rem,18rem)] max-lg:flex-1 max-lg:grid-rows-none">
 					<div className="hidden lg:block">
 						<TeamLineup
 							align="left"
@@ -1768,9 +1779,9 @@ export function MatchPlayback({
 						/>
 					</div>
 
-					<div className="relative min-w-0 max-lg:col-span-full">
+					<div className="relative min-w-0 max-lg:col-span-full max-lg:flex max-lg:h-full max-lg:min-h-0 max-lg:flex-col">
 						<section
-							className="flex items-center justify-center gap-4"
+							className="flex shrink-0 items-center justify-center gap-3 sm:gap-4"
 							aria-label="Current map score"
 							data-round-winner={settleSide}
 						>
@@ -1786,7 +1797,7 @@ export function MatchPlayback({
 										className="round-score-pulse-ring round-score-pulse-ring-player"
 									/>
 								) : null}
-								<strong className="relative text-4xl tabular-nums text-emerald-300 sm:text-6xl">
+								<strong className="relative text-3xl tabular-nums text-emerald-300 sm:text-4xl lg:text-6xl">
 									{displayScore[0]}
 								</strong>
 							</span>
@@ -1803,7 +1814,7 @@ export function MatchPlayback({
 										className="round-score-pulse-ring round-score-pulse-ring-opponent"
 									/>
 								) : null}
-								<strong className="relative text-4xl tabular-nums text-amber-300 sm:text-6xl">
+								<strong className="relative text-3xl tabular-nums text-amber-300 sm:text-4xl lg:text-6xl">
 									{displayScore[1]}
 								</strong>
 							</span>
@@ -1826,7 +1837,7 @@ export function MatchPlayback({
 							teamLabels={shortLabels}
 						/>
 
-						<div className="flex flex-col">
+						<div className="flex min-h-0 flex-col max-lg:flex-1">
 							<div className="order-2 lg:order-1">
 								<EconomyBars
 									roundValues={displayRoundValues}
@@ -1911,13 +1922,13 @@ export function MatchPlayback({
 									</div>
 								</fieldset>
 							</div>
-							<div className="order-1 mt-4 lg:order-2 lg:mt-5">
-								<h4 className="text-center text-xs font-semibold uppercase tracking-wider text-zinc-500">
+							<div className="order-1 mt-3 flex min-h-0 flex-col lg:order-2 lg:mt-5 max-lg:flex-1">
+								<h4 className="hidden text-center text-xs font-semibold uppercase tracking-wider text-zinc-500 lg:block">
 									Play-by-play
 								</h4>
-								<div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
+								<div className="mt-3 grid min-h-0 grid-cols-1 gap-3 max-lg:mt-0 max-lg:flex-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
 									{feed ? (
-										<ol>
+										<ol className="max-lg:flex max-lg:h-full max-lg:min-h-0 max-lg:flex-col">
 											<RoundFeedItem
 												key={feed.round.round}
 												round={feed.round}
@@ -1963,7 +1974,7 @@ export function MatchPlayback({
 						/>
 					</div>
 				</div>
-				<fieldset className="fixed inset-x-0 bottom-0 z-50 flex gap-2 border-t border-white/12 bg-zinc-950/95 px-3 py-2 pb-[max(0.5rem,var(--safe-bottom))] backdrop-blur-xl lg:hidden">
+				<fieldset className="fixed inset-x-0 bottom-0 z-50 flex gap-2 border-t border-white/12 bg-zinc-950/95 px-3 py-2 pb-[max(0.5rem,var(--safe-bottom))] backdrop-blur-xl touch-manipulation lg:hidden">
 					<legend className="sr-only">Replay controls</legend>
 					<button
 						type="button"

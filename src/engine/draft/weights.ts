@@ -6,6 +6,9 @@ export const PLAYER_CARD_COUNT = 5;
 /** Coach candidates sampled for the sixth round. */
 export const COACH_CANDIDATE_COUNT = 5;
 
+/** One-in-N chance a legendary coach appears in that slate. */
+export const LEGENDARY_COACH_ODDS = 20;
+
 /** Major rerolls and team rerolls each player may spend before a pick. */
 export const REROLL_BUDGET = 2;
 

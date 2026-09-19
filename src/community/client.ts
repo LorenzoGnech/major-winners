@@ -338,6 +338,33 @@ function parseProfileRow(row: ProfileRow): RankedProfile | null {
 	return parsed.success ? parsed.data : null;
 }
 
+export type DisplayNameResult = { ok: true; profile: RankedProfile } | { ok: false; error: string };
+
+export async function displayNameTaken(displayName: string): Promise<boolean> {
+	const supabase = getSupabase();
+	if (!supabase) return false;
+	const { data, error } = await supabase.rpc("display_name_taken", {
+		p_display_name: displayName,
+	});
+	if (error) return false;
+	return data === true;
+}
+
+export async function setDisplayName(displayName: string): Promise<DisplayNameResult> {
+	const supabase = getSupabase();
+	if (!supabase) return { ok: false, error: "Community features are not configured." };
+	const { data, error } = await supabase.rpc("set_display_name", {
+		p_display_name: displayName,
+	});
+	const row = Array.isArray(data) ? data[0] : data;
+	if (error || !row) {
+		return { ok: false, error: error?.message ?? "Could not save username." };
+	}
+	const profile = parseProfileRow(row as ProfileRow);
+	if (!profile) return { ok: false, error: "Could not save username." };
+	return { ok: true, profile };
+}
+
 export async function fetchMyProfile(userId: string): Promise<RankedProfile | null> {
 	const supabase = getSupabase();
 	if (!supabase) return null;

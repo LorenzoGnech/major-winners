@@ -11,10 +11,12 @@ import {
 	DraftError,
 	emptyRoles,
 	getCompletedDraft,
+	LEGENDARY_COACH_ODDS,
 	otherMajorAppearances,
 	PLAYER_CARD_COUNT,
 	ROLE_FIT,
 	roleFit,
+	sampleCoachIds,
 	sampleOrgYears,
 	startDraft,
 	TIER_WEIGHTS,
@@ -103,13 +105,35 @@ describe("startDraft", () => {
 		);
 	});
 
-	it("always offers legendary coaches in the sixth-round slate", () => {
-		for (const seed of [1, 42, "share-code", "daily"]) {
-			const state = startDraft(dataset, seed);
-			expect(state.coachIds[0]).toBe("jabich");
-			expect(state.coachIds).toContain("jabich");
-			expect(new Set(state.coachIds).size).toBe(COACH_CANDIDATE_COUNT);
-		}
+	it("rarely offers legendary coaches in the sixth-round slate", () => {
+		const coaches = [
+			{ id: "jabich", tier: "legendary" as const },
+			{ id: "alpha" },
+			{ id: "bravo" },
+			{ id: "charlie" },
+			{ id: "delta" },
+			{ id: "echo" },
+		];
+		const rng = (first: number) => {
+			let calls = 0;
+			return {
+				nextInt: (maxExclusive: number) => {
+					calls += 1;
+					if (calls === 1) {
+						expect(maxExclusive).toBe(LEGENDARY_COACH_ODDS);
+						return first;
+					}
+					return 0;
+				},
+			};
+		};
+		const offered = sampleCoachIds(coaches, rng(0));
+		expect(offered[0]).toBe("jabich");
+		expect(new Set(offered).size).toBe(COACH_CANDIDATE_COUNT);
+
+		const missed = sampleCoachIds(coaches, rng(1));
+		expect(missed).not.toContain("jabich");
+		expect(new Set(missed).size).toBe(COACH_CANDIDATE_COUNT);
 	});
 
 	it("changes the rolled sequence when the seed changes", () => {

@@ -56,6 +56,12 @@
 	--safe-left: env(safe-area-inset-left, 0px);
 }
 
+html,
+body {
+	max-width: 100%;
+	overflow-x: clip;
+}
+
 /* Tailwind v4 preflight resets buttons to the default arrow. */
 @layer base {
 	button:not(:disabled),

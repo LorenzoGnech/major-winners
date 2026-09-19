@@ -15,7 +15,13 @@ import type {
 	PlayerPick,
 	RolledOrgYearCard,
 } from "./types";
-import { COACH_CANDIDATE_COUNT, orgYearWeight, PLAYER_CARD_COUNT, REROLL_BUDGET } from "./weights";
+import {
+	COACH_CANDIDATE_COUNT,
+	LEGENDARY_COACH_ODDS,
+	orgYearWeight,
+	PLAYER_CARD_COUNT,
+	REROLL_BUDGET,
+} from "./weights";
 
 function snapshotPlayer(
 	season: Dataset["playerSeasons"][number],
@@ -124,7 +130,7 @@ export function canRerollMajor(state: DraftState, dataset: Dataset): boolean {
 }
 
 export function sampleCoachIds(
-	coaches: readonly Coach[],
+	coaches: readonly Pick<Coach, "id" | "tier">[],
 	rng: IntRng,
 	count = COACH_CANDIDATE_COUNT,
 ): string[] {
@@ -132,11 +138,14 @@ export function sampleCoachIds(
 		.filter((coach) => isLegendaryCoach(coach))
 		.map((coach) => coach.id)
 		.sort((left, right) => left.localeCompare(right));
-	const rest = shuffle(
-		coaches.filter((coach) => !isLegendaryCoach(coach)).map((coach) => coach.id),
-		rng,
-	);
-	return [...legendary, ...rest].slice(0, count);
+	const regular = coaches.filter((coach) => !isLegendaryCoach(coach)).map((coach) => coach.id);
+	const offerLegendary =
+		legendary.length > 0 && regular.length >= count && rng.nextInt(LEGENDARY_COACH_ODDS) === 0;
+	const rest = shuffle(regular, rng);
+	if (offerLegendary) {
+		return [...legendary, ...rest].slice(0, count);
+	}
+	return [...rest, ...legendary].slice(0, count);
 }
 
 export function startDraft(dataset: Dataset, seed: number | string): DraftState {

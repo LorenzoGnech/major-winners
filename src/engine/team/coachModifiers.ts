@@ -13,12 +13,12 @@ export function modifierTotal(modifiers: CoachModifiers): number {
 	return modifiers.comeback + modifiers.economy + modifiers.antistrat;
 }
 
-/** Integer bonus budget from that roster's finish. Everyone gets at least one point. */
+/** Integer bonus budget from that roster's finish. Everyone gets at least two points. */
 export function placementModifierPoints(placement: number): number {
-	if (placement <= 1) return 4;
-	if (placement <= 2) return 3;
-	if (placement <= 4) return 2;
-	return 1;
+	if (placement <= 1) return 5;
+	if (placement <= 2) return 4;
+	if (placement <= 8) return 3;
+	return 2;
 }
 
 /**
@@ -26,8 +26,7 @@ export function placementModifierPoints(placement: number): number {
  * The starting axis rotates from a stable hash of `salt` so last-place cards
  * are not all +1 anti-strat.
  */
-export function modifiersFromPlacement(placement: number, salt: string): CoachModifiers {
-	const points = placementModifierPoints(placement);
+export function modifiersFromPoints(points: number, salt: string): CoachModifiers {
 	const start = hashStringToSeed(salt) % AXES.length;
 	const order = AXES.map((_, index) => AXES[(start + index) % AXES.length] ?? "antistrat");
 	const modifiers: CoachModifiers = { comeback: 0, economy: 0, antistrat: 0 };
@@ -44,6 +43,10 @@ export function modifiersFromPlacement(placement: number, salt: string): CoachMo
 	return modifiers;
 }
 
+export function modifiersFromPlacement(placement: number, salt: string): CoachModifiers {
+	return modifiersFromPoints(placementModifierPoints(placement), salt);
+}
+
 export function bestCoachPlacement(
 	coachId: string,
 	orgYears: readonly Pick<OrgYear, "coachId" | "placement">[],
@@ -56,15 +59,19 @@ export function bestCoachPlacement(
 	return best;
 }
 
+function sameModifiers(left: CoachModifiers, right: CoachModifiers): boolean {
+	return (
+		left.comeback === right.comeback &&
+		left.economy === right.economy &&
+		left.antistrat === right.antistrat
+	);
+}
+
 function matchesPlacementFormula(modifiers: CoachModifiers, salt: string): boolean {
-	return [1, 2, 3, 5].some((placement) => {
-		const derived = modifiersFromPlacement(placement, salt);
-		return (
-			derived.comeback === modifiers.comeback &&
-			derived.economy === modifiers.economy &&
-			derived.antistrat === modifiers.antistrat
-		);
-	});
+	// 1 remains so pre-baseline rows still count as auto-filled and get re-derived.
+	return [1, 2, 3, 4, 5].some((points) =>
+		sameModifiers(modifiers, modifiersFromPoints(points, salt)),
+	);
 }
 
 /** Keep hand-tuned rows. Re-derive auto-filled (and zero) rows from best roster placement. */

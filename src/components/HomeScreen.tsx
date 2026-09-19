@@ -63,6 +63,8 @@ export type HomeCommunityProps = {
 	onHandleDraft: (value: string) => void;
 	onRanked: () => void;
 	onSubmitHandle: () => void;
+	onSaveUsername: () => void;
+	usernameBusy: boolean;
 	onLeaveQueue: () => void;
 };
 
@@ -80,14 +82,14 @@ type HomeScreenProps = {
 	onStart: () => void;
 };
 
-const MENU_BUTTON =
-	"w-full border px-5 py-3.5 text-sm font-semibold uppercase tracking-[0.22em] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e53935]";
+const MENU_BUTTON_BASE =
+	"w-full border font-semibold uppercase transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e53935]";
+const MENU_BUTTON = `${MENU_BUTTON_BASE} px-5 py-3.5 text-sm tracking-[0.22em]`;
 const PRIMARY_BUTTON = `${MENU_BUTTON} border-transparent bg-[#e53935] text-white hover:bg-[#f04848]`;
 const SECONDARY_BUTTON = `${MENU_BUTTON} border-white/20 bg-transparent text-white hover:border-white/50 hover:bg-white/5`;
+const SPLIT_BUTTON = `${MENU_BUTTON_BASE} min-w-0 border-white/20 bg-transparent px-2 py-3.5 text-[11px] tracking-[0.08em] text-white hover:border-white/50 hover:bg-white/5 sm:px-4 sm:text-xs sm:tracking-[0.14em]`;
 const FIELD_CLASS =
 	"mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-center text-sm uppercase tracking-[0.18em] text-white placeholder:text-zinc-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e53935]";
-const AUTH_BUTTON =
-	"min-h-11 border border-white/20 bg-black/55 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-xl transition hover:border-white/50 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e53935]";
 
 function BrandMark({ size }: { size: "lg" | "sm" }) {
 	return (
@@ -192,7 +194,7 @@ export function RankedStatsPanel({ profile }: { profile: RankedProfile | null })
 	const winRate = profile ? rankedWinRate(profile.wins, profile.losses) : null;
 	const rows = profile
 		? ([
-				["Handle", profile.displayName],
+				["Username", profile.displayName],
 				["Elo", profile.elo],
 				["Wins", profile.wins],
 				["Losses", profile.losses],
@@ -200,7 +202,7 @@ export function RankedStatsPanel({ profile }: { profile: RankedProfile | null })
 				["Win streak", profile.streak],
 			] as const)
 		: ([
-				["Handle", "—"],
+				["Username", "—"],
 				["Elo", ELO_START],
 				["Wins", 0],
 				["Losses", 0],
@@ -218,13 +220,18 @@ export function RankedStatsPanel({ profile }: { profile: RankedProfile | null })
 			<p className="mt-1 text-xs text-zinc-500">
 				{profile
 					? "Elo moves after both players report the same BO5."
-					: "Sign in, pick a handle, and queue for a nearby opponent."}
+					: "Sign in, pick a username, and queue for a nearby opponent."}
 			</p>
 			<dl className="mt-5 grid grid-cols-2 gap-2">
 				{rows.map(([label, value]) => (
-					<div key={label} className="border border-white/10 px-3 py-3">
-						<dt className="text-[10px] uppercase tracking-[0.14em] text-zinc-500">{label}</dt>
-						<dd className="mt-1 font-bold tabular-nums text-white">{value}</dd>
+					<div
+						key={label}
+						className="min-w-0 overflow-hidden border border-white/10 px-2.5 py-3 sm:px-3"
+					>
+						<dt className="text-[9px] leading-snug uppercase tracking-normal text-zinc-500 sm:text-[10px] sm:tracking-[0.14em]">
+							{label}
+						</dt>
+						<dd className="mt-1 wrap-break-word font-bold tabular-nums text-white">{value}</dd>
 					</div>
 				))}
 			</dl>
@@ -314,9 +321,14 @@ export function DailyStatsPanel({ stats, dataset }: { stats: DailyStats; dataset
 			<p className="mt-1 text-xs text-zinc-500">Stored only in this browser.</p>
 			<dl className="mt-5 grid grid-cols-2 gap-2">
 				{rows.map(([label, value]) => (
-					<div key={label} className="border border-white/10 px-3 py-3">
-						<dt className="text-[10px] uppercase tracking-[0.14em] text-zinc-500">{label}</dt>
-						<dd className="mt-1 font-bold tabular-nums text-white">{value}</dd>
+					<div
+						key={label}
+						className="min-w-0 overflow-hidden border border-white/10 px-2.5 py-3 sm:px-3"
+					>
+						<dt className="text-[9px] leading-snug uppercase tracking-normal text-zinc-500 sm:text-[10px] sm:tracking-[0.14em]">
+							{label}
+						</dt>
+						<dd className="mt-1 wrap-break-word font-bold tabular-nums text-white">{value}</dd>
 					</div>
 				))}
 			</dl>
@@ -345,15 +357,6 @@ export function HomeScreen({
 				className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.45)_62%,rgba(0,0,0,0.78)_100%)]"
 				aria-hidden
 			/>
-			{view !== "signin" && view !== "profile" && community.enabled && !community.userEmail ? (
-				<button
-					type="button"
-					onClick={() => onView("signin")}
-					className={`fixed top-[max(1rem,var(--safe-top))] right-[max(1rem,var(--safe-right))] z-20 ${AUTH_BUTTON}`}
-				>
-					Sign in
-				</button>
-			) : null}
 			<div
 				className={`relative z-10 flex w-full flex-col items-center border border-white/10 bg-black/55 px-4 py-6 text-center backdrop-blur-xl sm:px-6 sm:py-8 ${
 					view === "leaderboards" || view === "profile"
@@ -391,17 +394,19 @@ export function HomeScreen({
 						) : null}
 						{community.enabled ? (
 							<div className="grid w-full grid-cols-2 gap-3">
-								<button
-									type="button"
-									onClick={() => onView("profile")}
-									className={SECONDARY_BUTTON}
-								>
-									My profile
-								</button>
+								{community.userEmail ? (
+									<button type="button" onClick={() => onView("profile")} className={SPLIT_BUTTON}>
+										My profile
+									</button>
+								) : (
+									<button type="button" onClick={() => onView("signin")} className={SPLIT_BUTTON}>
+										Sign in
+									</button>
+								)}
 								<button
 									type="button"
 									onClick={() => onView("leaderboards")}
-									className={SECONDARY_BUTTON}
+									className={SPLIT_BUTTON}
 								>
 									Leaderboards
 								</button>
@@ -477,15 +482,15 @@ export function HomeScreen({
 
 				{view === "ranked-handle" ? (
 					<SetupForm
-						title="Ranked handle"
-						detail="This name appears on the Elo board. Letters, numbers, and underscore."
+						title="Username"
+						detail="This name appears on saved teams and ranked matches. Letters, numbers, and underscore."
 						onBack={() => onView("community")}
 						onSubmit={community.onSubmitHandle}
 						submitLabel="Find match"
 					>
 						<HomeField
 							id="home-ranked-handle"
-							label="Handle"
+							label="Username"
 							value={community.handleDraft}
 							onChange={community.onHandleDraft}
 							error={community.handleError}
@@ -559,7 +564,7 @@ export function HomeScreen({
 				{view === "signin" ? (
 					<SetupForm
 						title="Sign in"
-						detail="Optional. Publishing still works without an account."
+						detail="Optional. Publishing still works anonymously. A username is used on saved teams and ranked matches."
 						onBack={() => onView("menu")}
 						onSubmit={community.onSignIn}
 						submitLabel={community.authBusy ? "Sending…" : "Send magic link"}
@@ -574,6 +579,15 @@ export function HomeScreen({
 							placeholder="you@example.com"
 							maxLength={120}
 						/>
+						<HomeField
+							id="home-username"
+							label="Username"
+							value={community.handleDraft}
+							onChange={community.onHandleDraft}
+							error={community.handleError}
+							placeholder="e.g. lore"
+							maxLength={DISPLAY_NAME_MAX}
+						/>
 						{community.authMessage ? (
 							<p className="text-sm text-emerald-200">{community.authMessage}</p>
 						) : null}
@@ -583,13 +597,46 @@ export function HomeScreen({
 				{view === "profile" ? (
 					<div className="mt-8 flex w-full flex-col items-center gap-6 text-left">
 						<div className="w-full text-center">
-							<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
+							<h2 className="text-base font-semibold uppercase tracking-[0.12em] text-white sm:text-lg sm:tracking-[0.18em]">
 								My profile
 							</h2>
 							{community.userEmail ? (
 								<p className="mt-2 text-sm text-zinc-400">{community.userEmail}</p>
 							) : null}
 						</div>
+						{community.enabled && community.userEmail ? (
+							<form
+								className="flex w-full max-w-lg flex-col items-center gap-3"
+								onSubmit={(event) => {
+									event.preventDefault();
+									community.onSaveUsername();
+								}}
+							>
+								<HomeField
+									id="profile-username"
+									label="Username"
+									value={community.handleDraft}
+									onChange={community.onHandleDraft}
+									error={community.handleError}
+									placeholder="e.g. lore"
+									maxLength={DISPLAY_NAME_MAX}
+								/>
+								<p className="text-xs text-zinc-500">
+									Used on saved teams and ranked matches. Letters, numbers, and underscore.
+								</p>
+								<button
+									type="submit"
+									disabled={community.usernameBusy}
+									className={`${PRIMARY_BUTTON} disabled:opacity-50`}
+								>
+									{community.usernameBusy
+										? "Saving…"
+										: community.profile
+											? "Save username"
+											: "Set username"}
+								</button>
+							</form>
+						) : null}
 						<div
 							className={
 								community.enabled && community.userEmail
@@ -607,11 +654,19 @@ export function HomeScreen({
 						</div>
 						<div className="flex w-full max-w-md flex-row gap-3">
 							{community.userEmail ? (
-								<button type="button" onClick={community.onSignOut} className={`flex-1 ${PRIMARY_BUTTON}`}>
+								<button
+									type="button"
+									onClick={community.onSignOut}
+									className={`flex-1 ${PRIMARY_BUTTON}`}
+								>
 									Sign out
 								</button>
 							) : null}
-							<button type="button" onClick={() => onView("menu")} className={`flex-1 ${SECONDARY_BUTTON}`}>
+							<button
+								type="button"
+								onClick={() => onView("menu")}
+								className={`flex-1 ${SECONDARY_BUTTON}`}
+							>
 								Back
 							</button>
 						</div>

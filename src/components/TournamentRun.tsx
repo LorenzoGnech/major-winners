@@ -12,6 +12,7 @@ import {
 } from "../engine";
 import { MatchPlayback } from "./MatchPlayback";
 import { preloadMapArt } from "./mapArt";
+import { resetMobileViewport } from "./mobileViewport";
 import { OpponentPreview } from "./OpponentPreview";
 import { OrgCrest } from "./OrgCrest";
 import { RunSummary } from "./RunSummary";
@@ -94,6 +95,13 @@ export function TournamentRun({
 		preloadMapArt(MAP_POOL.map((map) => map.background));
 	}, []);
 
+	const matchPhase = liveSeries ? "live" : "board";
+	useEffect(() => {
+		if (matchPhase === "live" || matchPhase === "board") {
+			resetMobileViewport();
+		}
+	}, [matchPhase]);
+
 	function playNext() {
 		const result = beginNextMatch(state, playerTeam, opponents);
 		if (!result.ok) {
@@ -163,7 +171,7 @@ export function TournamentRun({
 				/>
 			) : null}
 			<div
-				className={`${terminal ? "mt-5 " : ""}rounded-2xl border border-emerald-300/25 bg-zinc-900/65 p-4 sm:p-6 ${liveSeries ? "max-lg:hidden" : ""}`}
+				className={`${terminal ? "mt-5 " : ""}overflow-x-clip rounded-2xl border border-emerald-300/25 bg-zinc-900/65 p-4 sm:p-6 ${liveSeries ? "max-lg:hidden" : ""}`}
 			>
 				{terminal ? null : (
 					<div className="flex flex-wrap items-start justify-between gap-4">

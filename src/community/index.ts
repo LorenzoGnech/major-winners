@@ -1,4 +1,6 @@
 export {
+	type DisplayNameResult,
+	displayNameTaken,
 	fetchBestRuns,
 	fetchEloLeaderboard,
 	fetchMyProfile,
@@ -13,6 +15,7 @@ export {
 	publishSavedTeam,
 	recordDuelResult,
 	rosterNicks,
+	setDisplayName,
 	signInWithMagicLink,
 	signOut,
 } from "./client";
@@ -67,7 +70,14 @@ export {
 	rankedSearchWindow,
 	rankedWinRate,
 } from "./elo";
-export { loadPublishedFingerprints, rememberPublishedFingerprint } from "./local";
+export {
+	clearPendingDisplayName,
+	loadPendingDisplayName,
+	loadPublishedFingerprints,
+	PENDING_DISPLAY_NAME_KEY,
+	rememberPendingDisplayName,
+	rememberPublishedFingerprint,
+} from "./local";
 export {
 	buildCommunityOpponents,
 	mergeOpponentPools,
@@ -82,6 +92,7 @@ export {
 } from "./ranking";
 export {
 	AUTHOR_NAME_MAX,
+	authorNameFromProfile,
 	COMMUNITY_BOARD_SIZE,
 	type CommunityGameMode,
 	communityModeSchema,

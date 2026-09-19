@@ -49,6 +49,7 @@ export {
 	type DraftState,
 	emptyRoles,
 	getCompletedDraft,
+	LEGENDARY_COACH_ODDS,
 	type MovePlayerAction,
 	orgYearWeight,
 	otherMajorAppearances,

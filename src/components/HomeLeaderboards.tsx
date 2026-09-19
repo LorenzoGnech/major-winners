@@ -61,8 +61,8 @@ export function formatSavedAt(iso: string): string {
 
 function BoardShell({ title, children }: { title: string; children: ReactNode }) {
 	return (
-		<section className="min-w-0 border border-white/10 bg-black/40 p-4 text-left">
-			<h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400">
+		<section className="min-w-0 border border-white/10 bg-black/40 p-3 text-left sm:p-4">
+			<h2 className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-400 sm:text-[11px] sm:tracking-[0.2em]">
 				{title}
 			</h2>
 			<div className="mt-3">{children}</div>
@@ -139,9 +139,9 @@ export function HomeLeaderboards({
 												{saved ? ` · ${saved}` : ""}
 											</p>
 										</div>
-										<p className="shrink-0 text-right text-xs tabular-nums text-zinc-300">
+										<p className="max-w-[42%] shrink-0 text-right text-[11px] tabular-nums text-zinc-300 sm:text-xs">
 											{run.wins}–{run.losses}
-											<span className="mt-0.5 block text-[10px] text-zinc-500">
+											<span className="mt-0.5 block text-[9px] leading-tight text-zinc-500 sm:text-[10px]">
 												maps {run.mapsWon}–{run.mapsLost} · rnd {run.roundsWon}–{run.roundsLost}
 											</span>
 										</p>

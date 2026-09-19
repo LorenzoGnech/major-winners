@@ -62,6 +62,10 @@ export function parseAuthorName(value: unknown): string {
 	return name;
 }
 
+export function authorNameFromProfile(displayName: string | null | undefined): string {
+	return parseAuthorName(displayName ?? "");
+}
+
 export function rosterSignature(roster: RosterSnapshot): string {
 	return ROLES.map((role) => roster[role]).join(",");
 }

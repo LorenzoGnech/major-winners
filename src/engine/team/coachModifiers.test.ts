@@ -4,6 +4,7 @@ import {
 	bestCoachPlacement,
 	fillCoachModifiers,
 	modifiersFromPlacement,
+	modifiersFromPoints,
 	modifierTotal,
 	placementModifierPoints,
 } from "./coachModifiers";
@@ -29,20 +30,22 @@ const blank: Coach = {
 };
 
 describe("placementModifierPoints", () => {
-	it("gives every finish at least one bonus point", () => {
-		expect(placementModifierPoints(1)).toBe(4);
-		expect(placementModifierPoints(2)).toBe(3);
-		expect(placementModifierPoints(3)).toBe(2);
-		expect(placementModifierPoints(4)).toBe(2);
-		expect(placementModifierPoints(5)).toBe(1);
-		expect(placementModifierPoints(32)).toBe(1);
+	it("gives every finish at least two bonus points", () => {
+		expect(placementModifierPoints(1)).toBe(5);
+		expect(placementModifierPoints(2)).toBe(4);
+		expect(placementModifierPoints(3)).toBe(3);
+		expect(placementModifierPoints(4)).toBe(3);
+		expect(placementModifierPoints(5)).toBe(3);
+		expect(placementModifierPoints(8)).toBe(3);
+		expect(placementModifierPoints(9)).toBe(2);
+		expect(placementModifierPoints(32)).toBe(2);
 	});
 });
 
 describe("modifiersFromPlacement", () => {
 	it("spreads champion points without exceeding 2 per axis", () => {
 		const modifiers = modifiersFromPlacement(1, "champion");
-		expect(modifierTotal(modifiers)).toBe(4);
+		expect(modifierTotal(modifiers)).toBe(5);
 		expect(
 			Math.max(modifiers.comeback, modifiers.economy, modifiers.antistrat),
 		).toBeLessThanOrEqual(2);
@@ -51,12 +54,12 @@ describe("modifiersFromPlacement", () => {
 		).toBeGreaterThanOrEqual(1);
 	});
 
-	it("always grants at least one point, even for a field-floor finish", () => {
+	it("always grants at least two points, even for a field-floor finish", () => {
 		const modifiers = modifiersFromPlacement(24, "cult-coach");
-		expect(modifierTotal(modifiers)).toBe(1);
+		expect(modifierTotal(modifiers)).toBe(2);
 		expect(
 			[modifiers.comeback, modifiers.economy, modifiers.antistrat].filter((value) => value === 1),
-		).toHaveLength(1);
+		).toHaveLength(2);
 	});
 
 	it("is stable for a coach id and can rotate the leftover axis", () => {
@@ -93,6 +96,17 @@ describe("fillCoachModifiers", () => {
 		};
 		const filled = fillCoachModifiers([stale, zonic], [{ coachId: stale.id, placement: 12 }]);
 		expect(filled[0]?.modifiers).toEqual(modifiersFromPlacement(12, stale.id));
+		expect(filled[1]?.modifiers).toEqual(zonic.modifiers);
+	});
+
+	it("re-derives pre-baseline one-point rows instead of treating them as hand-tuned", () => {
+		const stale: Coach = {
+			...blank,
+			modifiers: modifiersFromPoints(1, blank.id),
+		};
+		const filled = fillCoachModifiers([stale, zonic], [{ coachId: stale.id, placement: 16 }]);
+		expect(filled[0]?.modifiers).toEqual(modifiersFromPlacement(16, stale.id));
+		expect(modifierTotal(filled[0]?.modifiers ?? stale.modifiers)).toBe(2);
 		expect(filled[1]?.modifiers).toEqual(zonic.modifiers);
 	});
 });

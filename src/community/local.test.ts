@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { loadPublishedFingerprints, rememberPublishedFingerprint } from "./local";
+import {
+	clearPendingDisplayName,
+	loadPendingDisplayName,
+	loadPublishedFingerprints,
+	rememberPendingDisplayName,
+	rememberPublishedFingerprint,
+} from "./local";
 
 class MemoryStorage implements Storage {
 	private data = new Map<string, string>();
@@ -32,5 +38,17 @@ describe("published fingerprint memory", () => {
 		expect([...loadPublishedFingerprints(storage)]).toEqual(["a|b"]);
 		storage.setItem("major-winners:published-fingerprints:v1", "{nope");
 		expect(loadPublishedFingerprints(storage).size).toBe(0);
+	});
+});
+
+describe("pending display name", () => {
+	it("remembers a valid username and ignores junk", () => {
+		const storage = new MemoryStorage();
+		rememberPendingDisplayName(storage, "ab");
+		expect(loadPendingDisplayName(storage)).toBeNull();
+		rememberPendingDisplayName(storage, "Lore_2018");
+		expect(loadPendingDisplayName(storage)).toBe("Lore_2018");
+		clearPendingDisplayName(storage);
+		expect(loadPendingDisplayName(storage)).toBeNull();
 	});
 });

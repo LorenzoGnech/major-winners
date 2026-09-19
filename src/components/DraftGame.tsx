@@ -1,6 +1,8 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import {
+	authorNameFromProfile,
 	buildCommunityOpponents,
+	clearPendingDisplayName,
 	clearPersistedDuel,
 	createDuel,
 	DUEL_POLL_MS,
@@ -8,6 +10,7 @@ import {
 	type DuelKind,
 	type DuelRoom,
 	type DuelSide,
+	displayNameTaken,
 	fetchBestRuns,
 	fetchDuel,
 	fetchEloLeaderboard,
@@ -19,6 +22,7 @@ import {
 	joinDuel,
 	leaveRankedQueue,
 	liveSeriesFromDuelRoom,
+	loadPendingDisplayName,
 	loadPersistedDuel,
 	loadPublishedFingerprints,
 	mergeOpponentPools,
@@ -26,7 +30,6 @@ import {
 	onAuthChange,
 	otherSide,
 	type PublishedRunSnapshot,
-	parseAuthorName,
 	parseDisplayName,
 	publishFinishedRun,
 	publishSavedTeam,
@@ -34,11 +37,13 @@ import {
 	type RankedProfile,
 	type RankedResult,
 	recordDuelResult,
+	rememberPendingDisplayName,
 	rememberPublishedFingerprint,
 	rosterForSide,
 	runFingerprint,
 	type SavedTeamSnapshot,
 	savePersistedDuel,
+	setDisplayName,
 	sideIndex,
 	signInWithMagicLink,
 	signOut as signOutCommunity,
@@ -470,6 +475,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [eloBoard, setEloBoard] = useState<RankedProfile[]>([]);
 	const [handleDraft, setHandleDraft] = useState("");
 	const [handleError, setHandleError] = useState<string | null>(null);
+	const [usernameBusy, setUsernameBusy] = useState(false);
 	const [rankedError, setRankedError] = useState<string | null>(null);
 	const [rankedElo, setRankedElo] = useState<number | null>(null);
 	const [rankedWindow, setRankedWindow] = useState<number | null>(null);
@@ -607,13 +613,33 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			return;
 		}
 		let cancelled = false;
-		void Promise.all([fetchMyPublishedRuns(userId), fetchMyProfile(userId)]).then(
-			([runs, profile]) => {
-				if (cancelled) return;
-				setMyRuns(runs);
-				setRankedProfile(profile);
-			},
-		);
+		void (async () => {
+			const [runs, existing] = await Promise.all([
+				fetchMyPublishedRuns(userId),
+				fetchMyProfile(userId),
+			]);
+			let profile = existing;
+			try {
+				const pending = loadPendingDisplayName(window.localStorage);
+				if (pending && !existing) {
+					const result = await setDisplayName(pending);
+					if (result.ok) {
+						profile = result.profile;
+					} else if (!cancelled) {
+						setHandleError(result.error);
+					}
+				}
+				if (pending) clearPendingDisplayName(window.localStorage);
+			} catch {
+				// Applying a pending username is best-effort.
+			}
+			if (cancelled) return;
+			setMyRuns(runs);
+			setRankedProfile(profile);
+			if (profile) {
+				setHandleDraft((current) => current || profile.displayName);
+			}
+		})();
 		return () => {
 			cancelled = true;
 		};
@@ -957,8 +983,32 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			setAuthError("Enter an email for a magic link.");
 			return;
 		}
+		const typed = handleDraft.trim();
+		if (typed) {
+			const name = parseDisplayName(typed);
+			if (!name) {
+				setHandleError("Use 3–16 letters, numbers, or underscore.");
+				return;
+			}
+			if (await displayNameTaken(name)) {
+				setHandleError("That name is taken.");
+				return;
+			}
+			try {
+				rememberPendingDisplayName(window.localStorage, name);
+			} catch {
+				// Remembering a pending username is best-effort.
+			}
+		} else {
+			try {
+				clearPendingDisplayName(window.localStorage);
+			} catch {
+				// Clearing a pending username is best-effort.
+			}
+		}
 		setAuthBusy(true);
 		setAuthError(null);
+		setHandleError(null);
 		setAuthMessage(null);
 		const error = await signInWithMagicLink(email, window.location.origin);
 		setAuthBusy(false);
@@ -967,6 +1017,24 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			return;
 		}
 		setAuthMessage("Check your email for the sign-in link.");
+	}
+
+	async function submitUsername() {
+		const name = parseDisplayName(handleDraft);
+		if (!name) {
+			setHandleError("Use 3–16 letters, numbers, or underscore.");
+			return;
+		}
+		setUsernameBusy(true);
+		setHandleError(null);
+		const result = await setDisplayName(name);
+		setUsernameBusy(false);
+		if (!result.ok) {
+			setHandleError(result.error);
+			return;
+		}
+		setRankedProfile(result.profile);
+		setHandleDraft(result.profile.displayName);
 	}
 
 	async function submitSignOut() {
@@ -1396,15 +1464,16 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			(duelTeamFingerprint && savedFingerprints.has(duelTeamFingerprint)),
 	);
 
-	async function saveFinishedTeam(authorName: string) {
+	async function saveFinishedTeam() {
 		if (!completedDraft || !communityEnabled) return;
+		const authorName = authorNameFromProfile(rankedProfile?.displayName);
 		if (mode === "duel") {
 			if (!duelTeamFingerprint) return;
 			setSaveBusy(true);
 			setSaveError(null);
 			setSaveMessage(null);
 			const result = await publishSavedTeam({
-				authorName: parseAuthorName(authorName),
+				authorName,
 				teamName,
 				draft: completedDraft,
 				userId,
@@ -1430,7 +1499,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setSaveError(null);
 		setSaveMessage(null);
 		const result = await publishFinishedRun({
-			authorName: parseAuthorName(authorName),
+			authorName,
 			teamName,
 			mode: publishMode,
 			draft: completedDraft,
@@ -1546,6 +1615,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					},
 					onRanked: openRanked,
 					onSubmitHandle: submitRankedHandle,
+					onSaveUsername: () => {
+						void submitUsername();
+					},
+					usernameBusy,
 					onLeaveQueue: () => {
 						void cancelRankedQueue();
 					},
@@ -1553,6 +1626,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				onView={(view) => {
 					if (homeView === "ranked" && view !== "ranked") {
 						void leaveRankedQueue();
+					}
+					if (view === "profile" && rankedProfile) {
+						setHandleDraft(rankedProfile.displayName);
+						setHandleError(null);
+					}
+					if (view === "signin") {
+						setHandleError(null);
 					}
 					setHomeView(view);
 				}}
@@ -1570,52 +1650,50 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		<>
 			<HomeLogo onGoHome={goHome} />
 			<div
-				className={`mx-auto w-full px-4 pb-5 pt-[calc(var(--safe-top)+4.75rem)] sm:px-6 sm:pb-8 sm:pt-[calc(var(--safe-top)+5.75rem)] ${simulating ? "max-w-360" : "max-w-7xl"} ${state.phase.type === "player" && !rolling && !simulating ? "max-lg:pb-28" : ""}`}
+				className={`mx-auto w-full overflow-x-clip px-4 pb-5 pt-[calc(var(--safe-top)+4.75rem)] sm:px-6 sm:pb-8 sm:pt-[calc(var(--safe-top)+5.75rem)] ${simulating ? "max-w-360 max-lg:px-3 max-lg:pt-[calc(var(--safe-top)+4.25rem)] max-lg:pb-2" : "max-w-7xl"} ${state.phase.type === "player" && !rolling && !simulating ? "max-lg:pb-28" : ""}`}
 			>
-				<header className="flex items-start justify-between gap-4">
-					<div className="min-w-0">
-						<p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300">
-							{mode === "daily"
-								? `Today’s Challenge · ${identity.day} UTC · ${identity.id}`
-								: mode === "community"
-									? "Free play with community teams"
-									: mode === "duel"
-										? duelKind === "ranked"
-											? "Ranked match"
-											: `Private match · ${duelCode || "lobby"}`
-										: "Free Play"}
-						</p>
-						<h1
-							className={`mt-1 font-semibold tracking-tight text-white ${simulating ? "text-2xl sm:text-4xl" : "text-3xl sm:text-4xl"}`}
-						>
-							{teamName}
-						</h1>
-						<p
-							className={`mt-2 max-w-xl text-sm leading-6 text-zinc-400 ${simulating ? "max-lg:hidden" : ""}`}
-						>
-							Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
-						</p>
-					</div>
-					{!tournament && !pendingRestart && mode !== "duel" && (
-						<button
-							type="button"
-							onClick={requestNewDraft}
-							className="shrink-0 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-						>
-							New draft
-						</button>
-					)}
-					{mode === "duel" && !showDuelMatch && !showDuelRecap && (
-						<button
-							type="button"
-							onClick={requestAbandon}
-							onBlur={() => setConfirmAbandon(false)}
-							className="shrink-0 rounded-lg border border-red-300/20 px-3 py-2 text-xs font-semibold text-red-200 transition hover:border-red-300/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
-						>
-							{confirmAbandon ? "Confirm abandon" : "Abandon run"}
-						</button>
-					)}
-				</header>
+				{simulating ? null : (
+					<header className="flex items-start justify-between gap-4">
+						<div className="min-w-0">
+							<p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300">
+								{mode === "daily"
+									? `Today’s Challenge · ${identity.day} UTC · ${identity.id}`
+									: mode === "community"
+										? "Free play with community teams"
+										: mode === "duel"
+											? duelKind === "ranked"
+												? "Ranked match"
+												: `Private match · ${duelCode || "lobby"}`
+											: "Free Play"}
+							</p>
+							<h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+								{teamName}
+							</h1>
+							<p className="mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+								Five eras. Five picks. One coach. Build your Counter-Strike legends roster.
+							</p>
+						</div>
+						{!tournament && !pendingRestart && mode !== "duel" && (
+							<button
+								type="button"
+								onClick={requestNewDraft}
+								className="shrink-0 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
+							>
+								New draft
+							</button>
+						)}
+						{mode === "duel" && !showDuelMatch && !showDuelRecap && (
+							<button
+								type="button"
+								onClick={requestAbandon}
+								onBlur={() => setConfirmAbandon(false)}
+								className="shrink-0 rounded-lg border border-red-300/20 px-3 py-2 text-xs font-semibold text-red-200 transition hover:border-red-300/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
+							>
+								{confirmAbandon ? "Confirm abandon" : "Abandon run"}
+							</button>
+						)}
+					</header>
+				)}
 
 				{mode === "duel" && duelCode && !showDuelMatch && !showDuelRecap ? (
 					<DuelRoomBanner
@@ -1648,7 +1726,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				) : null}
 
 				<div
-					className={`mt-6 grid gap-5 ${showSideRoster ? "lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start" : ""}`}
+					className={`grid gap-5 ${simulating ? "mt-0 lg:mt-6" : "mt-6"} ${showSideRoster ? "lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start" : ""}`}
 				>
 					<main className="min-w-0">
 						{showSideRoster && (
@@ -1702,8 +1780,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 												busy={saveBusy}
 												message={saveMessage}
 												error={saveError}
-												onSave={(author) => {
-													void saveFinishedTeam(author);
+												authorName={authorNameFromProfile(rankedProfile?.displayName)}
+												signedIn={Boolean(userEmail)}
+												onSave={() => {
+													void saveFinishedTeam();
 												}}
 											/>
 											{dailyResult ? (
@@ -1961,8 +2041,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 												busy={saveBusy}
 												message={saveMessage}
 												error={saveError}
-												onSave={(author) => {
-													void saveFinishedTeam(author);
+												authorName={authorNameFromProfile(rankedProfile?.displayName)}
+												signedIn={Boolean(userEmail)}
+												onSave={() => {
+													void saveFinishedTeam();
 												}}
 											/>
 										) : null}

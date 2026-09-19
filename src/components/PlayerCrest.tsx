@@ -2,6 +2,7 @@ import type { PlayerSeason } from "../data";
 import { playerCrestTone, playerInitials, playerPhotoSrc } from "../data/playerPhoto";
 
 const SIZE_CLASS = {
+	xs: "size-6 text-[8px]",
 	sm: "size-8 text-[10px]",
 	md: "size-12 text-xs",
 	lg: "size-16 text-sm",

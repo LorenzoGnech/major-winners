@@ -12,6 +12,7 @@ import {
 	uniqueTeamsByRoster,
 } from "./ranking";
 import {
+	authorNameFromProfile,
 	DEFAULT_AUTHOR_NAME,
 	type PublishedRunSnapshot,
 	parseAuthorName,
@@ -54,6 +55,8 @@ describe("community schema", () => {
 		expect(parseAuthorName("")).toBe(DEFAULT_AUTHOR_NAME);
 		expect(parseAuthorName("   ")).toBe(DEFAULT_AUTHOR_NAME);
 		expect(parseAuthorName("Lore")).toBe("Lore");
+		expect(authorNameFromProfile(undefined)).toBe(DEFAULT_AUTHOR_NAME);
+		expect(authorNameFromProfile("lore")).toBe("lore");
 	});
 
 	it("fingerprints the roster and run tuple", () => {
