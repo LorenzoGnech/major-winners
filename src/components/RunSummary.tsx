@@ -3,6 +3,7 @@ import type { RunPlayerStats, TeamProfile, TournamentState } from "../engine";
 import { summarizeTournamentRun } from "../engine";
 import { flagEmoji, ROLE_LABELS } from "./draftPresentation";
 import { PlayerCrest } from "./PlayerCrest";
+import { RecapPlayButton } from "./RecapPlayButton";
 
 const CONFETTI = [
 	{ left: "6%", delay: "0ms", duration: "2.4s", color: "#6ee7b7", width: "8px", drift: "18px" },
@@ -59,11 +60,15 @@ export function RunSummary({
 	playerTeam,
 	playerTeamName,
 	playersById,
+	onPlayAgain,
+	playAgainLabel = "Play again",
 }: {
 	state: TournamentState;
 	playerTeam: TeamProfile;
 	playerTeamName: string;
 	playersById: ReadonlyMap<string, PlayerSeason>;
+	onPlayAgain?: () => void;
+	playAgainLabel?: string;
 }) {
 	const summary = summarizeTournamentRun(state, playerTeam);
 	const champion = summary.status === "champion";
@@ -128,6 +133,12 @@ export function RunSummary({
 							: `You won the Major · ${summary.wins}–${summary.losses}.`
 						: `Eliminated · ${summary.finish} · ${summary.wins}–${summary.losses}.`}
 				</p>
+
+				{onPlayAgain ? (
+					<div className="mt-6">
+						<RecapPlayButton onClick={onPlayAgain}>{playAgainLabel}</RecapPlayButton>
+					</div>
+				) : null}
 
 				<dl className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-5">
 					<Stat label="Record" value={`${summary.wins}–${summary.losses}`} />

@@ -4,6 +4,7 @@ import type { PlayerSeason } from "../data";
 import type { DuelSeriesSummary, RunPlayerStats } from "../engine";
 import { flagEmoji, ROLE_LABELS } from "./draftPresentation";
 import { PlayerCrest } from "./PlayerCrest";
+import { RecapPlayButton } from "./RecapPlayButton";
 
 const CONFETTI = [
 	{ left: "8%", delay: "0ms", duration: "2.4s", color: "#6ee7b7", width: "8px", drift: "18px" },
@@ -119,6 +120,8 @@ export function DuelSummary({
 	extras,
 	ranked = false,
 	rankedResult = null,
+	onPlayAgain,
+	playAgainLabel = "Back to Home",
 }: {
 	summary: DuelSeriesSummary;
 	viewerSide: 0 | 1;
@@ -126,6 +129,8 @@ export function DuelSummary({
 	extras?: ReactNode;
 	ranked?: boolean;
 	rankedResult?: RankedResult | null;
+	onPlayAgain?: () => void;
+	playAgainLabel?: string;
 }) {
 	const won = summary.winner === viewerSide;
 	const winner = summary.sides[summary.winner];
@@ -212,6 +217,11 @@ export function DuelSummary({
 						))}
 					</ul>
 				) : null}
+				{onPlayAgain ? (
+					<div className="mt-6">
+						<RecapPlayButton onClick={onPlayAgain}>{playAgainLabel}</RecapPlayButton>
+					</div>
+				) : null}
 
 				<div className="mt-6 grid gap-4 lg:grid-cols-2">
 					<TeamRecap
@@ -231,6 +241,11 @@ export function DuelSummary({
 				</div>
 
 				{extras ? <div className="mt-5">{extras}</div> : null}
+				{onPlayAgain ? (
+					<div className={extras ? "mt-6" : "mt-5"}>
+						<RecapPlayButton onClick={onPlayAgain}>{playAgainLabel}</RecapPlayButton>
+					</div>
+				) : null}
 			</div>
 		</section>
 	);

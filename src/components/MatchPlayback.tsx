@@ -101,7 +101,7 @@ function mapPickCaption(
 	return "";
 }
 const FEED_BOX_CLASS =
-	"flex h-32 min-h-28 flex-col overflow-hidden sm:h-64 lg:h-44 max-lg:min-h-28 max-lg:flex-1";
+	"flex min-h-28 flex-col overflow-hidden max-lg:min-h-48 max-lg:flex-1 lg:h-44";
 
 const ROLE_LABELS: Record<Role, string> = {
 	awp: "AWP",
@@ -1882,8 +1882,8 @@ export function MatchPlayback({
 							teamLabels={shortLabels}
 						/>
 
-						<div className="flex min-h-0 flex-col max-lg:flex-1">
-							<div className="order-2 lg:order-1">
+						<div className="flex min-h-0 flex-col max-lg:flex-1 max-lg:gap-2">
+							<div className="order-2 shrink-0 lg:order-1">
 								<EconomyBars
 									roundValues={displayRoundValues}
 									totals={displayTotals}
@@ -1967,13 +1967,13 @@ export function MatchPlayback({
 									</div>
 								</fieldset>
 							</div>
-							<div className="order-1 mt-3 flex min-h-0 flex-col lg:order-2 lg:mt-5 max-lg:flex-1">
+							<div className="order-1 mt-3 flex min-h-0 flex-col lg:order-2 lg:mt-5 max-lg:min-h-48 max-lg:grow max-lg:shrink-0">
 								<h4 className="hidden text-center text-xs font-semibold uppercase tracking-wider text-zinc-500 lg:block">
 									Play-by-play
 								</h4>
-								<div className="mt-3 grid min-h-0 grid-cols-1 gap-3 max-lg:mt-0 max-lg:flex-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
+								<div className="mt-3 grid min-h-0 grid-cols-1 gap-3 max-lg:mt-0 max-lg:min-h-48 max-lg:flex-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,16rem)]">
 									{feed ? (
-										<ol className="max-lg:flex max-lg:h-full max-lg:min-h-0 max-lg:flex-col">
+										<ol className="max-lg:flex max-lg:h-full max-lg:min-h-48 max-lg:flex-col">
 											<RoundFeedItem
 												key={feed.round.round}
 												round={feed.round}

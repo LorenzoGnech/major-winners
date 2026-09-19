@@ -1115,6 +1115,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setNameDraft("");
 		setNameError(null);
 		setPendingRestart(false);
+		setSelectedPlayerId(null);
+		setSaveError(null);
+		setSaveMessage(null);
 		setState(startDraft(dataset, mode === "daily" ? identity.seed : freePlaySeed()));
 		setRollKind("full");
 		setSettledCardKey(null);
@@ -1798,6 +1801,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								playersById={playersById}
 								onChange={setTournament}
 								onAbandon={abandonRun}
+								onPlayAgain={confirmNewDraft}
 								terminalExtras={
 									communityEnabled && runSummary ? (
 										<div className="mt-4 space-y-4">
@@ -2059,30 +2063,22 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								playersById={playersById}
 								ranked={duelKind === "ranked"}
 								rankedResult={rankedResult}
+								onPlayAgain={abandonRun}
 								extras={
-									<div className="space-y-4">
-										{communityEnabled ? (
-											<SaveTeamPanel
-												teamName={teamName}
-												alreadySaved={alreadySaved}
-												busy={saveBusy}
-												message={saveMessage}
-												error={saveError}
-												authorName={authorNameFromProfile(rankedProfile?.displayName)}
-												signedIn={Boolean(userEmail)}
-												onSave={() => {
-													void saveFinishedTeam();
-												}}
-											/>
-										) : null}
-										<button
-											type="button"
-											onClick={abandonRun}
-											className="w-full rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition hover:border-white/30 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-										>
-											Back to Home
-										</button>
-									</div>
+									communityEnabled ? (
+										<SaveTeamPanel
+											teamName={teamName}
+											alreadySaved={alreadySaved}
+											busy={saveBusy}
+											message={saveMessage}
+											error={saveError}
+											authorName={authorNameFromProfile(rankedProfile?.displayName)}
+											signedIn={Boolean(userEmail)}
+											onSave={() => {
+												void saveFinishedTeam();
+											}}
+										/>
+									) : undefined
 								}
 							/>
 						) : null}

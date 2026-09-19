@@ -15,6 +15,7 @@ import { preloadMapArt } from "./mapArt";
 import { resetMobileViewport } from "./mobileViewport";
 import { OpponentPreview } from "./OpponentPreview";
 import { OrgCrest } from "./OrgCrest";
+import { RecapPlayButton } from "./RecapPlayButton";
 import { RunSummary } from "./RunSummary";
 import { visibleTournamentBoard } from "./tournamentBoard";
 
@@ -39,6 +40,8 @@ type TournamentRunProps = {
 	playersById: ReadonlyMap<string, PlayerSeason>;
 	onChange: (state: TournamentState) => void;
 	onAbandon: () => void;
+	onPlayAgain?: () => void;
+	playAgainLabel?: string;
 	terminalExtras?: ReactNode;
 };
 
@@ -81,6 +84,8 @@ export function TournamentRun({
 	playersById,
 	onChange,
 	onAbandon,
+	onPlayAgain,
+	playAgainLabel = "Play again",
 	terminalExtras,
 }: TournamentRunProps) {
 	const [confirmAbandon, setConfirmAbandon] = useState(false);
@@ -159,6 +164,8 @@ export function TournamentRun({
 					playerTeam={playerTeam}
 					playerTeamName={playerTeamName}
 					playersById={playersById}
+					onPlayAgain={onPlayAgain}
+					playAgainLabel={playAgainLabel}
 				/>
 			) : null}
 			<div
@@ -258,6 +265,12 @@ export function TournamentRun({
 				)}
 
 				{terminal ? terminalExtras : null}
+
+				{terminal && onPlayAgain ? (
+					<div className="mt-6">
+						<RecapPlayButton onClick={onPlayAgain}>{playAgainLabel}</RecapPlayButton>
+					</div>
+				) : null}
 
 				{error && (
 					<p role="alert" className="mt-4 text-sm text-red-200">
