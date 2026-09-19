@@ -153,7 +153,7 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 			{ kind: "win-prob", amount: 0.045 },
 		],
 	),
-	def("one-tap-master", "bonus", "One Tap Master", "one taps everyone for three rounds", [
+	def("one-tap-master", "bonus", "One Tap Master", "One-tap everyone for three rounds", [
 		{ kind: "combat", scale: 2 },
 		{ kind: "win-prob", amount: 0.08, when: "pistol" },
 	]),
@@ -167,7 +167,7 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 			{ kind: "morale", self: 30 },
 		],
 	),
-	def("god-denis", "bonus", "God Denis", "the_denis is on your side for three rounds", [
+	def("god-denis", "bonus", "God Denis", "The_denis is on your side for three rounds", [
 		{ kind: "combat", scale: 2 },
 	]),
 	def("ez4ence", "bonus", "EZ4ENCE", "The next three rounds are EZ4ENCE", [
