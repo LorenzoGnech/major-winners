@@ -3,5 +3,9 @@
 	"compatibility_date": "2026-09-17",
 	"assets": {
 		"directory": "./dist"
-	}
+	},
+	"routes": [
+		{ "pattern": "major-winners.com", "custom_domain": true },
+		{ "pattern": "www.major-winners.com", "custom_domain": true }
+	]
 }
