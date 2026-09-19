@@ -8,7 +8,7 @@ import { MAJOR_SOURCES, type MajorSource } from "./major-source-manifest";
 
 const JSON_DIR = new URL("../src/data/json/", import.meta.url);
 const CACHE_DIR = new URL("../.cache/major-import/", import.meta.url);
-const USER_AGENT = "MajorWinners/1.0 (https://major.lorenzognech.workers.dev)";
+const USER_AGENT = "MajorWinners/1.0 (https://major-winners.com)";
 const ACCESSED_AT = new Date().toISOString().slice(0, 10);
 const WRITE = process.argv.includes("--write");
 const OFFLINE = process.argv.includes("--offline");

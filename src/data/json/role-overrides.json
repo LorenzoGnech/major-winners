@@ -1997,11 +1997,18 @@
 			"lurker"
 		]
 	},
-	"k0nfig-2016-team-dignitas": {
+	"cajunb-2016-team-dignitas": {
 		"primaryRole": "awp",
 		"roles": [
 			"awp",
 			"entry"
+		]
+	},
+	"k0nfig-2016-team-dignitas": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
 		]
 	},
 	"rubino-2016-team-dignitas": {
@@ -2060,11 +2067,18 @@
 			"lurker"
 		]
 	},
-	"k0nfig-2017-north": {
+	"cajunb-2017-north": {
 		"primaryRole": "awp",
 		"roles": [
 			"awp",
 			"entry"
+		]
+	},
+	"k0nfig-2017-north": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
 		]
 	},
 	"rubino-2017-north": {
@@ -2263,11 +2277,25 @@
 			"entry"
 		]
 	},
-	"k0nfig-2018-north": {
+	"cajunb-2018-north": {
 		"primaryRole": "awp",
 		"roles": [
 			"awp",
 			"entry"
+		]
+	},
+	"cajunb-2018-optic-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"k0nfig-2018-north": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
 		]
 	},
 	"aizy-2018-north": {

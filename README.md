@@ -36,7 +36,7 @@ npm run import:majors -- --offline --write
 See [`AGENTS.md`](AGENTS.md) for architecture and game invariants and
 [`docs/DATA.md`](docs/DATA.md) for provenance and import details.
 
-Production is [major.lorenzognech.workers.dev](https://major.lorenzognech.workers.dev/). The site is static Cloudflare Workers assets (`wrangler.jsonc`, output `dist/`). Build with `npm run build`; Cloudflare should use Node 22, build command `npm run build`, and deploy from `dist`.
+Production is [major-winners.com](https://major-winners.com/). The site is static Cloudflare Workers assets (`wrangler.jsonc`, output `dist/`). Build with `npm run build`; Cloudflare should use Node 22, build command `npm run build`, and deploy from `dist`.
 
 ## Licensing
 

@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-	site: "https://major.lorenzognech.workers.dev",
+	site: "https://major-winners.com",
 	output: "static",
 	integrations: [react()],
 	vite: {

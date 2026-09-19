@@ -17,7 +17,7 @@ import { orgYearSchema, playerSeasonSchema } from "../src/data/schema";
 const JSON_DIR = new URL("../src/data/json/", import.meta.url);
 const HLTV_STATS_DIR = new URL("../.cache/hltv-import/stats/", import.meta.url);
 const PLAYER_ROLE_CACHE = new URL("../.cache/player-roles/", import.meta.url);
-const USER_AGENT = "MajorWinners/1.0 (https://major.lorenzognech.workers.dev)";
+const USER_AGENT = "MajorWinners/1.0 (https://major-winners.com)";
 const ARGS = process.argv.slice(2);
 const DRY_RUN = ARGS.includes("--dry-run");
 const FETCH_ROLES = ARGS.includes("--fetch-roles");

@@ -378,7 +378,7 @@ function DailySharePanel({
 	const [status, setStatus] = useState("");
 	const url =
 		typeof window === "undefined"
-			? "https://major.lorenzognech.workers.dev/"
+			? "https://major-winners.com/"
 			: new URL("/", window.location.href).href;
 	const text = formatDailyShare(result, url);
 	async function copy() {

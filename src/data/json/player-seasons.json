@@ -8958,11 +8958,11 @@
 		"orgId": "team-dignitas",
 		"photo": "/photos/players/cajunb/2016.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -8994,11 +8994,11 @@
 		"orgId": "north",
 		"photo": "/photos/players/cajunb/2017.png",
 		"game": "csgo",
-		"roles": ["support", "lurker"],
-		"primaryRole": "support",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -9030,11 +9030,11 @@
 		"orgId": "north",
 		"photo": "/photos/players/cajunb/2018.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -9066,11 +9066,11 @@
 		"orgId": "optic-gaming",
 		"photo": "/photos/players/cajunb/2018.png",
 		"game": "csgo",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -31997,8 +31997,8 @@
 		"orgId": "team-dignitas",
 		"photo": "/photos/players/k0nfig/2016.png",
 		"game": "csgo",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["entry", "lurker"],
+		"primaryRole": "entry",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -32033,8 +32033,8 @@
 		"orgId": "north",
 		"photo": "/photos/players/k0nfig/2017.png",
 		"game": "csgo",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["entry", "lurker"],
+		"primaryRole": "entry",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -32069,8 +32069,8 @@
 		"orgId": "north",
 		"photo": "/photos/players/k0nfig/2018.png",
 		"game": "csgo",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["entry", "lurker"],
+		"primaryRole": "entry",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
