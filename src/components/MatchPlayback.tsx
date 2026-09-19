@@ -1,8 +1,10 @@
 import { type ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Org, PlayerSeason, Role } from "../data";
 import {
+	activeTraitAuras,
 	applyGamePlan,
 	type BonusId,
+	bonusById,
 	equipmentValue,
 	getMap,
 	type HighlightEvent,
@@ -24,7 +26,6 @@ import {
 	type TeamMemberProfile,
 	TIMEOUT_MORALE,
 } from "../engine";
-import { bonusById } from "../engine/bonuses";
 import { BonusMoment } from "./BonusMoment";
 import { ClutchMoment } from "./ClutchMoment";
 import {
@@ -42,6 +43,7 @@ import { OrgCrest } from "./OrgCrest";
 import { PlayerCrest } from "./PlayerCrest";
 import { lineupDeadIds, liveCastLines } from "./roundCast";
 import { TimeoutMoment } from "./TimeoutMoment";
+import { TraitAuraFx } from "./TraitAuraFx";
 import { TraitIcons } from "./TraitBadge";
 import { WeaponIcon } from "./WeaponIcon";
 
@@ -340,6 +342,17 @@ export function shouldHoldForCoachTimeout(
 	huddleDone: boolean,
 ): boolean {
 	return pendingTimeout && caughtUp && mapOpen && !huddleDone;
+}
+
+export function playbackTraitRound(
+	cursor: PlaybackCursor,
+	map: MapResult | undefined,
+	upcomingRound?: number,
+): number {
+	if (upcomingRound && upcomingRound > 0) return upcomingRound;
+	if (cursor.inProgressRound) return cursor.inProgressRound.round;
+	const settled = map?.rounds[cursor.settledRoundCount - 1];
+	return settled?.round ?? 0;
 }
 
 export function upcomingBonusRound(
@@ -716,6 +729,7 @@ function TeamLineup({
 	involvedIds,
 	deadIds,
 	playersById,
+	auras,
 }: {
 	align: "left" | "right";
 	label: string;
@@ -728,6 +742,7 @@ function TeamLineup({
 	involvedIds: ReadonlySet<string>;
 	deadIds: ReadonlySet<string>;
 	playersById?: ReadonlyMap<string, PlayerSeason>;
+	auras: ReadonlyMap<string, { polarity: "bonus" | "malus" }>;
 }) {
 	const isRight = align === "right";
 	const tone =
@@ -767,16 +782,30 @@ function TeamLineup({
 					const line = stats.get(member.id) ?? { kills: 0, deaths: 0, assists: 0 };
 					const dead = deadIds.has(member.id);
 					const hot = !dead && involvedIds.has(member.id);
+					const aura = auras.get(member.id);
 					return (
 						<li
 							key={member.id}
-							title={dead ? `${member.nick}, eliminated this round` : undefined}
-							aria-label={dead ? `${member.nick}, eliminated this round` : undefined}
+							title={
+								aura
+									? `${member.nick}, ${aura.polarity === "malus" ? "malus" : "bonus"} active`
+									: dead
+										? `${member.nick}, eliminated this round`
+										: undefined
+							}
+							aria-label={
+								aura
+									? `${member.nick}, ${aura.polarity === "malus" ? "malus" : "bonus"} active`
+									: dead
+										? `${member.nick}, eliminated this round`
+										: undefined
+							}
 							className={`flex items-center gap-2 rounded-xl px-1.5 py-1.5 motion-safe:transition-[opacity,filter,background-color] ${
 								isRight ? "flex-row-reverse" : ""
 							} ${dead ? "" : hot ? "bg-white/8 ring-1 ring-white/15" : ""}`}
 						>
-							<div className={`shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
+							<div className={`relative shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
+								{aura ? <TraitAuraFx polarity={aura.polarity} /> : null}
 								<PlayerCrest player={crestFor(member, playersById)} size="md" />
 							</div>
 							<div
@@ -825,6 +854,7 @@ function CompactMatchLineups({
 	deadIds,
 	involvedIds,
 	playersById,
+	auras,
 }: {
 	leftLabel: string;
 	rightLabel: string;
@@ -834,6 +864,7 @@ function CompactMatchLineups({
 	deadIds: ReadonlySet<string>;
 	involvedIds: ReadonlySet<string>;
 	playersById?: ReadonlyMap<string, PlayerSeason>;
+	auras: ReadonlyMap<string, { polarity: "bonus" | "malus" }>;
 }) {
 	function column(
 		label: string,
@@ -854,12 +885,14 @@ function CompactMatchLineups({
 						const line = stats.get(member.id) ?? { kills: 0, deaths: 0, assists: 0 };
 						const dead = deadIds.has(member.id);
 						const hot = !dead && involvedIds.has(member.id);
+						const aura = auras.get(member.id);
 						return (
 							<li
 								key={member.id}
 								className={`flex items-center gap-1 rounded-md px-0.5 py-0 ${hot ? "bg-white/8" : ""}`}
 							>
-								<div className={`shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
+								<div className={`relative shrink-0 ${dead ? "opacity-40 grayscale" : ""}`}>
+									{aura ? <TraitAuraFx polarity={aura.polarity} compact /> : null}
 									<PlayerCrest player={crestFor(member, playersById)} size="xs" />
 								</div>
 								<p
@@ -1448,6 +1481,8 @@ export function MatchPlayback({
 		);
 	}
 
+	const traitRound = playbackTraitRound(cursor, activeMap, upcomingBonus?.round.round);
+	const traitAuras = activeTraitAuras(activeMap.rounds, traitRound);
 	const feed = latestRoundFeed(cursor, activeMap);
 	const stats = liveLines(activeMap.rounds, cursor.settledRoundCount, cursor.inProgressKills);
 	const latestKill = cursor.inProgressKills.at(-1);
@@ -1643,7 +1678,7 @@ export function MatchPlayback({
 		<div className="mt-5 space-y-4 max-lg:mt-0">
 			<section
 				aria-labelledby="match-heading"
-				className="relative overflow-x-clip overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950/70 p-4 max-lg:flex max-lg:max-h-[calc(100svh-var(--safe-top)-5rem)] max-lg:flex-col max-lg:p-3 max-lg:pb-24 max-lg:touch-manipulation sm:p-6 sm:max-lg:pb-24"
+				className="relative overflow-x-clip overflow-y-auto rounded-2xl border border-white/10 bg-zinc-950/70 p-4 max-lg:flex max-lg:max-h-[calc(100svh-var(--app-nav-height)-0.5rem)] max-lg:flex-col max-lg:p-3 max-lg:pb-24 max-lg:touch-manipulation sm:p-6 sm:max-lg:pb-24"
 				style={
 					background
 						? {
@@ -1776,6 +1811,7 @@ export function MatchPlayback({
 							involvedIds={involvedIds}
 							deadIds={boardDeadIds}
 							playersById={playersById}
+							auras={traitAuras}
 						/>
 					</div>
 
@@ -1829,6 +1865,7 @@ export function MatchPlayback({
 							deadIds={boardDeadIds}
 							involvedIds={involvedIds}
 							playersById={playersById}
+							auras={traitAuras}
 						/>
 
 						<RoundTimeline
@@ -1971,6 +2008,7 @@ export function MatchPlayback({
 							involvedIds={involvedIds}
 							deadIds={boardDeadIds}
 							playersById={playersById}
+							auras={traitAuras}
 						/>
 					</div>
 				</div>

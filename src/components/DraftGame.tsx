@@ -85,6 +85,7 @@ import {
 	type TeamProfile,
 	type TournamentState,
 } from "../engine";
+import { AppNav } from "./AppNav";
 import { parseCustomSeed } from "./customSeed";
 import {
 	CompactRosterBar,
@@ -107,7 +108,6 @@ import {
 } from "./dailyPersistence";
 import { GAME_LABELS } from "./draftPresentation";
 import { LEGACY_MAJOR_LOGO, LEGACY_MAJOR_REEL_ID, visibleLabel } from "./draftReel";
-import { HomeLogo } from "./HomeLogo";
 import { DailyStatsPanel, type HomeAction, HomeScreen, type HomeView } from "./HomeScreen";
 import { MajorCrest } from "./MajorCrest";
 import { MatchPlayback } from "./MatchPlayback";
@@ -1649,11 +1649,28 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		);
 	}
 
+	const showRecapHome =
+		!pendingRestart &&
+		Boolean(tournament && !tournament.liveSeries && tournament.status !== "active");
+
 	return (
 		<>
-			<HomeLogo onGoHome={goHome} />
+			<AppNav
+				onGoHome={goHome}
+				action={
+					showRecapHome ? (
+						<button
+							type="button"
+							onClick={abandonRun}
+							className="rounded-lg bg-emerald-300 px-3 py-1.5 text-xs font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 sm:px-4 sm:py-2 sm:text-sm"
+						>
+							Back to Home
+						</button>
+					) : null
+				}
+			/>
 			<div
-				className={`mx-auto w-full overflow-x-clip px-4 pb-5 pt-[calc(var(--safe-top)+4.75rem)] sm:px-6 sm:pb-8 sm:pt-[calc(var(--safe-top)+5.75rem)] ${simulating ? "max-w-360 max-lg:px-3 max-lg:pt-[calc(var(--safe-top)+4.25rem)] max-lg:pb-2" : "max-w-7xl"} ${state.phase.type === "player" && !rolling && !simulating ? "max-lg:pb-28" : ""}`}
+				className={`mx-auto w-full overflow-x-clip px-4 pb-5 pt-4 sm:px-6 sm:pb-8 sm:pt-5 ${simulating ? "max-w-360 max-lg:px-3 max-lg:pt-2 max-lg:pb-2" : "max-w-7xl"} ${state.phase.type === "player" && !rolling && !simulating ? "max-lg:pb-28" : ""}`}
 			>
 				{simulating ? null : (
 					<header className="flex items-start justify-between gap-4">
@@ -1908,7 +1925,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 									</div>
 
 									<div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start">
-										<div className="hidden lg:col-start-2 lg:row-span-2 lg:block lg:sticky lg:top-24">
+										<div className="hidden lg:col-start-2 lg:row-span-2 lg:block lg:sticky lg:top-[calc(var(--app-nav-height)+0.75rem)]">
 											<LiveRoster {...rosterProps} />
 										</div>
 										<div className="space-y-3 lg:col-start-1 lg:row-start-1">
@@ -2151,7 +2168,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					</main>
 
 					{showSideRoster && (
-						<aside className="sticky top-24 hidden lg:block">
+						<aside className="sticky top-[calc(var(--app-nav-height)+0.75rem)] hidden lg:block">
 							<LiveRoster {...rosterProps} />
 						</aside>
 					)}

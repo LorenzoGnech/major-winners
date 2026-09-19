@@ -1,214 +1,4779 @@
 {
+	"910-2024-the-mongolz": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"ablej-2019-furia-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"adren-2019-avangar": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
 	"ahl-2003-sk": {
 		"primaryRole": "support",
-		"roles": ["support", "entry"]
+		"roles": [
+			"support",
+			"entry"
+		]
+	},
+	"aleksib-2022-nip": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"allu-2015-nip": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"archi-2009-fnatic": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"autimatic-2018-cloud9": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"autimatic-2019-cloud9": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"autimatic-2022-evil-geniuses": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"bart4k-2023-the-mongolz": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"blamef-2024-fnatic": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"blamef-2026-big": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"blitz-2022-ihc-esports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"blitz-2023-the-mongolz": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"blitz-2024-the-mongolz": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"boltz-2015-keyd-stars": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"boltz-2022-imperial-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"broky-2022-faze": {
 		"primaryRole": "awp",
-		"roles": ["awp", "lurker"]
+		"roles": [
+			"awp",
+			"lurker"
+		]
+	},
+	"cadian-2014-copenhagen-wolves": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
 	},
 	"carn-2009-fnatic": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"chelo-2024-furia-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"chrisj-2018-mouz": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"chrisj-2019-mouz": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"coldzera-2015-luminosity-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
 	},
 	"coldzera-2016-sk": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"coldzera-2018-sk": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"daps-2016-optic-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"deadfox-2017-hellraisers": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"dennis-2016-fnatic": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"dennis-2017-fnatic": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"dennis-2018-nip": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
 	},
 	"device-2018-astralis": {
 		"primaryRole": "awp",
-		"roles": ["awp", "entry"]
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"draken_william_sundin-2018-fnatic": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"dsn-2009-fnatic": {
 		"primaryRole": "support",
-		"roles": ["support", "lurker"]
+		"roles": [
+			"support",
+			"lurker"
+		]
 	},
 	"dupreeh-2018-astralis": {
 		"primaryRole": "entry",
-		"roles": ["entry", "lurker"]
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"edward-2018-navi": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "support"]
+		"roles": [
+			"lurker",
+			"support"
+		]
 	},
 	"electronic-2018-navi": {
 		"primaryRole": "entry",
-		"roles": ["entry", "lurker"]
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"element-2003-sk": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"roles": [
+			"lurker",
+			"entry"
+		]
 	},
 	"fallen-2016-sk": {
 		"primaryRole": "igl",
-		"roles": ["igl", "awp"]
+		"roles": [
+			"igl",
+			"awp"
+		]
+	},
+	"fallen-2024-furia-esports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"fer-2015-keyd-stars": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"fer-2015-luminosity-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"fer-2016-luminosity-gaming": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"fer-2016-sk": {
 		"primaryRole": "entry",
-		"roles": ["entry", "lurker"]
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"fer-2018-mibr": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"fer-2018-sk": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"fer-2022-imperial-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
 	},
 	"fifflaren-2013-nip": {
 		"primaryRole": "support",
-		"roles": ["support", "awp"]
+		"roles": [
+			"support",
+			"awp"
+		]
 	},
 	"fisker-2003-sk": {
 		"primaryRole": "entry",
-		"roles": ["entry", "support"]
+		"roles": [
+			"entry",
+			"support"
+		]
 	},
 	"flamie-2018-navi": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"roles": [
+			"lurker",
+			"entry"
+		]
 	},
 	"flusha-2015-fnatic": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "igl"]
+		"roles": [
+			"lurker",
+			"igl"
+		]
+	},
+	"flusha-2016-fnatic": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"flusha-2017-fnatic": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"flusha-2017-godsent": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"flusha-2018-fnatic": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
 	},
 	"fnx-2016-sk": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"roles": [
+			"lurker",
+			"entry"
+		]
 	},
 	"forest-2009-fnatic": {
 		"primaryRole": "entry",
-		"roles": ["entry", "lurker"]
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"forest-2013-nip": {
 		"primaryRole": "entry",
-		"roles": ["entry", "lurker", "awp"]
+		"roles": [
+			"entry",
+			"lurker",
+			"awp"
+		]
 	},
 	"friberg-2013-nip": {
 		"primaryRole": "entry",
-		"roles": ["entry", "support"]
+		"roles": [
+			"entry",
+			"support"
+		]
+	},
+	"friberg-2014-nip": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"frozen-2021-mouz": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"frozen-2022-mouz": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"frozen-2025-faze": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
 	},
 	"get_right-2013-nip": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"get_right-2014-nip": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"get_right-2015-nip": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"get_right-2016-nip": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"get_right-2018-nip": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"get_right-2019-nip": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"gla1ve-2014-copenhagen-wolves": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"awp"
+		]
 	},
 	"gla1ve-2018-astralis": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"golden-2019-nip": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"gratisfaction-2019-renegades": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
 	},
 	"gux-2009-fnatic": {
 		"primaryRole": "awp",
-		"roles": ["awp", "lurker"]
+		"roles": [
+			"awp",
+			"lurker"
+		]
+	},
+	"hampus-2022-nip": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"igl"
+		]
 	},
 	"heaton-2003-sk": {
 		"primaryRole": "awp",
-		"roles": ["awp", "entry"]
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"heavygod-2026-g2": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"hiko-2015-liquid": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"igl"
+		]
+	},
+	"hunter-2023-g2": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"hunter-2025-g2": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"hunter-2026-g2": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"jame-2019-avangar": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"jks-2015-renegades": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jks-2015-vox-eminor": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jks-2019-renegades": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jks-2023-g2": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jks-2025-flyquest": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jks-2026-flyquest": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jl-2023-apeks": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
 	},
 	"jw-2015-fnatic": {
 		"primaryRole": "awp",
-		"roles": ["awp", "entry"]
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"kabal-2022-ihc-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"karrigan-2013-n-faculty": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2014-copenhagen-wolves": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2014-reason-gaming": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2015-team-solomid": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2016-astralis": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2017-faze": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2018-faze": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2019-mouz": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2021-faze": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2022-faze": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2023-faze": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2024-faze": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2025-faze": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"karrigan-2026-team-falcons": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"kioshima-2019-cloud9": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
 	},
 	"krimz-2015-fnatic": {
 		"primaryRole": "support",
-		"roles": ["support", "lurker"]
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"kscerato-2019-furia-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"kscerato-2021-furia-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"kscerato-2022-furia-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"kscerato-2023-furia-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"kscerato-2024-furia-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"kscerato-2025-furia": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"kscerato-2026-furia": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"latto-2025-legacy": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"lekr0-2017-godsent": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"lowel-2017-mouz": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"lux-2025-legacy": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"maden-2022-ence": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"magisk-2018-astralis": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "entry"]
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"magisk-2022-vitality": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"matys-2024-fnatic": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"matys-2025-g2": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"nealan-2022-evil-geniuses": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"neo-2013-universal-soldiers": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"neo-2014-virtus-pro": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"neo-2015-virtus-pro": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"neo-2016-virtus-pro": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"neo-2017-virtus-pro": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"neo-2018-virtus-pro": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"nitr0-2015-liquid": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"olofmeister-2015-fnatic": {
 		"primaryRole": "entry",
-		"roles": ["entry", "lurker"]
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"potti-2003-sk": {
 		"primaryRole": "igl",
-		"roles": ["igl", "lurker"]
+		"roles": [
+			"igl",
+			"lurker"
+		]
 	},
 	"pronax-2015-fnatic": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"pyth-2016-nip": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"rain-2022-faze": {
 		"primaryRole": "entry",
-		"roles": ["entry", "support"]
+		"roles": [
+			"entry",
+			"support"
+		]
+	},
+	"rain-2024-faze": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"ropz-2017-mouz": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"ropz-2018-mouz": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"ropz-2019-mouz": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"ropz-2021-mouz": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
 	},
 	"ropz-2022-faze": {
 		"primaryRole": "lurker",
-		"roles": ["lurker", "support"]
+		"roles": [
+			"lurker",
+			"support"
+		]
+	},
+	"ropz-2024-faze": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
 	},
 	"s1mple-2018-navi": {
 		"primaryRole": "awp",
-		"roles": ["awp", "entry"]
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"skullz-2024-furia-esports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"igl"
+		]
+	},
+	"snatchie-2018-virtus-pro": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"snax-2017-virtus-pro": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"spinx-2022-ence": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"spinx-2022-vitality": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"spinx-2026-mouz": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"stanislaw-2016-optic-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"stewie2k-2018-mibr": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"story-2026-flyquest": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"styko-2017-hellraisers": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"styko-2018-cloud9": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"styko-2023-apeks": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"tabsen-2026-big": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"taco-2016-luminosity-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
 	},
 	"taco-2016-sk": {
 		"primaryRole": "support",
-		"roles": ["support", "lurker"]
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"taz-2013-universal-soldiers": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"taz-2014-virtus-pro": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"taz-2015-virtus-pro": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"taz-2016-virtus-pro": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"topgun-2015-vox-eminor": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"twistzz-2022-faze": {
 		"primaryRole": "entry",
-		"roles": ["entry", "lurker"]
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"twistzz-2025-faze": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"vexite-2025-flyquest": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"xelex-2026-mouz": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"xertion-2022-mouz": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	},
 	"xizt-2013-nip": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
 	},
 	"xyp9x-2018-astralis": {
 		"primaryRole": "support",
-		"roles": ["support", "lurker"]
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"yam-2015-renegades": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"yekindar-2026-furia": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"yuurih-2021-furia-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"yuurih-2022-furia-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"yuurih-2023-furia-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"yuurih-2025-furia": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
 	},
 	"zeus-2018-navi": {
 		"primaryRole": "igl",
-		"roles": ["igl", "support"]
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"twist-2013-sk": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl"
+		]
+	},
+	"pita-2013-sk": {
+		"primaryRole": "support",
+		"roles": [
+			"support"
+		]
+	},
+	"delpan-2013-sk": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp"
+		]
+	},
+	"kucher-2013-astana-dragons": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"adren-2013-astana-dragons": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"hiko-2013-complexity": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"n0thing-2013-complexity": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"smithzz-2013-verygames": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"scream-2013-verygames": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"kqly-2013-clan-mystik": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"iorek-2013-clan-mystik": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"dazed-2013-team-ibuypower": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"anger-2013-team-ibuypower": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"dennis-2013-lgb-esports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"skytten-2013-lgb-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"happy-2013-recursive-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"maniac-2013-recursive-esports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"hiko-2014-complexity": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"n0thing-2014-complexity": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"smithzz-2014-titan": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"scream-2014-titan": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"dennis-2014-lgb-esports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"cype-2014-lgb-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"olofmeister-2014-lgb-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"krimz-2014-lgb-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"apex-2014-team-ldlc-com": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"happy-2014-team-ldlc-com": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"kqly-2014-team-ldlc-com": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"uzzziii-2014-team-ldlc-com": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"kucher-2014-hellraisers": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"adren-2014-hellraisers": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"dazed-2014-team-ibuypower": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"anger-2014-team-ibuypower": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"hiko-2014-cloud9": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"shroud-2014-cloud9": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"rain-2014-london-conspiracy": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"polly-2014-london-conspiracy": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"bondik-2014-dat-team": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"b1ad3-2014-dat-team": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"fxy0-2014-epsilon-esports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"sf-2014-epsilon-esports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"shox-2014-epsilon-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"nico-2014-copenhagen-wolves": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"pimp-2014-copenhagen-wolves": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"maikelele-2014-nip": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"forest-2014-nip": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"nex-2014-planetkey-dynamics": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry"
+		]
+	},
+	"alexrr-2014-planetkey-dynamics": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker"
+		]
+	},
+	"krystal-2014-penta-sports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl"
+		]
+	},
+	"fel1x-2014-penta-sports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp"
+		]
+	},
+	"minise-2014-esc-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp"
+		]
+	},
+	"szpero-2014-esc-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support"
+		]
+	},
+	"blackpoison-2014-bravado-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp"
+		]
+	},
+	"detrony-2014-bravado-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support"
+		]
+	},
+	"happy-2015-team-envyus": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"nbk-2015-team-envyus": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"kucher-2015-hellraisers": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"dosia-2015-hellraisers": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"ptr-2015-counter-logic-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"reltuc-2015-counter-logic-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"bondik-2015-flipsid3-tactics": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"b1ad3-2015-flipsid3-tactics": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"steel_lucas_lopes-2015-keyd-stars": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"stonde-2015-3dmax": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp"
+		]
+	},
+	"natu-2015-3dmax": {
+		"primaryRole": "support",
+		"roles": [
+			"support"
+		]
+	},
+	"apex-2015-team-envyus": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"nex-2015-mouz": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"denis-2015-mouz": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"steel_lucas_lopes-2015-luminosity-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"boltz-2015-luminosity-gaming": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"dennis-2015-team-kinguin": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"scream-2015-team-kinguin": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"peet-2015-team-ebettle": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp"
+		]
+	},
+	"hyper-2015-team-ebettle": {
+		"primaryRole": "support",
+		"roles": [
+			"support"
+		]
+	},
+	"shox-2015-titan": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"rpk-2015-titan": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"emagine-2015-team-immunity": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl"
+		]
+	},
+	"snyper-2015-team-immunity": {
+		"primaryRole": "support",
+		"roles": [
+			"support"
+		]
+	},
+	"dennis-2015-g2": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"maikelele-2015-g2": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"fugly-2015-liquid": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"adren-2015-liquid": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"elige-2015-liquid": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"peet-2015-vexed-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp"
+		]
+	},
+	"hyper-2015-vexed-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support"
+		]
+	},
+	"apex-2016-team-envyus": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"happy-2016-team-envyus": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"nbk-2016-team-envyus": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"fox-2016-faze": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"maikelele-2016-faze": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"smithzz-2016-g2": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"rpk-2016-g2": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"shox-2016-g2": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"scream-2016-g2": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"chrisj-2016-mouz": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"denis-2016-mouz": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"professor_chaos-2016-splyce": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"davey-2016-splyce": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"dosia-2016-gambit-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"hooch-2016-gambit-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"bondik-2016-flipsid3-tactics": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"b1ad3-2016-flipsid3-tactics": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"hiko-2016-liquid": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"adren-2016-liquid": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"fugly-2016-counter-logic-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"reltuc-2016-counter-logic-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"stewie2k-2016-cloud9": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"n0thing-2016-cloud9": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"freakazoid-2016-cloud9": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"k0nfig-2016-team-dignitas": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"rubino-2016-team-dignitas": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"fer-2017-sk": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"coldzera-2017-sk": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"hiko-2017-liquid": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"pimp-2017-liquid": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"olofmeister-2017-fnatic": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"seized-2017-navi": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"edward-2017-navi": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"k0nfig-2017-north": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"rubino-2017-north": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"chrisj-2017-mouz": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"denis-2017-mouz": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"tarik-2017-optic-gaming": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"naf-2017-optic-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"apex-2017-team-envyus": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"happy-2017-team-envyus": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"nbk-2017-team-envyus": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"smithzz-2017-g2": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"rpk-2017-g2": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"shox-2017-g2": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"bondik-2017-hellraisers": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"felps-2017-sk": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"keev-2017-big": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"nex-2017-big": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"tabsen-2017-big": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"stewie2k-2017-cloud9": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"shroud-2017-cloud9": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"dosia-2018-gambit-esports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"fitch-2018-gambit-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"byali-2018-virtus-pro": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"taz-2018-virtus-pro": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"lekr0-2018-fnatic": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"golden-2018-fnatic": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"felps-2018-sk": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"keev-2018-big": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"nex-2018-big": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"tabsen-2018-big": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"k0nfig-2018-north": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"aizy-2018-north": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"rush-2018-cloud9": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"tarik-2018-cloud9": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"seized-2018-flipsid3-tactics": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"b1ad3-2018-flipsid3-tactics": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"apex-2018-g2": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"nbk-2018-g2": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"sunny-2018-mouz": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"innocent-2018-sprout": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"spiidi-2018-sprout": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"zehn-2018-sprout": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"denis-2018-sprout": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"buster-2018-avangar": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"krizzen-2018-avangar": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"nifty-2018-renegades": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"ustilo-2018-renegades": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"happy-2018-team-envy": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"scream-2018-team-envy": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"xms-2018-team-envy": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"awp"
+		]
+	},
+	"rpk-2018-team-envy": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"summer-2018-flash-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"karsa-2018-flash-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"loveyy-2018-flash-gaming": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"attacker-2018-flash-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"coldzera-2018-mibr": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"tarik-2018-mibr": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"michu-2018-virtus-pro": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"rez-2018-nip": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"forest-2018-nip": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"shahzam-2018-complexity": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"yay-2018-complexity": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"android-2018-complexity": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"cadian-2018-rogue": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"hiko-2018-rogue": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"rickeh-2018-rogue": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"igl"
+		]
+	},
+	"davcost-2018-team-spirit": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"dima-2018-team-spirit": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"bntet-2018-tyloo": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"dd-2018-tyloo": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"xccurate-2018-tyloo": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"somebody-2018-tyloo": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"coldzera-2019-mibr": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"felps-2019-mibr": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"nex-2019-big": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"tabsen-2019-big": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"rain-2019-faze": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"adren-2019-faze": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"olofmeister-2019-faze": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"rez-2019-nip": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"forest-2019-nip": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"shox-2019-g2": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jackz-2019-g2": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"bntet-2019-tyloo": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"attacker-2019-tyloo": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"aerial-2019-ence": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"sergej-2019-ence": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"fugly-2019-nrg-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"ethan-2019-nrg-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"jkaem-2019-renegades": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"davcost-2019-team-spirit": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"dima-2019-team-spirit": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"coldyy1-2019-team-spirit": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"somedieyoung-2019-team-spirit": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"sterling-2019-grayhound-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"malta-2019-grayhound-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"erkast-2019-grayhound-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"advent-2019-vici-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"freeman-2019-vici-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"fer-2019-mibr": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"zews-2019-mibr": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"buster-2019-avangar": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"igl"
+		]
+	},
+	"nukkye-2019-hellraisers": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"oskar-2019-hellraisers": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"obo-2019-complexity": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"dephh-2019-complexity": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"tarik-2019-nrg-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"brehze-2019-nrg-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"xsepower-2019-forze": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"jerry-2019-forze": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"ottond-2019-cr4zy": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"espiranto-2019-cr4zy": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"hunter-2019-cr4zy": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"kjaerbye-2019-north": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"aizy-2019-north": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"jugi-2019-north": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"valde-2019-north": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"krad-2019-dreameaters": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"kinqie-2019-dreameaters": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"speed4k-2019-dreameaters": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"forester-2019-dreameaters": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"plopski-2021-nip": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"rez-2021-nip": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"shox-2021-vitality": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"kyojin-2021-vitality": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"misutaaa-2021-vitality": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"hunter-2021-g2": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"niko-2021-g2": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"elige-2021-liquid": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"naf-2021-liquid": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"lucky-2021-astralis": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"dupreeh-2021-astralis": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"dav1g-2021-movistar-riders": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"deathzz-2021-movistar-riders": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"refrezh-2021-heroic": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"sjuush-2021-heroic": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"nekiz-2021-pain-gaming": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"hardzao-2021-pain-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"zyphon-2021-copenhagen-flames": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jabbi-2021-copenhagen-flames": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"olofmeister-2021-faze": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"rain-2021-faze": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"taco-2021-godsent": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"b4rtin-2021-godsent": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"dumau-2021-godsent": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"felps-2021-godsent": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"latto-2021-godsent": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"buster-2021-virtus-pro": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"qikert-2021-virtus-pro": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"zevy-2021-sharks-esports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"pancc-2021-sharks-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"dank1ng-2021-tyloo": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"somebody-2021-tyloo": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"ins-2021-renegades": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"malta-2021-renegades": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"alistair-2021-renegades": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"sico-2021-renegades": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"hatz-2021-renegades": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"stavn-2022-heroic": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"sjuush-2022-heroic": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"refrezh-2022-heroic": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"teses-2022-heroic": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"krimbo-2022-big": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"tabsen-2022-big": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"rez-2022-nip": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"plopski-2022-nip": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"dycha-2022-ence": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"kensi-2022-forze": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"shalfey-2022-forze": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"gxx-2022-bad-news-eagles": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"sinnopsyy-2022-bad-news-eagles": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"buster-2022-outsiders": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"qikert-2022-outsiders": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"junior-2022-complexity": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"fang-2022-complexity": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"floppy-2022-complexity": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"ins-2022-renegades": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"sico-2022-renegades": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"alistair-2022-renegades": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"shox-2022-liquid": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"naf-2022-liquid": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"igl"
+		]
+	},
+	"max-2022-9z-team": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"rox-2022-9z-team": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"luken-2022-9z-team": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"dgt-2022-9z-team": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"dav1d-2022-9z-team": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"slaxz-2022-sprout": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"zyphon-2022-sprout": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"refrezh-2022-sprout": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"launx-2022-sprout": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"brehze-2022-evil-geniuses": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"hext-2022-evil-geniuses": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"taco-2022-00-nation": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"coldzera-2022-00-nation": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"roej-2022-fnatic": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"krimz-2022-fnatic": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"annihilation-2022-ihc-esports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"techno4k-2022-ihc-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"ins-2022-grayhound-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"sico-2022-grayhound-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"alistair-2022-grayhound-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"mynio-2023-9ine": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"kei-2023-9ine": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"kylar-2023-9ine": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"goofy-2023-9ine": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"roej-2023-fnatic": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"krimz-2023-fnatic": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"stavn-2023-heroic": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"sjuush-2023-heroic": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"teses-2023-heroic": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"sdy-2023-monte": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"woro2k-2023-monte": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"demqq-2023-monte": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"biguzera-2023-pain-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"hardzao-2023-pain-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"zevy-2023-pain-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"maden-2023-ence": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"nertz-2023-ence": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"ins-2023-grayhound-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"sico-2023-grayhound-gaming": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"alistair-2023-grayhound-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"liazz-2023-grayhound-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"vexite-2023-grayhound-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"fang-2023-complexity": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"floppy-2023-complexity": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"annihilation-2023-the-mongolz": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"techno4k-2023-the-mongolz": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"wood7-2023-fluxo": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"felps-2023-fluxo": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"history-2023-fluxo": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"lucaozy-2023-fluxo": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"v_m-2023-fluxo": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"fl1t-2024-virtus-pro": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"mir-2024-virtus-pro": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"jl-2024-navi": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"im-2024-navi": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"sense-2024-apeks": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"cacanito-2024-apeks": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"teses-2024-heroic": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"nertz-2024-heroic": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"nodios-2024-ecstatic": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"salazar-2024-ecstatic": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"queenix-2024-ecstatic": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"techno4k-2024-the-mongolz": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"vini-2024-imperial-esports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"felps-2024-imperial-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"noway-2024-imperial-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"kauez-2024-pain-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"n1ssim-2024-pain-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"jee-2024-lynn-vision-gaming": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"emiliaqaq-2024-lynn-vision-gaming": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"icy-2024-amkal-esports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"krad-2024-amkal-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"stadodo-2024-koi": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"mopoz-2024-koi": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"dav1g-2024-koi": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"just-2024-koi": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"nekiz-2024-legacy": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"dumau-2024-legacy": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"maka-2024-3dmax": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"lucky-2024-3dmax": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"djoko-2024-3dmax": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"ex3rcice-2024-3dmax": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"electronic-2024-virtus-pro": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"fame-2024-virtus-pro": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"twistzz-2024-liquid": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"yekindar-2024-liquid": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"krimbo-2024-big": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"tabsen-2024-big": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"rigon-2024-big": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"jdc-2024-big": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"fl4mus-2024-gamerlegion": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"andu-2024-gamerlegion": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"drop-2024-mibr": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"brnz4n-2024-mibr": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"insani-2024-mibr": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"icy-2024-cloud9": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"heavygod-2024-cloud9": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"liazz-2024-flyquest": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"vexite-2024-flyquest": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"fear-2024-passion-ua": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"zerrofix-2024-passion-ua": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jambo-2024-passion-ua": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"jackasmo-2024-passion-ua": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"summer-2024-rare-atom": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"l1hang-2024-rare-atom": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"kaze-2024-rare-atom": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"somebody-2024-rare-atom": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"910-2025-the-mongolz": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"techno4k-2025-the-mongolz": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"maj3r-2025-aurora-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"xantares-2025-aurora-gaming": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"wicadia-2025-aurora-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"jl-2025-navi": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"b1t-2025-navi": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"im-2025-navi": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"maka-2025-3dmax": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"lucky-2025-3dmax": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"icy-2025-virtus-pro": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"fame-2025-virtus-pro": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"fl1t-2025-virtus-pro": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"brnz4n-2025-mibr": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"insani-2025-mibr": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"swisher-2025-m80": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"lake-2025-m80": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"lnz-2025-heroic": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"yxngstxr-2025-heroic": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"mercury-2025-tyloo": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"attacker-2025-tyloo": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jee-2025-tyloo": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"moseyuh-2025-tyloo": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"cool4st-2025-chinggis-warriors": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"ariucle-2025-chinggis-warriors": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"try-2025-imperial-esports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"noway-2025-imperial-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"decenty-2025-imperial-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"chayjesus-2025-imperial-esports": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"1eer-2025-nemiga-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"xant3r-2025-nemiga-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"hext-2025-nrg": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"jeorge-2025-nrg": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"dumau-2025-legacy": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"n1ssim-2025-legacy": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"l00m1-2025-metizport": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"plopski-2025-metizport": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"adamb-2025-metizport": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"zevy-2025-fluxo": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"kye-2025-fluxo": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"yekindar-2025-furia": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"hypex-2025-gamerlegion": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"tauson-2025-gamerlegion": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jambo-2025-fnatic": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"fear-2025-fnatic": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"r1nkle-2025-nip": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"ewjerkz-2025-nip": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"chelo-2025-imperial-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"decenty-2025-fluxo": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"lucaozy-2025-fluxo": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"drop-2025-red-canids": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"venomzera-2025-red-canids": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"history-2025-red-canids": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"kauez-2025-red-canids": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"chayjesus-2025-red-canids": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"summer-2025-rare-atom": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"marek-2025-rare-atom": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"tiger-2025-rare-atom": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"l1hang-2025-rare-atom": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"910-2026-the-mongolz": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"techno4k-2026-the-mongolz": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"krabeni-2026-fut-esports": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"dem0n-2026-fut-esports": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"cmtry-2026-fut-esports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"dumau-2026-legacy": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"n1ssim-2026-legacy": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"biguzera-2026-pain-gaming": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"snow-2026-pain-gaming": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"meyern-2026-9z-team": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"huasopeek-2026-9z-team": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"hypex-2026-gamerlegion": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"pr-2026-gamerlegion": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"s1zzi-2026-b8": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"kensizor-2026-b8": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"chr1zn-2026-heroic": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"yxngstxr-2026-heroic": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"fl4mus-2026-betboom-team": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"magnojez-2026-betboom-team": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"gr1ks-2026-big": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"jdc-2026-big": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"slaxz-2026-m80": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"swisher-2026-m80": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"lake-2026-m80": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"lnz-2026-mibr": {
+		"primaryRole": "igl",
+		"roles": [
+			"igl",
+			"support"
+		]
+	},
+	"brnz4n-2026-mibr": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"kl1m-2026-mibr": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"insani-2026-mibr": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"modo-2026-sinners-esports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"stressarn-2026-sinners-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"grim-2026-nrg": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"sonic-2026-nrg": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"jee-2026-tyloo": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"moseyuh-2026-tyloo": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"maxxkor-2026-sharks-esports": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"rdnzao-2026-sharks-esports": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"fer-2026-gaimin-gladiators": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
+	},
+	"luken-2026-gaimin-gladiators": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"alistair-2026-thunderdownunder": {
+		"primaryRole": "awp",
+		"roles": [
+			"awp",
+			"entry"
+		]
+	},
+	"tjp-2026-thunderdownunder": {
+		"primaryRole": "support",
+		"roles": [
+			"support",
+			"lurker"
+		]
+	},
+	"liazz-2026-thunderdownunder": {
+		"primaryRole": "lurker",
+		"roles": [
+			"lurker",
+			"entry"
+		]
+	},
+	"vexite-2026-flyquest": {
+		"primaryRole": "entry",
+		"roles": [
+			"entry",
+			"lurker"
+		]
 	}
 }

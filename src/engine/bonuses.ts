@@ -59,6 +59,8 @@ export const TRAIT_REVEAL_CHANCE = 0.5;
 export const TRAIT_PROC_CHANCE = 0.02;
 /** Combat scale 2.0 is about a timeout-sized round swing; 0.25 (VAC) is −3.4% per remaining round. */
 export const COMBAT_WIN_PROB_WEIGHT = 0.045;
+export const MIN_TRAIT_LINGER_ROUNDS = 3;
+const ROUND_LINGER = { type: "rounds", count: MIN_TRAIT_LINGER_ROUNDS } as const;
 
 export function combatWinProb(scale: number): number {
 	return (scale - 1) * COMBAT_WIN_PROB_WEIGHT;
@@ -89,7 +91,7 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"mastermind",
 		"bonus",
 		"Mastermind",
-		"Take over calling and tilt the rest of the map our way",
+		"Enter the mind of the enemy and out-call them for the rest of the map",
 		[{ kind: "win-prob", amount: 0.035 }],
 		{ type: "map" },
 	),
@@ -97,42 +99,48 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"professor",
 		"bonus",
 		"The Professor",
-		"Out-think them for the rest of the map",
+		"Read the enemy plays like a textbook for the rest of the map",
 		[{ kind: "win-prob", amount: 0.035 }],
 		{ type: "map" },
 	),
-	def("red-bull", "bonus", "Red Bull", "Go nuclear and swing a round our way", [
+	def("red-bull", "bonus", "Red Bull", "Go nuclear and swing the next three rounds our way", [
 		{ kind: "combat", scale: 2 },
 	]),
 	def(
 		"trashtalk",
 		"bonus",
 		"Trashtalk",
-		"Get in their heads, drain their morale, and steal a round",
+		"Trashtalk the enemy into a mistake and reduce their morale for three rounds",
 		[
 			{ kind: "win-prob", amount: 0.03 },
 			{ kind: "morale", opponent: -20 },
 		],
 	),
-	def("x-god", "bonus", "X-God", "Lift the whole squad and take a round", [
-		{ kind: "win-prob", amount: 0.03 },
-		{ kind: "morale", self: 20 },
-	]),
-	def("olofboost", "bonus", "Olofboost", "Steal a round on a save or force buy", [
+	def(
+		"x-god",
+		"bonus",
+		"X-God",
+		"The X God boosts the squad morale with his looks for three rounds",
+		[
+			{ kind: "win-prob", amount: 0.03 },
+			{ kind: "morale", self: 20 },
+		],
+	),
+	def("olofboost", "bonus", "Olofboost", "Steal eco or force rounds for a stretch of three", [
 		{ kind: "win-prob", amount: 0.12, when: "eco-force" },
 	]),
-	def("clutch-minister", "bonus", "Clutch Minister", "Stay last alive and snatch a round", [
+	def("clutch-minister", "bonus", "Clutch Minister", "Stay last alive and snatch three rounds", [
 		{ kind: "win-prob", amount: 0.03 },
 		{ kind: "clutch", scale: 2.5 },
 	]),
-	def("god-cs", "bonus", "God CS", "Take over a round like nobody else is on the server", [
+	def("god-cs", "bonus", "God CS", "Take over three rounds like nobody else is on the server", [
 		{ kind: "combat", scale: 2 },
 	]),
 	def(
 		"inhuman-reactions",
 		"bonus",
 		"Inhuman Reactions",
-		"Win the opener, clutch harder, and take a round",
+		"Win the opener, clutch harder, and take three rounds",
 		[
 			{ kind: "opener", scale: 3 },
 			{ kind: "clutch", scale: 2 },
@@ -143,7 +151,7 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"one-tap-master",
 		"bonus",
 		"One Tap Master",
-		"Pop off for a round, and even harder on pistols",
+		"Pop off for three rounds, and even harder on pistols",
 		[
 			{ kind: "combat", scale: 2 },
 			{ kind: "win-prob", amount: 0.08, when: "pistol" },
@@ -153,16 +161,16 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"brother",
 		"bonus",
 		"You're not my friend, you're my brother my friend",
-		"Bind the squad together and take a round",
+		"Bind the squad together and take three rounds",
 		[
 			{ kind: "win-prob", amount: 0.04 },
 			{ kind: "morale", self: 30 },
 		],
 	),
-	def("god-denis", "bonus", "God Denis", "Go superhuman and take a round", [
+	def("god-denis", "bonus", "God Denis", "Go superhuman and take three rounds", [
 		{ kind: "combat", scale: 2 },
 	]),
-	def("ez4ence", "bonus", "EZ4ENCE", "Send the crowd into a frenzy and take a round", [
+	def("ez4ence", "bonus", "EZ4ENCE", "Send the crowd into a frenzy and take three rounds", [
 		{ kind: "win-prob", amount: 0.03 },
 		{ kind: "morale", self: 20 },
 	]),
@@ -170,18 +178,18 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"guardian-flick",
 		"bonus",
 		"I remember a Guardian flick",
-		"Pull the AWP, win the opener, and take over a round",
+		"Pull the AWP, win the opener, and take over three rounds",
 		[{ kind: "force-awp" }, { kind: "opener", scale: 3 }, { kind: "combat", scale: 2 }],
 	),
-	def("choke", "malus", "Choke", "Freeze up and throw a winnable round", [
+	def("choke", "malus", "Choke", "Freeze up and throw winnable rounds for a stretch of three", [
 		{ kind: "combat", scale: 0.4 },
 		{ kind: "clutch", scale: 0.2 },
 		{ kind: "win-prob", amount: -0.03 },
 	]),
-	def("in-jail", "malus", "In jail", "Play a round at half strength", [
+	def("in-jail", "malus", "In jail", "Play three rounds at half strength", [
 		{ kind: "combat", scale: 0.5 },
 	]),
-	def("pregnant", "malus", "Pregnant", "Play a step slow and lose a bit of bite for a round", [
+	def("pregnant", "malus", "Pregnant", "Play a step slow and lose a bit of bite for three rounds", [
 		{ kind: "combat", scale: 0.5 },
 	]),
 	def(
@@ -192,10 +200,13 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		[{ kind: "combat", scale: 0.25 }],
 		{ type: "map" },
 	),
-	def("save", "malus", "Save", "Sit out the fights and leave the team a man short", [
-		{ kind: "combat", scale: 0.05 },
-		{ kind: "exclude-killer" },
-	]),
+	def(
+		"save",
+		"malus",
+		"Save",
+		"Sit out the fights for three rounds and leave the team a man short",
+		[{ kind: "combat", scale: 0.05 }, { kind: "exclude-killer" }],
+	),
 	def(
 		"tactical-genius",
 		"bonus",
@@ -211,11 +222,13 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"na-player",
 		"malus",
 		"The North American Player",
-		"Have a classic off-round and play at half strength",
+		"Have a classic three-round dip and play at half strength",
 		[{ kind: "combat", scale: 0.5 }],
 	),
-	def("jacked", "bonus", "Jacked", "Play a round much stronger", [{ kind: "combat", scale: 1.5 }]),
-	def("one-more-star", "malus", "Just one more star", "Tilt the squad and leak a round", [
+	def("jacked", "bonus", "Jacked", "Play three rounds much stronger", [
+		{ kind: "combat", scale: 1.5 },
+	]),
+	def("one-more-star", "malus", "Just one more star", "Tilt the squad and leak three rounds", [
 		{ kind: "win-prob", amount: -0.04 },
 		{ kind: "morale", self: -20 },
 	]),
@@ -223,10 +236,10 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"new-porsche",
 		"malus",
 		"New Porsche",
-		"Admire the new ride and play a round at half strength",
+		"Admire the new ride and play three rounds at half strength",
 		[{ kind: "combat", scale: 0.5 }],
 	),
-	def("duk", "malus", "Duk", "Get lost in the chickens and sag for a round", [
+	def("duk", "malus", "Duk", "Get lost in the chickens and sag for three rounds", [
 		{ kind: "win-prob", amount: -0.025 },
 		{ kind: "morale", self: -10 },
 	]),
@@ -247,6 +260,40 @@ export function bonusById(id: BonusId): BonusDefinition {
 	const row = byId.get(id);
 	if (!row) throw new Error(`unknown bonus "${id}"`);
 	return row;
+}
+
+export function traitLingerSpec(id: BonusId): { type: "map" } | { type: "rounds"; count: number } {
+	return bonusById(id).linger ?? ROUND_LINGER;
+}
+
+export type TraitAura = {
+	seasonId: string;
+	playerId: string;
+	bonusId: BonusId;
+	polarity: BonusPolarity;
+};
+
+export function activeTraitAuras(
+	rounds: readonly { round: number; bonus?: RoundBonus }[],
+	roundNumber: number,
+): ReadonlyMap<string, TraitAura> {
+	const bySeason = new Map<string, TraitAura>();
+	if (roundNumber <= 0) return bySeason;
+	for (const round of rounds) {
+		const bonus = round.bonus;
+		if (!bonus || round.round > roundNumber) continue;
+		const spec = traitLingerSpec(bonus.bonusId);
+		const active = spec.type === "map" ? true : roundNumber < round.round + spec.count;
+		if (!active) continue;
+		const definition = bonusById(bonus.bonusId);
+		bySeason.set(bonus.seasonId, {
+			seasonId: bonus.seasonId,
+			playerId: bonus.playerId,
+			bonusId: bonus.bonusId,
+			polarity: definition.polarity,
+		});
+	}
+	return bySeason;
 }
 
 function asBonusIds(value: unknown): BonusId[] {
@@ -389,16 +436,16 @@ export function resolveTraitRound(input: {
 			: { ...row },
 	);
 	if (procHit) {
-		const linger = bonusById(procHit.bonusId).linger;
+		const linger = traitLingerSpec(procHit.bonusId);
 		const teamField = procHit.team === 1 ? ({ team: 1 } as const) : {};
-		if (linger?.type === "map") {
+		if (linger.type === "map") {
 			lingering.push({
 				bonusId: procHit.bonusId,
 				seasonId: procHit.member.id,
 				until: { type: "map" },
 				...teamField,
 			});
-		} else if (linger?.type === "rounds") {
+		} else {
 			lingering.push({
 				bonusId: procHit.bonusId,
 				seasonId: procHit.member.id,
@@ -458,9 +505,6 @@ export function resolveTraitRound(input: {
 	for (const row of lingering) {
 		const includeInstant = proc?.bonusId === row.bonusId && proc.seasonId === row.seasonId;
 		applyDefinition(bonusById(row.bonusId), row.seasonId, includeInstant, row.team ?? 0);
-	}
-	if (procHit && !bonusById(procHit.bonusId).linger) {
-		applyDefinition(bonusById(procHit.bonusId), procHit.member.id, true, procHit.team ?? 0);
 	}
 
 	return {

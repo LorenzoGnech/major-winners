@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+	activeTraitAuras,
 	BONUS_CATALOG,
 	bonusById,
 	collectTraitHolders,
 	combatWinProb,
 	eligibleTraits,
 	type LingeringBonus,
+	MIN_TRAIT_LINGER_ROUNDS,
 	pickTraitHits,
 	resolveTraitRound,
 	revealTraits,
@@ -13,6 +15,7 @@ import {
 	TRAIT_REVEAL_CHANCE,
 	tickLingering,
 	traitDraftHint,
+	traitLingerSpec,
 } from "./bonuses";
 import type { Attributes } from "./ratings/attributes";
 import { createRng } from "./rng";
@@ -199,6 +202,7 @@ describe("resolveTraitRound", () => {
 		});
 		expect(doubled.winProb).toBeCloseTo(0.045);
 		expect(doubled.modifiers.combatScale.get(member.id)).toBe(2);
+		expect(doubled.lingering[0]?.until).toEqual({ type: "rounds", remaining: 3 });
 		const halved = resolveTraitRound({
 			lingering: [],
 			hits: [{ member, bonusId: "in-jail" }],
@@ -279,6 +283,31 @@ describe("resolveTraitRound", () => {
 		expect(guest.winProb).toBeCloseTo(-0.04);
 		expect(guest.moraleSelf).toBe(0);
 		expect(guest.moraleOpponent).toBe(30);
+	});
+
+	it("gives every catalog trait at least three lingering rounds, or the rest of the map", () => {
+		for (const trait of BONUS_CATALOG) {
+			const spec = traitLingerSpec(trait.id);
+			if (spec.type === "rounds") {
+				expect(spec.count).toBeGreaterThanOrEqual(MIN_TRAIT_LINGER_ROUNDS);
+			}
+		}
+	});
+
+	it("keeps a three-round aura on the player who proc'd it", () => {
+		const rounds = [
+			{
+				round: 4,
+				bonus: { playerId: "p", seasonId: "alpha-awp", bonusId: "jacked" as const },
+			},
+			{ round: 5 },
+			{ round: 6 },
+			{ round: 7 },
+		];
+		expect(activeTraitAuras(rounds, 3).size).toBe(0);
+		expect(activeTraitAuras(rounds, 4).get("alpha-awp")?.polarity).toBe("bonus");
+		expect(activeTraitAuras(rounds, 6).get("alpha-awp")?.bonusId).toBe("jacked");
+		expect(activeTraitAuras(rounds, 7).size).toBe(0);
 	});
 });
 

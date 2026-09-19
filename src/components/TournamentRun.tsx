@@ -154,15 +154,6 @@ export function TournamentRun({
 			aria-label={terminal ? "Major run" : undefined}
 		>
 			{terminal ? (
-				<button
-					type="button"
-					onClick={onAbandon}
-					className="fixed top-[max(1rem,var(--safe-top))] right-[max(1rem,var(--safe-right))] z-100 rounded-lg bg-emerald-300 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300"
-				>
-					Back to Home
-				</button>
-			) : null}
-			{terminal ? (
 				<RunSummary
 					state={state}
 					playerTeam={playerTeam}

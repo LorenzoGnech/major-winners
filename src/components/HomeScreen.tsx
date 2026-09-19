@@ -13,6 +13,7 @@ import {
 import type { Dataset } from "../data";
 import type { DailyStats, RatedPlayer } from "../engine";
 import { summarizeDailyStats } from "../engine";
+import { AppNav } from "./AppNav";
 import { CUSTOM_SEED_MAX } from "./customSeed";
 import { HomeHighlightReel } from "./HomeHighlightReel";
 import { formatSavedAt, HomeLeaderboards, RosterStrip } from "./HomeLeaderboards";
@@ -350,342 +351,361 @@ export function HomeScreen({
 	onStart,
 }: HomeScreenProps) {
 	return (
-		<div className="relative isolate flex min-h-dvh flex-col items-center justify-center bg-black px-6 py-12">
+		<div className="relative isolate flex min-h-dvh flex-col bg-black">
 			<HomeHighlightReel clips={HOME_HIGHLIGHTS} />
 			<div className="pointer-events-none fixed inset-0 bg-black/35" aria-hidden />
 			<div
 				className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.45)_62%,rgba(0,0,0,0.78)_100%)]"
 				aria-hidden
 			/>
-			<div
-				className={`relative z-10 flex w-full flex-col items-center border border-white/10 bg-black/55 px-4 py-6 text-center backdrop-blur-xl sm:px-6 sm:py-8 ${
-					view === "leaderboards" || view === "profile"
-						? "max-h-[calc(100dvh-2rem)] max-w-6xl overflow-y-auto overscroll-contain"
-						: "max-w-md"
-				}`}
-			>
-				<BrandMark size={view === "menu" ? "lg" : "sm"} />
-				<p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-400">
-					Counter-Strike legends draft
-				</p>
-				<h1 className="mt-2 text-4xl font-bold uppercase tracking-[0.16em] text-white sm:text-5xl">
-					Major Winners
-				</h1>
+			<AppNav onGoHome={() => onView("menu")} />
+			<div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-8 sm:py-12">
+				<div
+					className={`flex w-full flex-col items-center border border-white/10 bg-black/55 px-4 py-6 text-center backdrop-blur-xl sm:px-6 sm:py-8 ${
+						view === "leaderboards" || view === "profile"
+							? "max-h-[calc(100dvh-var(--app-nav-height)-2rem)] max-w-6xl overflow-y-auto overscroll-contain"
+							: "max-w-md"
+					}`}
+				>
+					<BrandMark size={view === "menu" ? "lg" : "sm"} />
+					<p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-400">
+						Counter-Strike legends draft
+					</p>
+					<h1 className="mt-2 text-4xl font-bold uppercase tracking-[0.16em] text-white sm:text-5xl">
+						Major Winners
+					</h1>
 
-				{view === "menu" ? (
-					<nav aria-label="Game modes" className="mt-10 flex w-full flex-col gap-3">
-						<button type="button" onClick={() => onChoose("daily")} className={PRIMARY_BUTTON}>
-							{hasDailyAttempt ? "Continue today's challenge" : "Today's challenge"}
-						</button>
-						<button type="button" onClick={() => onChoose("free")} className={SECONDARY_BUTTON}>
-							{hasFreePlaySave ? "Continue free play" : "Free play"}
-						</button>
-						<button type="button" onClick={() => onChoose("custom")} className={SECONDARY_BUTTON}>
-							Custom game seed
-						</button>
-						{community.enabled ? (
+					{view === "menu" ? (
+						<nav aria-label="Game modes" className="mt-10 flex w-full flex-col gap-3">
+							<button type="button" onClick={() => onChoose("daily")} className={PRIMARY_BUTTON}>
+								{hasDailyAttempt ? "Continue today's challenge" : "Today's challenge"}
+							</button>
+							<button type="button" onClick={() => onChoose("free")} className={SECONDARY_BUTTON}>
+								{hasFreePlaySave ? "Continue free play" : "Free play"}
+							</button>
+							<button type="button" onClick={() => onChoose("custom")} className={SECONDARY_BUTTON}>
+								Custom game seed
+							</button>
+							{community.enabled ? (
+								<button
+									type="button"
+									onClick={() => onView("community")}
+									className={SECONDARY_BUTTON}
+								>
+									Community
+								</button>
+							) : null}
+							{community.enabled ? (
+								<div className="grid w-full grid-cols-2 gap-3">
+									{community.userEmail ? (
+										<button
+											type="button"
+											onClick={() => onView("profile")}
+											className={SPLIT_BUTTON}
+										>
+											My profile
+										</button>
+									) : (
+										<button type="button" onClick={() => onView("signin")} className={SPLIT_BUTTON}>
+											Sign in
+										</button>
+									)}
+									<button
+										type="button"
+										onClick={() => onView("leaderboards")}
+										className={SPLIT_BUTTON}
+									>
+										Leaderboards
+									</button>
+								</div>
+							) : (
+								<button
+									type="button"
+									onClick={() => onView("profile")}
+									className={SECONDARY_BUTTON}
+								>
+									My profile
+								</button>
+							)}
+						</nav>
+					) : null}
+
+					{view === "community" ? (
+						<div className="mt-8 flex w-full flex-col items-center gap-3">
+							<div>
+								<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
+									Community
+								</h2>
+								<p className="mt-2 text-sm text-zinc-400">
+									Queue a ranked 1v1, host a private BO5, or play a Major against published teams.
+								</p>
+							</div>
+							<button type="button" onClick={community.onRanked} className={PRIMARY_BUTTON}>
+								{community.hasDuelSave && community.duelSaveKind === "ranked"
+									? "Continue ranked match"
+									: "Ranked match"}
+							</button>
+							<button
+								type="button"
+								onClick={() => (community.hasDuelSave ? onChoose("duel") : onView("private"))}
+								className={SECONDARY_BUTTON}
+							>
+								{community.hasDuelSave && community.duelSaveKind !== "ranked"
+									? "Continue private match"
+									: "Private match"}
+							</button>
+							<button
+								type="button"
+								onClick={() => onChoose("community")}
+								className={SECONDARY_BUTTON}
+							>
+								{community.hasSave
+									? "Continue free play with community teams"
+									: "Free play with community teams"}
+							</button>
+							<button type="button" onClick={() => onView("menu")} className={SECONDARY_BUTTON}>
+								Back
+							</button>
+						</div>
+					) : null}
+
+					{view === "private" ? (
+						<div className="mt-8 flex w-full flex-col items-center gap-3">
+							<div>
+								<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
+									Private match
+								</h2>
+								<p className="mt-2 text-sm text-zinc-400">
+									Create a lobby and share the code, or join one.
+								</p>
+							</div>
+							<button type="button" onClick={() => onChoose("duel")} className={PRIMARY_BUTTON}>
+								Create a lobby
+							</button>
+							<button
+								type="button"
+								onClick={() => onView("duel-join")}
+								className={SECONDARY_BUTTON}
+							>
+								Join a lobby
+							</button>
 							<button
 								type="button"
 								onClick={() => onView("community")}
 								className={SECONDARY_BUTTON}
 							>
-								Community
-							</button>
-						) : null}
-						{community.enabled ? (
-							<div className="grid w-full grid-cols-2 gap-3">
-								{community.userEmail ? (
-									<button type="button" onClick={() => onView("profile")} className={SPLIT_BUTTON}>
-										My profile
-									</button>
-								) : (
-									<button type="button" onClick={() => onView("signin")} className={SPLIT_BUTTON}>
-										Sign in
-									</button>
-								)}
-								<button
-									type="button"
-									onClick={() => onView("leaderboards")}
-									className={SPLIT_BUTTON}
-								>
-									Leaderboards
-								</button>
-							</div>
-						) : (
-							<button type="button" onClick={() => onView("profile")} className={SECONDARY_BUTTON}>
-								My profile
-							</button>
-						)}
-					</nav>
-				) : null}
-
-				{view === "community" ? (
-					<div className="mt-8 flex w-full flex-col items-center gap-3">
-						<div>
-							<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
-								Community
-							</h2>
-							<p className="mt-2 text-sm text-zinc-400">
-								Queue a ranked 1v1, host a private BO5, or play a Major against published teams.
-							</p>
-						</div>
-						<button type="button" onClick={community.onRanked} className={PRIMARY_BUTTON}>
-							{community.hasDuelSave && community.duelSaveKind === "ranked"
-								? "Continue ranked match"
-								: "Ranked match"}
-						</button>
-						<button
-							type="button"
-							onClick={() => (community.hasDuelSave ? onChoose("duel") : onView("private"))}
-							className={SECONDARY_BUTTON}
-						>
-							{community.hasDuelSave && community.duelSaveKind !== "ranked"
-								? "Continue private match"
-								: "Private match"}
-						</button>
-						<button
-							type="button"
-							onClick={() => onChoose("community")}
-							className={SECONDARY_BUTTON}
-						>
-							{community.hasSave
-								? "Continue free play with community teams"
-								: "Free play with community teams"}
-						</button>
-						<button type="button" onClick={() => onView("menu")} className={SECONDARY_BUTTON}>
-							Back
-						</button>
-					</div>
-				) : null}
-
-				{view === "private" ? (
-					<div className="mt-8 flex w-full flex-col items-center gap-3">
-						<div>
-							<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
-								Private match
-							</h2>
-							<p className="mt-2 text-sm text-zinc-400">
-								Create a lobby and share the code, or join one.
-							</p>
-						</div>
-						<button type="button" onClick={() => onChoose("duel")} className={PRIMARY_BUTTON}>
-							Create a lobby
-						</button>
-						<button type="button" onClick={() => onView("duel-join")} className={SECONDARY_BUTTON}>
-							Join a lobby
-						</button>
-						<button type="button" onClick={() => onView("community")} className={SECONDARY_BUTTON}>
-							Back
-						</button>
-					</div>
-				) : null}
-
-				{view === "ranked-handle" ? (
-					<SetupForm
-						title="Username"
-						detail="This name appears on saved teams and ranked matches. Letters, numbers, and underscore."
-						onBack={() => onView("community")}
-						onSubmit={community.onSubmitHandle}
-						submitLabel="Find match"
-					>
-						<HomeField
-							id="home-ranked-handle"
-							label="Username"
-							value={community.handleDraft}
-							onChange={community.onHandleDraft}
-							error={community.handleError}
-							placeholder="e.g. lore"
-							maxLength={DISPLAY_NAME_MAX}
-						/>
-					</SetupForm>
-				) : null}
-
-				{view === "ranked" ? (
-					<div className="mt-8 flex w-full flex-col items-center gap-4">
-						<div>
-							<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
-								Finding opponent
-							</h2>
-							<p className="mt-2 text-sm text-zinc-400">
-								Searching within ±{community.rankedWindow ?? 100} Elo
-								{community.rankedElo !== null ? ` · you are ${community.rankedElo}` : ""}.
-							</p>
-						</div>
-						{community.rankedError ? (
-							<p role="alert" className="text-xs text-red-300">
-								{community.rankedError}
-							</p>
-						) : null}
-						<button type="button" onClick={community.onLeaveQueue} className={SECONDARY_BUTTON}>
-							Cancel
-						</button>
-					</div>
-				) : null}
-
-				{view === "duel-join" ? (
-					<SetupForm
-						title="Join a lobby"
-						detail="Enter the 6-character room code. You each draft, then veto maps for a BO5."
-						onBack={() => onView("private")}
-						onSubmit={community.onJoinDuel}
-						submitLabel="Join lobby"
-					>
-						<HomeField
-							id="home-duel-code"
-							label="Room code"
-							value={community.joinCode}
-							onChange={community.onJoinCode}
-							error={community.joinError}
-							placeholder="e.g. K7M2QX"
-							maxLength={6}
-						/>
-					</SetupForm>
-				) : null}
-
-				{view === "custom" ? (
-					<SetupForm
-						title="Custom game seed"
-						detail="Same seed always produces the same draft and opponents."
-						onBack={() => onView("menu")}
-						onSubmit={onStart}
-					>
-						<HomeField
-							id="home-seed"
-							label="Seed"
-							value={seedDraft}
-							onChange={onSeedDraft}
-							error={seedError}
-							placeholder="e.g. 2026 or my-share-code"
-							maxLength={CUSTOM_SEED_MAX}
-						/>
-					</SetupForm>
-				) : null}
-
-				{view === "signin" ? (
-					<SetupForm
-						title="Sign in"
-						detail="Optional. Publishing still works anonymously. A username is used on saved teams and ranked matches."
-						onBack={() => onView("menu")}
-						onSubmit={community.onSignIn}
-						submitLabel={community.authBusy ? "Sending…" : "Send magic link"}
-					>
-						<HomeField
-							id="home-email"
-							label="Email"
-							type="email"
-							value={community.emailDraft}
-							onChange={community.onEmailDraft}
-							error={community.authError}
-							placeholder="you@example.com"
-							maxLength={120}
-						/>
-						<HomeField
-							id="home-username"
-							label="Username"
-							value={community.handleDraft}
-							onChange={community.onHandleDraft}
-							error={community.handleError}
-							placeholder="e.g. lore"
-							maxLength={DISPLAY_NAME_MAX}
-						/>
-						{community.authMessage ? (
-							<p className="text-sm text-emerald-200">{community.authMessage}</p>
-						) : null}
-					</SetupForm>
-				) : null}
-
-				{view === "profile" ? (
-					<div className="mt-8 flex w-full flex-col items-center gap-6 text-left">
-						<div className="w-full text-center">
-							<h2 className="text-base font-semibold uppercase tracking-[0.12em] text-white sm:text-lg sm:tracking-[0.18em]">
-								My profile
-							</h2>
-							{community.userEmail ? (
-								<p className="mt-2 text-sm text-zinc-400">{community.userEmail}</p>
-							) : null}
-						</div>
-						{community.enabled && community.userEmail ? (
-							<form
-								className="flex w-full max-w-lg flex-col items-center gap-3"
-								onSubmit={(event) => {
-									event.preventDefault();
-									community.onSaveUsername();
-								}}
-							>
-								<HomeField
-									id="profile-username"
-									label="Username"
-									value={community.handleDraft}
-									onChange={community.onHandleDraft}
-									error={community.handleError}
-									placeholder="e.g. lore"
-									maxLength={DISPLAY_NAME_MAX}
-								/>
-								<p className="text-xs text-zinc-500">
-									Used on saved teams and ranked matches. Letters, numbers, and underscore.
-								</p>
-								<button
-									type="submit"
-									disabled={community.usernameBusy}
-									className={`${PRIMARY_BUTTON} disabled:opacity-50`}
-								>
-									{community.usernameBusy
-										? "Saving…"
-										: community.profile
-											? "Save username"
-											: "Set username"}
-								</button>
-							</form>
-						) : null}
-						<div
-							className={
-								community.enabled && community.userEmail
-									? "grid w-full gap-8 md:grid-cols-2 md:items-start lg:grid-cols-3"
-									: "w-full max-w-lg"
-							}
-						>
-							<DailyStatsPanel stats={stats} dataset={community.dataset} />
-							{community.enabled && community.userEmail ? (
-								<RankedStatsPanel profile={community.profile} />
-							) : null}
-							{community.enabled && community.userEmail ? (
-								<BestTeamsPanel runs={community.myRuns} dataset={community.dataset} />
-							) : null}
-						</div>
-						<div className="flex w-full max-w-md flex-row gap-3">
-							{community.userEmail ? (
-								<button
-									type="button"
-									onClick={community.onSignOut}
-									className={`flex-1 ${PRIMARY_BUTTON}`}
-								>
-									Sign out
-								</button>
-							) : null}
-							<button
-								type="button"
-								onClick={() => onView("menu")}
-								className={`flex-1 ${SECONDARY_BUTTON}`}
-							>
 								Back
 							</button>
 						</div>
-					</div>
-				) : null}
-				{view === "leaderboards" ? (
-					<div className="mt-8 flex w-full flex-col items-center gap-6">
-						<HomeLeaderboards
-							runs={community.runs}
-							teams={community.teams}
-							eloBoard={community.eloBoard}
-							dataset={community.dataset}
-							ratedPlayers={community.ratedPlayers}
-						/>
-						<button type="button" onClick={() => onView("menu")} className={SECONDARY_BUTTON}>
-							Back
-						</button>
-					</div>
-				) : null}
+					) : null}
+
+					{view === "ranked-handle" ? (
+						<SetupForm
+							title="Username"
+							detail="This name appears on saved teams and ranked matches. Letters, numbers, and underscore."
+							onBack={() => onView("community")}
+							onSubmit={community.onSubmitHandle}
+							submitLabel="Find match"
+						>
+							<HomeField
+								id="home-ranked-handle"
+								label="Username"
+								value={community.handleDraft}
+								onChange={community.onHandleDraft}
+								error={community.handleError}
+								placeholder="e.g. lore"
+								maxLength={DISPLAY_NAME_MAX}
+							/>
+						</SetupForm>
+					) : null}
+
+					{view === "ranked" ? (
+						<div className="mt-8 flex w-full flex-col items-center gap-4">
+							<div>
+								<h2 className="text-lg font-semibold uppercase tracking-[0.18em] text-white">
+									Finding opponent
+								</h2>
+								<p className="mt-2 text-sm text-zinc-400">
+									Searching within ±{community.rankedWindow ?? 100} Elo
+									{community.rankedElo !== null ? ` · you are ${community.rankedElo}` : ""}.
+								</p>
+							</div>
+							{community.rankedError ? (
+								<p role="alert" className="text-xs text-red-300">
+									{community.rankedError}
+								</p>
+							) : null}
+							<button type="button" onClick={community.onLeaveQueue} className={SECONDARY_BUTTON}>
+								Cancel
+							</button>
+						</div>
+					) : null}
+
+					{view === "duel-join" ? (
+						<SetupForm
+							title="Join a lobby"
+							detail="Enter the 6-character room code. You each draft, then veto maps for a BO5."
+							onBack={() => onView("private")}
+							onSubmit={community.onJoinDuel}
+							submitLabel="Join lobby"
+						>
+							<HomeField
+								id="home-duel-code"
+								label="Room code"
+								value={community.joinCode}
+								onChange={community.onJoinCode}
+								error={community.joinError}
+								placeholder="e.g. K7M2QX"
+								maxLength={6}
+							/>
+						</SetupForm>
+					) : null}
+
+					{view === "custom" ? (
+						<SetupForm
+							title="Custom game seed"
+							detail="Same seed always produces the same draft and opponents."
+							onBack={() => onView("menu")}
+							onSubmit={onStart}
+						>
+							<HomeField
+								id="home-seed"
+								label="Seed"
+								value={seedDraft}
+								onChange={onSeedDraft}
+								error={seedError}
+								placeholder="e.g. 2026 or my-share-code"
+								maxLength={CUSTOM_SEED_MAX}
+							/>
+						</SetupForm>
+					) : null}
+
+					{view === "signin" ? (
+						<SetupForm
+							title="Sign in"
+							detail="Optional. Publishing still works anonymously. A username is used on saved teams and ranked matches."
+							onBack={() => onView("menu")}
+							onSubmit={community.onSignIn}
+							submitLabel={community.authBusy ? "Sending…" : "Send magic link"}
+						>
+							<HomeField
+								id="home-email"
+								label="Email"
+								type="email"
+								value={community.emailDraft}
+								onChange={community.onEmailDraft}
+								error={community.authError}
+								placeholder="you@example.com"
+								maxLength={120}
+							/>
+							<HomeField
+								id="home-username"
+								label="Username"
+								value={community.handleDraft}
+								onChange={community.onHandleDraft}
+								error={community.handleError}
+								placeholder="e.g. lore"
+								maxLength={DISPLAY_NAME_MAX}
+							/>
+							{community.authMessage ? (
+								<p className="text-sm text-emerald-200">{community.authMessage}</p>
+							) : null}
+						</SetupForm>
+					) : null}
+
+					{view === "profile" ? (
+						<div className="mt-8 flex w-full flex-col items-center gap-6 text-left">
+							<div className="w-full text-center">
+								<h2 className="text-base font-semibold uppercase tracking-[0.12em] text-white sm:text-lg sm:tracking-[0.18em]">
+									My profile
+								</h2>
+								{community.userEmail ? (
+									<p className="mt-2 text-sm text-zinc-400">{community.userEmail}</p>
+								) : null}
+							</div>
+							{community.enabled && community.userEmail ? (
+								<form
+									className="flex w-full max-w-lg flex-col items-center gap-3"
+									onSubmit={(event) => {
+										event.preventDefault();
+										community.onSaveUsername();
+									}}
+								>
+									<HomeField
+										id="profile-username"
+										label="Username"
+										value={community.handleDraft}
+										onChange={community.onHandleDraft}
+										error={community.handleError}
+										placeholder="e.g. lore"
+										maxLength={DISPLAY_NAME_MAX}
+									/>
+									<p className="text-xs text-zinc-500">
+										Used on saved teams and ranked matches. Letters, numbers, and underscore.
+									</p>
+									<button
+										type="submit"
+										disabled={community.usernameBusy}
+										className={`${PRIMARY_BUTTON} disabled:opacity-50`}
+									>
+										{community.usernameBusy
+											? "Saving…"
+											: community.profile
+												? "Save username"
+												: "Set username"}
+									</button>
+								</form>
+							) : null}
+							<div
+								className={
+									community.enabled && community.userEmail
+										? "grid w-full gap-8 md:grid-cols-2 md:items-start lg:grid-cols-3"
+										: "w-full max-w-lg"
+								}
+							>
+								<DailyStatsPanel stats={stats} dataset={community.dataset} />
+								{community.enabled && community.userEmail ? (
+									<RankedStatsPanel profile={community.profile} />
+								) : null}
+								{community.enabled && community.userEmail ? (
+									<BestTeamsPanel runs={community.myRuns} dataset={community.dataset} />
+								) : null}
+							</div>
+							<div className="flex w-full max-w-md flex-row gap-3">
+								{community.userEmail ? (
+									<button
+										type="button"
+										onClick={community.onSignOut}
+										className={`flex-1 ${PRIMARY_BUTTON}`}
+									>
+										Sign out
+									</button>
+								) : null}
+								<button
+									type="button"
+									onClick={() => onView("menu")}
+									className={`flex-1 ${SECONDARY_BUTTON}`}
+								>
+									Back
+								</button>
+							</div>
+						</div>
+					) : null}
+					{view === "leaderboards" ? (
+						<div className="mt-8 flex w-full flex-col items-center gap-6">
+							<HomeLeaderboards
+								runs={community.runs}
+								teams={community.teams}
+								eloBoard={community.eloBoard}
+								dataset={community.dataset}
+								ratedPlayers={community.ratedPlayers}
+							/>
+							<button type="button" onClick={() => onView("menu")} className={SECONDARY_BUTTON}>
+								Back
+							</button>
+						</div>
+					) : null}
+				</div>
 			</div>
 		</div>
 	);

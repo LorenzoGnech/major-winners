@@ -1,4 +1,5 @@
 export {
+	activeTraitAuras,
 	BONUS_CATALOG,
 	BONUS_IDS,
 	type BonusDefinition,
@@ -14,7 +15,9 @@ export {
 	revealTraits,
 	TRAIT_PROC_CHANCE,
 	TRAIT_REVEAL_CHANCE,
+	type TraitAura,
 	traitDraftHint,
+	traitLingerSpec,
 } from "./bonuses";
 export {
 	DAILY_STATS_VERSION,

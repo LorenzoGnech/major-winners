@@ -17,6 +17,7 @@ import {
 	playbackClutchTickMs,
 	playbackMorale,
 	playbackTickMs,
+	playbackTraitRound,
 	resolvePlayback,
 	savePlaybackSpeed,
 	seriesRoundsWon,
@@ -472,6 +473,29 @@ describe("upcomingBonusRound", () => {
 		);
 		expect(upcomingBonusRound(maps, ticks, startOfBonus)?.round.bonus?.bonusId).toBe("jacked");
 		expect(upcomingBonusRound(maps, ticks, startOfBonus + 1)).toBeUndefined();
+	});
+});
+
+describe("playbackTraitRound", () => {
+	it("uses the upcoming overlay round, then the in-progress round", () => {
+		const maps = [
+			{
+				label: "Mirage",
+				winner: 0 as const,
+				score: [1, 0] as const,
+				regulationScore: [1, 0] as const,
+				overtimeBlocks: 0,
+				rounds: [round(1, [{ killerTeam: 0, killerId: "a", victimTeam: 1, victimId: "x" }])],
+				scoreboard: [[], []] as const,
+				highlights: [],
+			},
+		];
+		const ticks = buildPlaybackTicks(maps);
+		const inProgress = resolvePlayback(maps, ticks, 1);
+		expect(playbackTraitRound(inProgress, maps[0], 4)).toBe(4);
+		expect(playbackTraitRound(inProgress, maps[0])).toBe(1);
+		const settled = resolvePlayback(maps, ticks, ticks.length);
+		expect(playbackTraitRound(settled, maps[0])).toBe(1);
 	});
 });
 
