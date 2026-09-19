@@ -129,10 +129,16 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 	def("olofboost", "bonus", "Olofboost", "Eco or force buys are stronger for three rounds", [
 		{ kind: "win-prob", amount: 0.12, when: "eco-force" },
 	]),
-	def("clutch-minister", "bonus", "Clutch Minister", "Higher probability of a clutch win for three rounds", [
-		{ kind: "win-prob", amount: 0.03 },
-		{ kind: "clutch", scale: 2.5 },
-	]),
+	def(
+		"clutch-minister",
+		"bonus",
+		"Clutch Minister",
+		"Higher probability of a clutch win for three rounds",
+		[
+			{ kind: "win-prob", amount: 0.03 },
+			{ kind: "clutch", scale: 2.5 },
+		],
+	),
 	def("god-cs", "bonus", "God CS", "The gods of CS are on your side for three rounds", [
 		{ kind: "combat", scale: 2 },
 	]),
@@ -147,16 +153,10 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 			{ kind: "win-prob", amount: 0.045 },
 		],
 	),
-	def(
-		"one-tap-master",
-		"bonus",
-		"One Tap Master",
-		"one taps everyone for three rounds",
-		[
-			{ kind: "combat", scale: 2 },
-			{ kind: "win-prob", amount: 0.08, when: "pistol" },
-		],
-	),
+	def("one-tap-master", "bonus", "One Tap Master", "one taps everyone for three rounds", [
+		{ kind: "combat", scale: 2 },
+		{ kind: "win-prob", amount: 0.08, when: "pistol" },
+	]),
 	def(
 		"brother",
 		"bonus",
@@ -181,17 +181,27 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		"Flicks will be smoother for three rounds",
 		[{ kind: "force-awp" }, { kind: "opener", scale: 3 }, { kind: "combat", scale: 2 }],
 	),
-	def("choke", "malus", "Choke", "A failed deagle shot from behind will hunt you for three rounds", [
-		{ kind: "combat", scale: 0.4 },
-		{ kind: "clutch", scale: 0.2 },
-		{ kind: "win-prob", amount: -0.03 },
-	]),
+	def(
+		"choke",
+		"malus",
+		"Choke",
+		"A failed deagle shot from behind will hunt you for three rounds",
+		[
+			{ kind: "combat", scale: 0.4 },
+			{ kind: "clutch", scale: 0.2 },
+			{ kind: "win-prob", amount: -0.03 },
+		],
+	),
 	def("in-jail", "malus", "In jail", "Check HLTV, for three round he's stuck in jail", [
 		{ kind: "combat", scale: 0.5 },
 	]),
-	def("pregnant", "malus", "Pregnant", "Check HLTV, performance will be affected for three rounds", [
-		{ kind: "combat", scale: 0.5 },
-	]),
+	def(
+		"pregnant",
+		"malus",
+		"Pregnant",
+		"Check HLTV, performance will be affected for three rounds",
+		[{ kind: "combat", scale: 0.5 }],
+	),
 	def(
 		"vac-ban",
 		"malus",
@@ -218,20 +228,22 @@ export const BONUS_CATALOG: readonly BonusDefinition[] = [
 		],
 		{ type: "map" },
 	),
-	def(
-		"na-player",
-		"malus",
-		"The North American Player",
-		"But Titan he's the french star",
-		[{ kind: "combat", scale: 0.5 }],
-	),
+	def("na-player", "malus", "The North American Player", "But Titan he's the french star", [
+		{ kind: "combat", scale: 0.5 },
+	]),
 	def("jacked", "bonus", "Jacked", "U wouldnt say this shit to him at lan", [
 		{ kind: "combat", scale: 1.5 },
 	]),
-	def("one-more-star", "malus", "Just one more star", "Since you're short of one more superstar, morale is down", [
-		{ kind: "win-prob", amount: -0.04 },
-		{ kind: "morale", self: -20 },
-	]),
+	def(
+		"one-more-star",
+		"malus",
+		"Just one more star",
+		"Since you're short of one more superstar, morale is down",
+		[
+			{ kind: "win-prob", amount: -0.04 },
+			{ kind: "morale", self: -20 },
+		],
+	),
 	def(
 		"new-porsche",
 		"malus",

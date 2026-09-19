@@ -72,7 +72,10 @@ export function OpponentPreview({
 				</div>
 			</div>
 
-			<ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-5 sm:gap-3" aria-label="Opponent roster">
+			<ul
+				className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-5 sm:gap-3"
+				aria-label="Opponent roster"
+			>
 				{roster.map((member) => (
 					<li
 						key={member.id}

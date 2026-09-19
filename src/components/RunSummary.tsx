@@ -137,7 +137,10 @@ export function RunSummary({
 					<Stat label="Team OVR" value={summary.teamOverall.toFixed(1)} wide />
 				</dl>
 
-				<ul className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-5 sm:gap-3" aria-label="Your roster">
+				<ul
+					className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-5 sm:gap-3"
+					aria-label="Your roster"
+				>
 					{summary.players.map((player, index) => {
 						const mvp = player.seasonId === summary.mvpSeasonId;
 						const highlights = [
@@ -192,9 +195,7 @@ export function RunSummary({
 										{player.assists}
 									</p>
 									<p className="mt-0.5 text-[11px] tabular-nums text-zinc-500">
-										{player.rounds > 0
-											? `${player.adr} ADR · ${player.kast}%`
-											: "No rounds"}
+										{player.rounds > 0 ? `${player.adr} ADR · ${player.kast}%` : "No rounds"}
 									</p>
 									<p
 										className={`mt-1 text-lg font-bold tabular-nums ${
