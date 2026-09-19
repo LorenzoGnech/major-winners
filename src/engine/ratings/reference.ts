@@ -13,7 +13,7 @@
  */
 export const ELITE_RATING_DISTRIBUTION = {
 	"1.0": { mean: 1.07, sd: 0.07 },
-	"2.0": { mean: 1.1, sd: 0.09 },
+	"2.0": { mean: 1.11, sd: 0.11 },
 } as const;
 
 export const OVR_Z_INTERCEPT = 78;
