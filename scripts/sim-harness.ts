@@ -115,7 +115,7 @@ console.log(
 
 assert(equal.winRate >= 0.45 && equal.winRate <= 0.55, "equal-team win rate left 45–55%");
 assert(
-	stronger.winRate >= 0.62 && stronger.winRate <= 0.93,
+	stronger.winRate >= 0.78 && stronger.winRate <= 0.93,
 	"+10 OVR team should be favored without certainty",
 );
 assert(equal.averageRounds >= 18 && equal.averageRounds <= 27, "average map length is implausible");

@@ -21,7 +21,7 @@ import {
 import { MAP_POOL } from "./maps";
 import { TIMEOUT_MORALE } from "./morale";
 import { formatRoundSummary } from "./roundSummary";
-import { roundWinProbability, scoreboardRating } from "./simulate";
+import { equipmentWinDelta, roundWinProbability, scoreboardRating } from "./simulate";
 import { maybeQueueAutoTimeout } from "./timeout";
 import { isWeaponLegalForBuy } from "./weapons";
 
@@ -159,7 +159,7 @@ describe("simulateSeries", () => {
 		for (let seed = 0; seed < samples; seed += 1) {
 			wins += simulateSeries({ teams, seed, format: "BO1" }).winner === 0 ? 1 : 0;
 		}
-		expect(wins / samples).toBeGreaterThan(0.62);
+		expect(wins / samples).toBeGreaterThan(0.78);
 		expect(wins / samples).toBeLessThan(0.93);
 	});
 
@@ -451,6 +451,31 @@ describe("roundWinProbability", () => {
 		expect(rifles - even).toBeGreaterThan(0.28);
 		expect(rifles).toBeGreaterThan(0.8);
 		expect(eco).toBeLessThan(0.22);
+	});
+
+	it("lets overall quality outweigh a modest mismatch more than before", () => {
+		const mismatch = [profile("favorite", 90), profile("underdog", 80)] as const;
+		const even = roundWinProbability(equalTeams, sides, buys, score, false);
+		const favored = roundWinProbability(mismatch, sides, buys, score, false);
+		expect(favored - even).toBeCloseTo(0.09, 2);
+	});
+
+	it("shrinks an underdog's gun advantage as the OVR gap grows", () => {
+		const evenGuns = equipmentWinDelta(["eco", "full-buy"], 0);
+		const mild = equipmentWinDelta(["eco", "full-buy"], 8);
+		const wide = equipmentWinDelta(["eco", "full-buy"], 16);
+		expect(evenGuns).toBeLessThan(0);
+		expect(Math.abs(mild)).toBeLessThan(Math.abs(evenGuns));
+		expect(Math.abs(wide)).toBeLessThan(Math.abs(mild));
+		const favoriteEco = roundWinProbability(
+			[profile("favorite", 90), profile("underdog", 80)],
+			sides,
+			["eco", "full-buy"],
+			score,
+			false,
+		);
+		const evenEco = roundWinProbability(equalTeams, sides, ["eco", "full-buy"], score, false);
+		expect(favoriteEco).toBeGreaterThan(evenEco);
 	});
 });
 

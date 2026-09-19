@@ -61,13 +61,19 @@ export {
 } from "./morale";
 export { chooseRoundSummary, formatRoundSummary, resolveRoundSummary } from "./roundSummary";
 export {
+	equipmentWinDelta,
 	HOME_PICK_EDGE,
 	homePickDelta,
+	MORALE_WIN_WEIGHT,
+	OVERALL_WIN_WEIGHT,
+	PISTOL_ATTR_WEIGHT,
 	partialMapResult,
 	playbackMaps,
 	roundWinProbability,
 	scoreboard,
 	scoreboardRating,
+	UNDERDOG_GUN_SHRINK,
+	UNDERDOG_GUN_SHRINK_CAP,
 } from "./simulate";
 export {
 	coachTimeoutJudgment,

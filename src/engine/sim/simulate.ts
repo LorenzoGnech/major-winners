@@ -15,11 +15,26 @@ import type {
 } from "./types";
 
 export const HOME_PICK_EDGE = 0.03;
+/** Per-OVR contribution to a rifle-round favorite. +10 OVR is about +9%. */
+export const OVERALL_WIN_WEIGHT = 0.009;
+export const PISTOL_ATTR_WEIGHT = 0.0012;
+export const MORALE_WIN_WEIGHT = 0.0009;
+/** Shrink the worse team's gun advantage so a pistol convert does not erase a mismatch. */
+export const UNDERDOG_GUN_SHRINK = 0.02;
+export const UNDERDOG_GUN_SHRINK_CAP = 0.4;
 
 export function homePickDelta(context: { homePick?: boolean; pickedBy?: 0 | 1 }): number {
 	if (context.pickedBy === 1) return -HOME_PICK_EDGE;
 	if (context.pickedBy === 0 || context.homePick) return HOME_PICK_EDGE;
 	return 0;
+}
+
+export function equipmentWinDelta(buys: readonly [BuyType, BuyType], overallDelta: number): number {
+	const raw = (EQUIPMENT_STRENGTH[buys[0]] - EQUIPMENT_STRENGTH[buys[1]]) * EQUIPMENT_WEIGHT;
+	if (raw === 0 || overallDelta === 0 || raw * overallDelta > 0) return raw;
+	return (
+		raw * (1 - clamp(Math.abs(overallDelta) * UNDERDOG_GUN_SHRINK, 0, UNDERDOG_GUN_SHRINK_CAP))
+	);
 }
 
 function round(value: number, digits = 3): number {
@@ -91,16 +106,17 @@ export function roundWinProbability(
 	context: RoundWinContext = {},
 ): number {
 	const style = context.mapStyle ?? "hybrid";
-	const overall = (teams[0].overall - teams[1].overall) * 0.006;
+	const overallDelta = teams[0].overall - teams[1].overall;
+	const overall = overallDelta * OVERALL_WIN_WEIGHT;
 	const tactical =
 		(sideStrength(teams[0], sides[0], style) - sideStrength(teams[1], sides[1], style)) * 0.001;
 	const ctEdge = sides[0] === "CT" ? 0.018 : -0.018;
-	const equipment = (EQUIPMENT_STRENGTH[buys[0]] - EQUIPMENT_STRENGTH[buys[1]]) * EQUIPMENT_WEIGHT;
+	const equipment = equipmentWinDelta(buys, overallDelta);
 	const pistolEdge = pistol
 		? (teams[0].attributes.aim +
 				teams[0].attributes.entry -
 				(teams[1].attributes.aim + teams[1].attributes.entry)) *
-			0.0006
+			PISTOL_ATTR_WEIGHT
 		: 0;
 	const deficit = score[1] - score[0];
 	const comeback =
@@ -111,7 +127,7 @@ export function roundWinProbability(
 				: 0;
 	const home = homePickDelta(context);
 	const morale =
-		context.morale !== undefined ? (context.morale[0] - context.morale[1]) * 0.0012 : 0;
+		context.morale !== undefined ? (context.morale[0] - context.morale[1]) * MORALE_WIN_WEIGHT : 0;
 	const timeout = context.timeoutTeam === 0 ? 0.04 : context.timeoutTeam === 1 ? -0.04 : 0;
 	const pistolBias = pistol ? (context.pistolBias ?? 0) : 0;
 	const earlyRoundBias = context.earlyRoundBias ?? 0;
