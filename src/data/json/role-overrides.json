@@ -2308,6 +2308,10 @@
 		"roles": ["igl", "support"]
 	},
 	"maka-2024-3dmax": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"graviti-2024-3dmax": {
 		"primaryRole": "igl",
 		"roles": ["igl", "support"]
 	},
@@ -2320,8 +2324,8 @@
 		"roles": ["entry", "lurker"]
 	},
 	"ex3rcice-2024-3dmax": {
-		"primaryRole": "awp",
-		"roles": ["awp", "entry"]
+		"primaryRole": "lurker",
+		"roles": ["lurker", "entry"]
 	},
 	"electronic-2024-virtus-pro": {
 		"primaryRole": "entry",
@@ -2456,8 +2460,16 @@
 		"roles": ["entry", "lurker"]
 	},
 	"maka-2025-3dmax": {
+		"primaryRole": "awp",
+		"roles": ["awp", "entry"]
+	},
+	"graviti-2025-3dmax": {
 		"primaryRole": "igl",
 		"roles": ["igl", "support"]
+	},
+	"ex3rcice-2025-3dmax": {
+		"primaryRole": "support",
+		"roles": ["support", "lurker"]
 	},
 	"lucky-2025-3dmax": {
 		"primaryRole": "entry",

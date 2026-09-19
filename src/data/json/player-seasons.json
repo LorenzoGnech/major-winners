@@ -17184,8 +17184,8 @@
 		"orgId": "3dmax",
 		"photo": "/photos/players/ex3rcice/2024.png",
 		"game": "cs2",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["lurker", "entry"],
+		"primaryRole": "lurker",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -17220,11 +17220,11 @@
 		"orgId": "3dmax",
 		"photo": "/photos/players/ex3rcice/2025.png",
 		"game": "cs2",
-		"roles": ["awp", "entry"],
-		"primaryRole": "awp",
+		"roles": ["support", "lurker"],
+		"primaryRole": "support",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -23475,11 +23475,11 @@
 		"orgId": "3dmax",
 		"photo": "/photos/players/graviti/2024.png",
 		"game": "cs2",
-		"roles": ["lurker", "entry"],
-		"primaryRole": "lurker",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -23511,11 +23511,11 @@
 		"orgId": "3dmax",
 		"photo": "/photos/players/graviti/2025.png",
 		"game": "cs2",
-		"roles": ["support", "lurker"],
-		"primaryRole": "support",
+		"roles": ["igl", "support"],
+		"primaryRole": "igl",
 		"roleProvenance": {
-			"kind": "inferred",
-			"source": "roster-assignment"
+			"kind": "curated",
+			"source": "role-overrides.json"
 		},
 		"dataRegime": "full",
 		"ratingProvenance": {
@@ -39939,8 +39939,8 @@
 		"orgId": "3dmax",
 		"photo": "/photos/players/maka/2024.png",
 		"game": "cs2",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
@@ -39975,8 +39975,8 @@
 		"orgId": "3dmax",
 		"photo": "/photos/players/maka/2025.png",
 		"game": "cs2",
-		"roles": ["igl", "support"],
-		"primaryRole": "igl",
+		"roles": ["awp", "entry"],
+		"primaryRole": "awp",
 		"roleProvenance": {
 			"kind": "curated",
 			"source": "role-overrides.json"
