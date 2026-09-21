@@ -1,15 +1,27 @@
+import { indexPlayerSeasons, PLAYER_SEASON_ID_ALIASES, resolveCoachId } from "../data/playerId";
 import { type Dataset, ROLES, type Role } from "../data/schema";
 import type { BonusId } from "../engine/bonuses";
 import type { CompletedDraft } from "../engine/draft";
 import { roleFit } from "../engine/draft";
-import type { SavedTeamSnapshot } from "./schema";
+import type { SavedTeamSnapshot, TraitsSnapshot } from "./schema";
 
-function orgYearIdForSeason(dataset: Dataset, seasonId: string): string | null {
-	const season = dataset.playerSeasons.find((player) => player.id === seasonId);
+function traitsForSnapshot(traits: TraitsSnapshot, seasonId: string): BonusId[] {
+	const current = traits[seasonId];
+	if (current) return current as BonusId[];
+	const legacyId = Object.entries(PLAYER_SEASON_ID_ALIASES).find(([, id]) => id === seasonId)?.[0];
+	return (legacyId ? traits[legacyId] : undefined) ?? [];
+}
+
+function orgYearIdForSeason(
+	dataset: Dataset,
+	playersById: ReadonlyMap<string, Dataset["playerSeasons"][number]>,
+	seasonId: string,
+): string | null {
+	const season = playersById.get(seasonId);
 	if (!season) return null;
 	const match = dataset.orgYears.find(
 		(orgYear) =>
-			orgYear.playerSeasonIds.includes(seasonId) ||
+			orgYear.playerSeasonIds.includes(season.id) ||
 			(orgYear.orgId === season.orgId && orgYear.year === season.year),
 	);
 	return match?.id ?? null;
@@ -19,22 +31,22 @@ export function completedDraftFromSnapshot(
 	snapshot: SavedTeamSnapshot,
 	dataset: Dataset,
 ): CompletedDraft | null {
-	if (!dataset.coaches.some((coach) => coach.id === snapshot.coachId)) return null;
-	const playersById = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
+	const coachId = resolveCoachId(snapshot.coachId);
+	if (!dataset.coaches.some((coach) => coach.id === coachId)) return null;
+	const playersById = indexPlayerSeasons(dataset.playerSeasons);
 	const orgYearsById = new Map(dataset.orgYears.map((orgYear) => [orgYear.id, orgYear]));
 	const roster = {} as CompletedDraft["roster"];
 	const used = new Set<string>();
 
 	for (const role of ROLES) {
-		const playerSeasonId = snapshot.roster[role];
-		if (used.has(playerSeasonId)) return null;
-		used.add(playerSeasonId);
-		const player = playersById.get(playerSeasonId);
-		const orgYearId = orgYearIdForSeason(dataset, playerSeasonId);
-		if (!player || !orgYearId) return null;
+		const player = playersById.get(snapshot.roster[role]);
+		if (!player || used.has(player.id)) return null;
+		used.add(player.id);
+		const orgYearId = orgYearIdForSeason(dataset, playersById, player.id);
+		if (!orgYearId) return null;
 		roster[role] = {
 			orgYearId,
-			playerSeasonId,
+			playerSeasonId: player.id,
 			role,
 			fit: roleFit(player, role),
 		};
@@ -61,7 +73,7 @@ export function completedDraftFromSnapshot(
 					id: row.seasonId,
 					primaryRole: playersById.get(row.seasonId)?.primaryRole ?? row.role,
 					roles: playersById.get(row.seasonId)?.roles ?? [row.role],
-					revealedTraitIds: (snapshot.traits[row.seasonId] ?? []) as BonusId[],
+					revealedTraitIds: traitsForSnapshot(snapshot.traits, row.seasonId),
 				})),
 			},
 		];
@@ -72,6 +84,6 @@ export function completedDraftFromSnapshot(
 		seed: snapshot.seed >>> 0,
 		cards,
 		roster,
-		coachId: snapshot.coachId,
+		coachId,
 	};
 }

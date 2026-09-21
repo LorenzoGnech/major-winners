@@ -160,6 +160,9 @@ export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 		}
 	}
 
+	/** Same career, documented flag change (dual national). */
+	const multiNationalityPlayerIds = new Set(["volt"]);
+	const nationalityByPlayerId = new Map<string, string>();
 	for (const season of data.playerSeasons) {
 		if (!orgIds.has(season.orgId)) {
 			issues.push({
@@ -177,6 +180,16 @@ export function collectDatasetIssues(data: Dataset): DatasetIssue[] {
 				path: `playerSeasons.${season.id}`,
 				message: "not referenced by any org-year",
 			});
+		}
+		if (season.nationality !== "ZZ" && !multiNationalityPlayerIds.has(season.playerId)) {
+			const seen = nationalityByPlayerId.get(season.playerId);
+			if (!seen) nationalityByPlayerId.set(season.playerId, season.nationality);
+			else if (seen !== season.nationality) {
+				issues.push({
+					path: `playerSeasons.${season.id}.nationality`,
+					message: `playerId "${season.playerId}" mixes ${seen} and ${season.nationality}`,
+				});
+			}
 		}
 	}
 

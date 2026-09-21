@@ -1,4 +1,4 @@
-import { type Dataset, ROLES, type Role } from "../data";
+import { type Dataset, indexPlayerSeasons, ROLES, type Role } from "../data";
 import {
 	buildTeamProfile,
 	type CompletedDraft,
@@ -88,7 +88,7 @@ export function createExhibitionMatch({
 	const opponentOrgYear = candidates[createRng(selectionSeed).nextInt(candidates.length)];
 	if (!opponentOrgYear?.coachId) throw new Error("selected historical opponent has no coach");
 
-	const playersById = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
+	const playersById = indexPlayerSeasons(dataset.playerSeasons);
 	const playerIdsByRole = bestRoleAssignment(opponentOrgYear.playerSeasonIds, playersById);
 	const opponentDraft: CompletedDraft = {
 		seed: selectionSeed,

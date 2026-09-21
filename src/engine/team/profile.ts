@@ -1,3 +1,4 @@
+import { indexPlayerSeasons } from "../../data/playerId";
 import {
 	type Coach,
 	isLegendaryCoach,
@@ -145,7 +146,7 @@ function memberFor(
 	return {
 		id: season.id,
 		playerId: season.playerId,
-		nick: season.nick,
+		nick: season.displayNick ?? season.nick,
 		nationality: season.nationality,
 		orgId: season.orgId,
 		year: season.year,
@@ -329,7 +330,7 @@ export function buildTeamProfile({
 	if (coach.id !== draft.coachId) {
 		throw new Error(`draft coach "${draft.coachId}" does not match supplied coach "${coach.id}"`);
 	}
-	const seasonsById = new Map(playerSeasons.map((season) => [season.id, season]));
+	const seasonsById = indexPlayerSeasons(playerSeasons);
 	const ratingsById = new Map(ratedPlayers.map((rated) => [rated.id, rated]));
 	const members = ROLES.map((role) => {
 		const pick = draft.roster[role];

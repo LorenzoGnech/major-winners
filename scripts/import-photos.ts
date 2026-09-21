@@ -2,6 +2,7 @@ import { access, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { gotScraping } from "got-scraping";
 import { type BrowserContext, chromium, type Page } from "patchright";
 import type { PlayerSeason } from "../src/data";
+import { HLTV_ID_BY_PLAYER_ID, pickHltvSearchResult } from "../src/data/playerId";
 import {
 	applyPlayerPhotos,
 	extensionForPhotoUrl,
@@ -199,9 +200,25 @@ function countryCodeFrom(flagUrl: string | undefined): string | undefined {
 	return code && /^[A-Za-z]{2}$/.test(code) ? code.toUpperCase() : undefined;
 }
 
-function pickSearchResult(results: SearchPlayer[], searchName: string): SearchPlayer | undefined {
-	const wanted = searchName.toLowerCase();
-	return results.find((result) => result.nickName?.toLowerCase() === wanted) ?? results[0];
+function pickSearchResult(
+	results: SearchPlayer[],
+	player: PlayerSeason,
+	searchName: string,
+): SearchPlayer | undefined {
+	const pinned = HLTV_ID_BY_PLAYER_ID[player.playerId];
+	if (pinned !== undefined) {
+		return (
+			results.find((result) => result.id === pinned) ?? {
+				id: pinned,
+				nickName: player.nick,
+			}
+		);
+	}
+	return pickHltvSearchResult(results, {
+		searchName,
+		playerId: player.playerId,
+		countryCode: player.nationality === "ZZ" ? undefined : player.nationality,
+	});
 }
 
 function identityCachePath(playerId: string): URL {
@@ -233,7 +250,7 @@ async function resolveIdentity(player: PlayerSeason): Promise<CachedIdentity | u
 		`https://www.hltv.org/search?term=${encodeURIComponent(searchName)}`,
 	);
 	const results = (JSON.parse(body) as { players?: SearchPlayer[] }[])[0]?.players ?? [];
-	const result = pickSearchResult(results, searchName);
+	const result = pickSearchResult(results, player, searchName);
 	if (!result) throw new Error(`no HLTV search hit for "${searchName}"`);
 	const realName = [result.firstName, result.lastName].filter(Boolean).join(" ").trim();
 	const identity: CachedIdentity = {

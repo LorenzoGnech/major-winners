@@ -1,4 +1,10 @@
-import { type Dataset, ROLES } from "../data";
+import {
+	type Dataset,
+	indexPlayerSeasons,
+	ROLES,
+	resolveCoachId,
+	resolvePlayerSeasonId,
+} from "../data";
 import {
 	type DailyStats,
 	type DraftState,
@@ -90,7 +96,7 @@ function validDraft(value: unknown, dataset: Dataset, seed: number): value is Dr
 				(player) =>
 					!isObject(player) ||
 					typeof player.id !== "string" ||
-					!roster.playerSeasonIds.includes(player.id),
+					!roster.playerSeasonIds.includes(resolvePlayerSeasonId(player.id)),
 			)
 		) {
 			return false;
@@ -109,13 +115,15 @@ function validDraft(value: unknown, dataset: Dataset, seed: number): value is Dr
 			isObject(card) && Array.isArray(card.players) ? card.players : [];
 		const player =
 			cardPlayers.length > 0
-				? dataset.playerSeasons.find(
-						(candidate) =>
-							candidate.id === pick.playerSeasonId &&
-							cardPlayers.some((snapshot) => isObject(snapshot) && snapshot.id === candidate.id),
-					)
+				? indexPlayerSeasons(dataset.playerSeasons).get(String(pick.playerSeasonId))
 				: undefined;
-		if (!player || pick.fit !== roleFit(player, role)) return false;
+		const snapshotHasPlayer = cardPlayers.some(
+			(snapshot) =>
+				isObject(snapshot) &&
+				typeof snapshot.id === "string" &&
+				resolvePlayerSeasonId(snapshot.id) === player?.id,
+		);
+		if (!player || !snapshotHasPlayer || pick.fit !== roleFit(player, role)) return false;
 	}
 	if (value.phase.type === "player")
 		return (
@@ -127,7 +135,11 @@ function validDraft(value: unknown, dataset: Dataset, seed: number): value is Dr
 		);
 	if (picks.length !== 5) return false;
 	if (value.phase.type === "coach") return value.coachId === null;
-	return typeof value.coachId === "string" && canonical.coachIds.includes(value.coachId);
+	return (
+		typeof value.coachId === "string" &&
+		(canonical.coachIds.includes(value.coachId) ||
+			canonical.coachIds.includes(resolveCoachId(value.coachId)))
+	);
 }
 export function parsePersistedDailyAttempt(
 	raw: string,

@@ -10,7 +10,7 @@ import {
 	topPublishedRuns,
 	uniqueTeamsByRoster,
 } from "../community";
-import { type Dataset, ROLES } from "../data";
+import { type Dataset, indexPlayerSeasons, playerDisplayNick, ROLES } from "../data";
 import type { RatedPlayer } from "../engine";
 import { PlayerCrest } from "./PlayerCrest";
 
@@ -177,8 +177,13 @@ export function HomeLeaderboards({
 	const best = rankedBestRuns(runs);
 	const daily = rankedDailyRuns(dailyRuns, dailySeed);
 	const top = rankedTopTeams(teams, dataset, ratedPlayers);
-	const nicks = new Map(dataset.playerSeasons.map((player) => [player.id, player.nick]));
-	const photos = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
+	const nicks = new Map(
+		[...indexPlayerSeasons(dataset.playerSeasons)].map(([id, player]) => [
+			id,
+			playerDisplayNick(player),
+		]),
+	);
+	const photos = indexPlayerSeasons(dataset.playerSeasons);
 	const dailySaved = formatSavedAt(`${dailyDay}T00:00:00.000Z`);
 
 	return (

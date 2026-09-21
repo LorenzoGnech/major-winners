@@ -1,4 +1,4 @@
-import { type Coach, type Dataset, ROLES, type Role } from "../../data";
+import { type Coach, type Dataset, indexPlayerSeasons, ROLES, type Role } from "../../data";
 import type { CompletedDraft } from "../draft";
 import { roleFit } from "../draft";
 import type { RatedPlayer } from "../ratings/rate";
@@ -88,7 +88,7 @@ export function buildHistoricalOpponents(
 	dataset: Dataset,
 	ratedPlayers: readonly RatedPlayer[],
 ): HistoricalOpponent[] {
-	const playersById = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
+	const playersById = indexPlayerSeasons(dataset.playerSeasons);
 	const coachesById = new Map(dataset.coaches.map((coach) => [coach.id, coach]));
 	const orgsById = new Map(dataset.orgs.map((org) => [org.id, org]));
 	const majorsById = new Map(dataset.majors.map((major) => [major.id, major]));

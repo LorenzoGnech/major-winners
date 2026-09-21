@@ -6,7 +6,7 @@ import {
 	useState,
 } from "react";
 import type { PlayerSeason, Role } from "../data";
-import { ROLES } from "../data";
+import { playerDisplayNick, ROLES } from "../data";
 import { playerInitials, playerPhotoSrc } from "../data/playerPhoto";
 import { ratePlayer, roleFit } from "../engine";
 import { type BonusId, bonusById } from "../engine/bonuses";
@@ -206,7 +206,7 @@ export function PlayerDraftCard({
 				type="button"
 				aria-grabbed={dragging}
 				aria-pressed={selected}
-				aria-label={`${player.nick}, ${player.year}, ${ROLE_LABELS[player.primaryRole]}${traitNames}. Tap to select a role, drag onto a slot, or press 1 through 5.`}
+				aria-label={`${playerDisplayNick(player)}, ${player.year}, ${ROLE_LABELS[player.primaryRole]}${traitNames}. Tap to select a role, drag onto a slot, or press 1 through 5.`}
 				onPointerDown={onPointerDown}
 				onKeyDown={onKeyDown}
 				onDragStart={(event) => event.preventDefault()}
@@ -238,7 +238,9 @@ export function PlayerDraftCard({
 					<div className="flex items-start justify-between gap-3">
 						<div className="min-w-0">
 							<div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-								<p className="text-lg font-semibold tracking-tight text-white">{player.nick}</p>
+								<p className="text-lg font-semibold tracking-tight text-white">
+									{playerDisplayNick(player)}
+								</p>
 								{traits?.map((id) => (
 									<TraitBadge key={id} id={id} />
 								))}
@@ -460,7 +462,7 @@ export function LiveRoster({
 									type="button"
 									aria-grabbed={draggingHere}
 									aria-pressed={selectedHere}
-									aria-label={`${player.nick}, ${ROLE_LABELS[role]}. Tap a role to move, drag to another slot, or press 1 through 5.`}
+									aria-label={`${playerDisplayNick(player)}, ${ROLE_LABELS[role]}. Tap a role to move, drag to another slot, or press 1 through 5.`}
 									onPointerDown={
 										onPointerDown ? (event) => onPointerDown(pick.playerSeasonId, event) : undefined
 									}
@@ -483,7 +485,7 @@ export function LiveRoster({
 									<div className="flex min-w-0 items-center gap-2">
 										<PlayerCrest player={player} size="sm" />
 										<span className="truncate text-sm font-semibold text-zinc-100">
-											{player.nick}
+											{playerDisplayNick(player)}
 										</span>
 										<TraitIcons ids={traitsFor?.(pick.playerSeasonId) ?? []} />
 									</div>
@@ -589,7 +591,7 @@ export function CompactRosterBar({
 									{ROLE_LABELS[role]}
 								</span>
 								<span className="mt-0.5 w-full truncate text-[11px] font-semibold text-zinc-100">
-									{player?.nick ?? "—"}
+									{player ? playerDisplayNick(player) : "—"}
 								</span>
 								{fit ? (
 									<span className="text-[9px] text-emerald-200">
@@ -615,7 +617,7 @@ export function PlayerDragGhost({ player, x, y }: { player: PlayerSeason; x: num
 		>
 			<div className="flex items-center justify-between gap-3">
 				<div className="min-w-0">
-					<p className="truncate text-sm font-semibold text-white">{player.nick}</p>
+					<p className="truncate text-sm font-semibold text-white">{playerDisplayNick(player)}</p>
 					<p className="text-[10px] uppercase tracking-wider text-zinc-500">
 						{ROLE_LABELS[player.primaryRole]}
 					</p>

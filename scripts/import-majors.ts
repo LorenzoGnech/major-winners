@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Coach, Major, Org, OrgTier, OrgYear, PlayerSeason, Source } from "../src/data";
+import { playerIdFor } from "../src/data/playerId";
 import { importRolesFor, parseRoleOverrides } from "../src/data/roles";
 import { fillCoachModifiers } from "../src/engine/team/coachModifiers";
 import { MAJOR_SOURCES, type MajorSource } from "./major-source-manifest";
@@ -71,15 +72,8 @@ function slug(value: string): string {
 		.replace(/^-+|-+$/g, "");
 }
 
-function playerSlug(value: string): string {
-	const normalized = value
-		.replace(/\s*\([^)]*(?:player|counter-strike)[^)]*\)\s*/gi, "")
-		.normalize("NFKD")
-		.replace(/[\u0300-\u036f]/g, "")
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "_")
-		.replace(/^_+|_+$/g, "");
-	return normalized === "f0rest" ? "forest" : normalized;
+function personId(person: { canonical: string; nick: string; nationality: string }): string {
+	return playerIdFor(person.canonical || person.nick, person.nationality);
 }
 
 function normalizeTeam(value: string): string {
@@ -203,9 +197,7 @@ function nationalityMap(wikitext: string): Map<string, string> {
 		if (country?.length !== 2) continue;
 		for (const player of row.matchAll(/\[\[([^|\]]+)(?:\|([^\]]+))?]]/g)) {
 			const canonical = player[1];
-			const display = player[2] ?? canonical;
-			output.set(playerSlug(canonical), country);
-			output.set(playerSlug(display), country);
+			output.set(playerIdFor(canonical, country), country);
 		}
 	}
 	return output;
@@ -310,11 +302,16 @@ function personFromParams(
 	const nick = cleanWikiValue(params.get(key));
 	if (!nick) return undefined;
 	const canonical = cleanWikiValue(params.get(`${key}link`)) || nick;
+	const explicitFlag = cleanWikiValue(params.get(`${key}flag`)).toUpperCase();
+	const nationality =
+		(explicitFlag.length === 2 ? explicitFlag : undefined) ??
+		nationalities.get(playerIdFor(canonical)) ??
+		nationalities.get(playerIdFor(nick)) ??
+		"ZZ";
 	return {
 		nick,
 		canonical,
-		nationality:
-			nationalities.get(playerSlug(canonical)) ?? nationalities.get(playerSlug(nick)) ?? "ZZ",
+		nationality,
 	};
 }
 
@@ -337,8 +334,8 @@ function personFromTemplate(
 			canonical,
 			nationality:
 				(explicitFlag.length === 2 ? explicitFlag : undefined) ??
-				nationalities.get(playerSlug(canonical)) ??
-				nationalities.get(playerSlug(nick)) ??
+				nationalities.get(playerIdFor(canonical)) ??
+				nationalities.get(playerIdFor(nick)) ??
 				"ZZ",
 		},
 		role: cleanWikiValue(params.get("role")).toLowerCase() || undefined,
@@ -586,7 +583,7 @@ async function main() {
 	const coachById = new Map(existingCoaches.map((coach) => [coach.id, coach]));
 	const existingCoachByIdentity = new Map(
 		existingCoaches.map((coach) => [
-			`${playerSlug(coach.nick)}:${coach.year}:${coach.orgId}`,
+			`${playerIdFor(coach.nick, coach.nationality)}:${coach.year}:${coach.orgId}`,
 			coach.id,
 		]),
 	);
@@ -615,14 +612,14 @@ async function main() {
 			if (team.placementVerified) verifiedPlacements++;
 			const orgId = orgIdFor(team.name);
 			const playerSeasonIds = team.players.map((player, slot) => {
-				const id = `${playerSlug(player.canonical)}-${major.year}-${orgId}`;
+				const id = `${personId(player)}-${major.year}-${orgId}`;
 				const ovr = fallbackOvr(team.placement, major.teamCount, slot);
 				if (!playerById.has(id)) {
 					const roles = importRolesFor(slot, existingPlayerById.get(id), roleOverrides[id]);
 					const existing = existingPlayerById.get(id);
 					playerById.set(id, {
 						id,
-						playerId: playerSlug(player.canonical),
+						playerId: personId(player),
 						nick: player.nick,
 						realName: player.nick,
 						nationality: player.nationality,
@@ -675,13 +672,13 @@ async function main() {
 				return id;
 			});
 			const substituteSeasonIds = team.substitutes.map((player) => {
-				const id = `${playerSlug(player.canonical)}-${major.year}-${orgId}`;
+				const id = `${personId(player)}-${major.year}-${orgId}`;
 				if (!playerById.has(id)) {
 					const roles = importRolesFor(3, existingPlayerById.get(id), roleOverrides[id]);
 					const existing = existingPlayerById.get(id);
 					playerById.set(id, {
 						id,
-						playerId: playerSlug(player.canonical),
+						playerId: personId(player),
 						nick: player.nick,
 						realName: player.nick,
 						nationality: player.nationality,
@@ -704,10 +701,9 @@ async function main() {
 			});
 			let coachId: string | undefined;
 			if (team.coach) {
-				const identity = `${playerSlug(team.coach.canonical)}:${major.year}:${orgId}`;
+				const identity = `${personId(team.coach)}:${major.year}:${orgId}`;
 				coachId =
-					existingCoachByIdentity.get(identity) ??
-					`${playerSlug(team.coach.canonical)}-${major.year}-${orgId}`;
+					existingCoachByIdentity.get(identity) ?? `${personId(team.coach)}-${major.year}-${orgId}`;
 				if (!coachById.has(coachId)) {
 					coachById.set(coachId, {
 						id: coachId,

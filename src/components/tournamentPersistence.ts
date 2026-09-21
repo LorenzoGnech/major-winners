@@ -1,4 +1,4 @@
-import { type Dataset, ROLES } from "../data";
+import { type Dataset, indexPlayerSeasons, ROLES, resolveCoachId } from "../data";
 import type { CompletedDraft, TournamentState } from "../engine";
 import { parseTeamName } from "./teamName";
 
@@ -83,10 +83,13 @@ export function parsePersistedTournamentRun(
 			return null;
 		}
 		const draft = value.draft;
+		const coachId = typeof draft.coachId === "string" ? draft.coachId : "";
 		if (
 			!Number.isInteger(draft.seed) ||
-			typeof draft.coachId !== "string" ||
-			!dataset.coaches.some((coach) => coach.id === draft.coachId) ||
+			!coachId ||
+			!dataset.coaches.some(
+				(coach) => coach.id === coachId || coach.id === resolveCoachId(coachId),
+			) ||
 			!isObject(draft.roster) ||
 			!Array.isArray(draft.cards)
 		) {
@@ -98,7 +101,7 @@ export function parsePersistedTournamentRun(
 				!isObject(pick) ||
 				pick.role !== role ||
 				typeof pick.playerSeasonId !== "string" ||
-				!dataset.playerSeasons.some((player) => player.id === pick.playerSeasonId)
+				!indexPlayerSeasons(dataset.playerSeasons).has(pick.playerSeasonId)
 			) {
 				return null;
 			}

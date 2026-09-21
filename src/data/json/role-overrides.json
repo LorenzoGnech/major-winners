@@ -1055,7 +1055,7 @@
 		"primaryRole": "lurker",
 		"roles": ["lurker", "entry"]
 	},
-	"adren-2015-liquid": {
+	"adren_american-2015-liquid": {
 		"primaryRole": "support",
 		"roles": ["support", "lurker"]
 	},
@@ -1147,7 +1147,7 @@
 		"primaryRole": "lurker",
 		"roles": ["lurker", "entry"]
 	},
-	"adren-2016-liquid": {
+	"adren_american-2016-liquid": {
 		"primaryRole": "support",
 		"roles": ["support", "igl"]
 	},
@@ -1743,7 +1743,7 @@
 		"primaryRole": "lurker",
 		"roles": ["lurker", "entry"]
 	},
-	"lucky-2021-astralis": {
+	"lucky_danish-2021-astralis": {
 		"primaryRole": "entry",
 		"roles": ["entry", "lurker"]
 	},

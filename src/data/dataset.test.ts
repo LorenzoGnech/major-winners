@@ -62,6 +62,46 @@ describe("complete Major dataset", () => {
 		expect(karrigan.every((season) => season.primaryRole === "igl")).toBe(true);
 	});
 
+	it("keeps shared nicks on separate careers", () => {
+		const dataset = loadDataset();
+		const kazakh = dataset.playerSeasons.filter((season) => season.playerId === "adren");
+		const american = dataset.playerSeasons.filter((season) => season.playerId === "adren_american");
+		const bosnian = dataset.playerSeasons.filter((season) => season.playerId === "niko");
+		const danish = dataset.playerSeasons.filter((season) => season.playerId === "niko_danish");
+		expect(kazakh.length).toBeGreaterThan(0);
+		expect(american.map((season) => season.id).sort()).toEqual([
+			"adren_american-2013-team-ibuypower",
+			"adren_american-2014-team-ibuypower",
+			"adren_american-2015-liquid",
+			"adren_american-2016-liquid",
+		]);
+		expect(kazakh.every((season) => season.nationality === "KZ")).toBe(true);
+		expect(american.every((season) => season.nationality === "US")).toBe(true);
+		expect(american.every((season) => season.displayNick === "adreN (US)")).toBe(true);
+		expect(bosnian.every((season) => season.nationality === "BA")).toBe(true);
+		expect(danish.map((season) => season.id).sort()).toEqual([
+			"niko_danish-2018-north",
+			"niko_danish-2023-og",
+		]);
+		expect(danish.every((season) => season.nationality === "DK")).toBe(true);
+		expect(danish.every((season) => season.displayNick === "niko (DK)")).toBe(true);
+		expect(
+			dataset.playerSeasons
+				.filter((season) => season.playerId === "alex_spanish")
+				.map((season) => season.id),
+		).toEqual(["alex_spanish-2021-movistar-riders"]);
+		expect(
+			dataset.playerSeasons
+				.filter((season) => season.playerId === "lucky_danish")
+				.map((season) => season.id),
+		).toEqual(["lucky_danish-2021-astralis"]);
+		expect(
+			dataset.coaches
+				.filter((coach) => coach.id.startsWith("adren_american-"))
+				.every((coach) => coach.nationality === "US"),
+		).toBe(true);
+	});
+
 	it("does not assign three or more primary AWPs on one roster", () => {
 		const dataset = loadDataset();
 		const seasonById = new Map(dataset.playerSeasons.map((season) => [season.id, season]));

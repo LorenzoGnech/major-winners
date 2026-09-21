@@ -11,7 +11,7 @@ import {
 	type SiteStats,
 	uniqueBestPublishedRuns,
 } from "../community";
-import type { Dataset } from "../data";
+import { type Dataset, indexPlayerSeasons, playerDisplayNick } from "../data";
 import type { DailyStats, RatedPlayer } from "../engine";
 import { summarizeDailyStats } from "../engine";
 import { AppNav } from "./AppNav";
@@ -307,8 +307,13 @@ export function BestTeamsPanel({
 	dataset: Dataset;
 }) {
 	const best = uniqueBestPublishedRuns(runs, PROFILE_BEST_TEAMS);
-	const nicks = new Map(dataset.playerSeasons.map((player) => [player.id, player.nick]));
-	const photos = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
+	const nicks = new Map(
+		[...indexPlayerSeasons(dataset.playerSeasons)].map(([id, player]) => [
+			id,
+			playerDisplayNick(player),
+		]),
+	);
+	const photos = indexPlayerSeasons(dataset.playerSeasons);
 	return (
 		<section aria-labelledby="best-teams-heading" className="w-full">
 			<h2
@@ -358,9 +363,9 @@ export function BestTeamsPanel({
 
 export function DailyStatsPanel({ stats, dataset }: { stats: DailyStats; dataset: Dataset }) {
 	const seasons = new Map(
-		dataset.playerSeasons.map((player) => [
-			player.id,
-			{ playerId: player.playerId, nick: player.nick },
+		[...indexPlayerSeasons(dataset.playerSeasons)].map(([id, player]) => [
+			id,
+			{ playerId: player.playerId, nick: playerDisplayNick(player) },
 		]),
 	);
 	const summary = summarizeDailyStats(stats, undefined, seasons);

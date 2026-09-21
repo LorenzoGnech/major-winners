@@ -168,6 +168,7 @@ export const playerSeasonSchema = z
 		id: z.string().min(1),
 		playerId: z.string().min(1),
 		nick: z.string().min(1),
+		displayNick: z.string().min(1).optional(),
 		realName: z.string().min(1),
 		nationality: z.string().length(2),
 		year: z.number().int(),

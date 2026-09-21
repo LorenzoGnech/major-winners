@@ -9,7 +9,7 @@ The game never talks to HLTV (or any other live stats API). Everything draftable
 | `src/data/json/majors.json` | 24 completed Valve Majors through IEM Cologne 2026 |
 | `src/data/json/orgs.json` | Organizations |
 | `src/data/json/org-years.json` | 511 played Major roster appearances plus two Legacy wildcards |
-| `src/data/json/player-seasons.json` | Player-org-seasons (`s1mple-2018-navi`, not a career), optional `photo` |
+| `src/data/json/player-seasons.json` | Player-org-seasons (`s1mple-2018-navi`, not a career), optional `photo` and `displayNick` |
 | `src/data/json/role-overrides.json` | Curated `primaryRole` / `roles` locks keyed by player-season id |
 | `src/data/json/coaches.json` | Coach cards for the sixth draft round |
 | `src/data/schema.ts` | Zod contracts |
@@ -43,7 +43,7 @@ Org logos are committed image files under `public/logos/`, referenced by `org.lo
 1. Fetch raw page wikitext at no more than one request every two seconds.
 2. For modern dynamic prize tables, fetch rendered API output at no more than one `action=parse` request every 30 seconds.
 3. Parse the five players who actually played, coach, registered non-playing substitutes, and final placement. Prize-pool ties use the start of the range (3 for 3rd–4th). Replaced source cards and non-team placeholders are discarded before field-size validation.
-4. Preserve already verified player ratings and any curated or inferred roles. Generate an explicit `fallback` row for every remaining player-org-season, using TeamCard order only when that season has no role lock.
+4. Preserve already verified player ratings and any curated or inferred roles. Generate an explicit `fallback` row for every remaining player-org-season, using TeamCard order only when that season has no role lock. Career ids keep Liquipedia `(X player)` disambiguators and split bare shared nicks by TeamCard flag (`adren` vs `adren_american`, `niko` vs `niko_danish`).
 5. Require 24 revision-pinned Majors and exactly 511 played roster appearances before writing.
 6. Fill coach modifiers from each coach's best roster placement unless the existing row is hand-tuned (it does not match the placement formula). Champion 5, finalist 4, top eight 3, everyone else 2.
 7. Run `npm run validate-data`, `npm run calibrate`, and the full test suite.
@@ -128,6 +128,7 @@ Constants and the mapping live in `src/engine/ratings/reference.ts`. After chang
 
 - Zod schema, including regime-consistency
 - Unique ids; player-season id equals `{playerId}-{year}-{orgId}`
+- One nationality per `playerId` (shared nicks such as AdreN/adreN and NiKo/niko are separate careers)
 - 24 revision-pinned Majors and the declared played field size for each
 - Every roster has exactly five unique existing player-seasons whose org, year, and game match
 - No orphan player-seasons; coach `orgId`s resolve

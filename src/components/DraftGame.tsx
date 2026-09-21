@@ -57,7 +57,7 @@ import {
 	teamFingerprint,
 } from "../community";
 import type { Coach, Dataset, Org, Role } from "../data";
-import { isLegendaryCoach, ROLES } from "../data";
+import { indexPlayerSeasons, isLegendaryCoach, ROLES } from "../data";
 import {
 	applyAction,
 	buildHistoricalOpponents,
@@ -522,7 +522,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const communityEnabled = isCommunityEnabled();
 
 	const playersById = useMemo(
-		() => new Map(dataset.playerSeasons.map((player) => [player.id, player])),
+		() => indexPlayerSeasons(dataset.playerSeasons),
 		[dataset.playerSeasons],
 	);
 	const orgYearsById = useMemo(

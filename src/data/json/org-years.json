@@ -323,7 +323,7 @@
 		"playerSeasonIds": [
 			"anger-2013-team-ibuypower",
 			"skadoodle-2013-team-ibuypower",
-			"adren-2013-team-ibuypower",
+			"adren_american-2013-team-ibuypower",
 			"azk-2013-team-ibuypower",
 			"dazed-2013-team-ibuypower"
 		],
@@ -846,7 +846,7 @@
 		"playerSeasonIds": [
 			"anger-2014-team-ibuypower",
 			"skadoodle-2014-team-ibuypower",
-			"adren-2014-team-ibuypower",
+			"adren_american-2014-team-ibuypower",
 			"azk-2014-team-ibuypower",
 			"dazed-2014-team-ibuypower"
 		],
@@ -2962,7 +2962,7 @@
 		"tier": "cult",
 		"placement": 13,
 		"playerSeasonIds": [
-			"adren-2015-liquid",
+			"adren_american-2015-liquid",
 			"nitr0-2015-liquid",
 			"fugly-2015-liquid",
 			"elige-2015-liquid",
@@ -3368,7 +3368,7 @@
 			"elige-2016-liquid",
 			"hiko-2016-liquid",
 			"s1mple-2016-liquid",
-			"adren-2016-liquid"
+			"adren_american-2016-liquid"
 		],
 		"substituteSeasonIds": [],
 		"coachId": "gbjame_s-2016-liquid",
@@ -5731,7 +5731,7 @@
 			"aizy-2018-north",
 			"valde-2018-north",
 			"kjaerbye-2018-north",
-			"niko-2018-north"
+			"niko_danish-2018-north"
 		],
 		"substituteSeasonIds": [],
 		"coachId": "ave-2018-north",
@@ -6085,7 +6085,7 @@
 			"stewie2k-2019-liquid"
 		],
 		"substituteSeasonIds": [],
-		"coachId": "adren-2019-liquid",
+		"coachId": "adren_american-2019-liquid",
 		"sources": [
 			{
 				"label": "Liquipedia",
@@ -6782,7 +6782,7 @@
 			"stewie2k-2019-liquid"
 		],
 		"substituteSeasonIds": [],
-		"coachId": "adren-2019-liquid",
+		"coachId": "adren_american-2019-liquid",
 		"sources": [
 			{
 				"label": "Liquipedia",
@@ -7505,7 +7505,7 @@
 			"xyp9x-2021-astralis",
 			"gla1ve-2021-astralis",
 			"magisk-2021-astralis",
-			"lucky-2021-astralis"
+			"lucky_danish-2021-astralis"
 		],
 		"substituteSeasonIds": ["bubzkji-2021-astralis"],
 		"coachId": "zonic-2021-astralis",
@@ -7583,7 +7583,7 @@
 		"placement": 17,
 		"playerSeasonIds": [
 			"mopoz-2021-movistar-riders",
-			"alex-2021-movistar-riders",
+			"alex_spanish-2021-movistar-riders",
 			"deathzz-2021-movistar-riders",
 			"sunpayus-2021-movistar-riders",
 			"dav1g-2021-movistar-riders"
@@ -8532,7 +8532,7 @@
 			"nitr0-2022-liquid"
 		],
 		"substituteSeasonIds": [],
-		"coachId": "adren-2022-liquid",
+		"coachId": "adren_american-2022-liquid",
 		"sources": [
 			{
 				"label": "Liquipedia",
@@ -9634,7 +9634,7 @@
 			"neofrag-2023-og",
 			"f1ku-2023-og",
 			"degster-2023-og",
-			"niko-2023-og"
+			"niko_danish-2023-og"
 		],
 		"substituteSeasonIds": [],
 		"coachId": "ruggah-2023-og",
@@ -11607,7 +11607,7 @@
 			"nicx-2025-complexity"
 		],
 		"substituteSeasonIds": ["junior-2025-complexity"],
-		"coachId": "adren-2025-complexity",
+		"coachId": "adren_american-2025-complexity",
 		"sources": [
 			{
 				"label": "Liquipedia",

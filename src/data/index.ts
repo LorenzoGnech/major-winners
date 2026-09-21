@@ -18,6 +18,7 @@ export function loadDataset(): Dataset {
 	return dataset;
 }
 
+export * from "./playerId";
 export * from "./schema";
 export {
 	assertValidDataset,

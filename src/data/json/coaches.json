@@ -52,10 +52,10 @@
 		}
 	},
 	{
-		"id": "adren-2019-liquid",
+		"id": "adren_american-2019-liquid",
 		"nick": "adreN",
 		"realName": "adreN",
-		"nationality": "KZ",
+		"nationality": "US",
 		"year": 2019,
 		"orgId": "liquid",
 		"modifiers": {
@@ -65,10 +65,10 @@
 		}
 	},
 	{
-		"id": "adren-2022-liquid",
+		"id": "adren_american-2022-liquid",
 		"nick": "adreN",
 		"realName": "adreN",
-		"nationality": "ZZ",
+		"nationality": "US",
 		"year": 2022,
 		"orgId": "liquid",
 		"modifiers": {
@@ -78,10 +78,10 @@
 		}
 	},
 	{
-		"id": "adren-2025-complexity",
+		"id": "adren_american-2025-complexity",
 		"nick": "adreN",
 		"realName": "adreN",
-		"nationality": "ZZ",
+		"nationality": "US",
 		"year": 2025,
 		"orgId": "complexity",
 		"modifiers": {
