@@ -114,36 +114,44 @@ function SiteStatsNote({ stats }: { stats: SiteStats | null }) {
 		dailyRunsWon: 0,
 		dailyRunsPlayed: 0,
 	};
-	const items = [
-		[shown.gamesPlayed.toLocaleString("en-US"), "games played", "games played"],
-		[shown.savedTeams.toLocaleString("en-US"), "saved teams", "saved teams"],
-		[shown.wins.toLocaleString("en-US"), "majors won", "majors won"],
+	const rows = [
 		[
-			`${shown.dailyRunsWon.toLocaleString("en-US")}/${shown.dailyRunsPlayed.toLocaleString("en-US")}`,
-			"daily runs",
-			"daily runs won / daily runs played",
+			[shown.gamesPlayed.toLocaleString("en-US"), "games played", "games played"],
+			[shown.savedTeams.toLocaleString("en-US"), "saved teams", "saved teams"],
+		],
+		[
+			[shown.wins.toLocaleString("en-US"), "majors won", "majors won"],
+			[
+				shown.dailyRunsWon.toLocaleString("en-US"),
+				"daily runs won",
+				"daily runs won",
+			],
 		],
 	] as const;
 	return (
-		<p
+		<div
 			className={`mb-3 w-full text-[9px] font-semibold uppercase tracking-[0.12em] text-zinc-500 lg:mb-[clamp(0.35rem,1vh,0.75rem)] sm:text-[10px] sm:tracking-[0.14em] ${
 				stats ? "" : "invisible"
 			}`}
 			aria-live="polite"
 			aria-hidden={!stats}
 		>
-			{items.map(([value, label, spoken], index) => (
-				<span key={label} title={spoken}>
-					{index > 0 ? (
-						<span className="mx-1.5 text-white/25" aria-hidden>
-							·
+			{rows.map((items) => (
+				<p key={items[0][1]} className="leading-relaxed">
+					{items.map(([value, label, spoken], index) => (
+						<span key={label} title={spoken}>
+							{index > 0 ? (
+								<span className="mx-1.5 text-white/25" aria-hidden>
+									·
+								</span>
+							) : null}
+							<span className="tabular-nums text-zinc-300">{value}</span>
+							{` ${label}`}
 						</span>
-					) : null}
-					<span className="tabular-nums text-zinc-300">{value}</span>
-					{` ${label}`}
-				</span>
+					))}
+				</p>
 			))}
-		</p>
+		</div>
 	);
 }
 

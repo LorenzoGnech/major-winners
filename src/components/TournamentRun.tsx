@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Org, PlayerSeason } from "../data";
 import type { HistoricalOpponent, LiveSeriesState, TeamProfile, TournamentState } from "../engine";
 import {
@@ -12,7 +12,7 @@ import {
 } from "../engine";
 import { MatchPlayback } from "./MatchPlayback";
 import { preloadMapArt } from "./mapArt";
-import { resetMobileViewport } from "./mobileViewport";
+import { blurWithoutScroll, isDesktopViewport, resetMobileViewport } from "./mobileViewport";
 import { OpponentPreview } from "./OpponentPreview";
 import { OrgCrest } from "./OrgCrest";
 import { RecapPlayButton } from "./RecapPlayButton";
@@ -101,10 +101,18 @@ export function TournamentRun({
 	}, []);
 
 	const matchPhase = liveSeries ? "live" : "board";
+	const preservedScrollY = useRef<number | null>(null);
+	useLayoutEffect(() => {
+		if (matchPhase !== "board") return;
+		const top = preservedScrollY.current;
+		if (top === null) return;
+		preservedScrollY.current = null;
+		window.scrollTo(window.scrollX, top);
+	}, [matchPhase]);
 	useEffect(() => {
-		if (matchPhase === "live" || matchPhase === "board") {
-			resetMobileViewport();
-		}
+		// Desktop keeps the current window scroll when a match commits back to the scout.
+		if (matchPhase === "board" && isDesktopViewport()) return;
+		resetMobileViewport();
 	}, [matchPhase]);
 
 	function playNext() {
@@ -133,14 +141,19 @@ export function TournamentRun({
 	}
 
 	function continueRun() {
-		if (liveSeries?.complete) {
-			const result = commitLiveMatch(state, playerTeam, opponents);
-			if (!result.ok) {
-				setError(result.error.message);
-				return;
-			}
-			onChange(result.value);
+		blurWithoutScroll();
+		if (!liveSeries?.complete) return;
+		if (isDesktopViewport()) {
+			preservedScrollY.current = window.scrollY;
 		}
+		const result = commitLiveMatch(state, playerTeam, opponents);
+		if (!result.ok) {
+			preservedScrollY.current = null;
+			setError(result.error.message);
+			return;
+		}
+		onChange(result.value);
+		setError(null);
 	}
 
 	function abandon() {
