@@ -187,7 +187,7 @@ export function HomeLeaderboards({
 	const dailySaved = formatSavedAt(`${dailyDay}T00:00:00.000Z`);
 
 	return (
-		<div className="grid w-full grid-cols-1 gap-4 min-[900px]:grid-cols-2">
+		<div className="grid w-full grid-cols-1 items-start gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
 			<BoardShell title={dailySaved ? `Today's Daily · ${dailySaved}` : "Today's Daily"}>
 				<RunBoard
 					runs={daily}

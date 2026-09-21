@@ -424,12 +424,18 @@ export function HomeScreen({
 				aria-hidden
 			/>
 			<AppNav onGoHome={() => onView("menu")} />
-			<div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-8 sm:py-12 lg:py-4">
+			<div
+				className={`relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center py-8 sm:py-12 lg:py-4 ${
+					view === "leaderboards" ? "px-3 sm:px-4" : "px-6"
+				}`}
+			>
 				<div
 					className={`flex w-full flex-col items-center border border-white/10 bg-black/55 px-4 py-6 text-center backdrop-blur-xl sm:px-6 sm:py-8 lg:py-[clamp(1rem,2.5vh,2rem)] ${
-						view === "leaderboards" || view === "profile"
-							? "max-h-[calc(100dvh-var(--app-nav-height)-2rem)] max-w-6xl overflow-y-auto overscroll-contain"
-							: "max-w-md"
+						view === "leaderboards"
+							? "max-h-[calc(100dvh-var(--app-nav-height)-2rem)] max-w-[96rem] overflow-y-auto overscroll-contain lg:px-4"
+							: view === "profile"
+								? "max-h-[calc(100dvh-var(--app-nav-height)-2rem)] max-w-6xl overflow-y-auto overscroll-contain"
+								: "max-w-md"
 					}`}
 				>
 					{view === "menu" && community.enabled ? (
