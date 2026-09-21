@@ -136,6 +136,50 @@ export const rankedResultSchema = z.object({
 });
 export type RankedResult = z.infer<typeof rankedResultSchema>;
 
+function asSignedInt(value: unknown): number | null {
+	if (typeof value === "number" && Number.isFinite(value)) return Math.trunc(value);
+	if (typeof value === "string" && /^-?\d+$/.test(value)) {
+		const parsed = Number(value);
+		return Number.isSafeInteger(parsed) ? parsed : null;
+	}
+	return null;
+}
+
+function parseRankedEloSide(value: unknown): RankedEloSide | null {
+	if (!value || typeof value !== "object") return null;
+	const row = value as Record<string, unknown>;
+	const rawName = row.displayName ?? row.display_name;
+	const displayName = typeof rawName === "string" ? rawName.trim() : "";
+	const elo = asSignedInt(row.elo);
+	if (!displayName || elo === null) return null;
+	const delta = row.delta === null || row.delta === undefined ? null : asSignedInt(row.delta);
+	return { displayName, elo, delta };
+}
+
+export function parseRankedResult(value: unknown): RankedResult | null {
+	let row: unknown = Array.isArray(value) ? value[0] : value;
+	if (typeof row === "string") {
+		try {
+			row = JSON.parse(row);
+		} catch {
+			return null;
+		}
+		if (Array.isArray(row)) row = row[0];
+	}
+	if (!row || typeof row !== "object") return null;
+	const record = row as Record<string, unknown>;
+	if (!("pending" in record) && !("eloApplied" in record) && !("elo_applied" in record)) {
+		return null;
+	}
+	return {
+		pending: Boolean(record.pending),
+		eloApplied: Boolean(record.eloApplied ?? record.elo_applied),
+		mismatch: Boolean(record.mismatch),
+		you: parseRankedEloSide(record.you),
+		opponent: parseRankedEloSide(record.opponent),
+	};
+}
+
 export type SiteStats = {
 	gamesPlayed: number;
 	savedTeams: number;
@@ -159,7 +203,28 @@ export function parseSiteStats(value: unknown): SiteStats | null {
 	const record = row as Record<string, unknown>;
 	const gamesPlayed = asCount(record.gamesPlayed ?? record.games_played);
 	const savedTeams = asCount(record.savedTeams ?? record.saved_teams);
-	const wins = asCount(record.wins);
+	const wins = asCount(record.majorsWon ?? record.majors_won) ?? asCount(record.wins);
 	if (gamesPlayed === null || savedTeams === null || wins === null) return null;
 	return { gamesPlayed, savedTeams, wins };
+}
+
+export function parseChampionshipSiteStats(value: unknown): SiteStats | null {
+	const row = Array.isArray(value) ? value[0] : value;
+	if (!row || typeof row !== "object") return null;
+	const record = row as Record<string, unknown>;
+	if (!("majorsWon" in record) && !("majors_won" in record)) return null;
+	return parseSiteStats(value);
+}
+
+export function aggregateSiteStats(
+	savedTeams: number,
+	runs: readonly { wins?: unknown; losses?: unknown; finish?: unknown }[],
+): SiteStats {
+	let gamesPlayed = 0;
+	let wins = 0;
+	for (const row of runs) {
+		gamesPlayed += (asCount(row.wins) ?? 0) + (asCount(row.losses) ?? 0);
+		if (row.finish === "Champion") wins += 1;
+	}
+	return { gamesPlayed, savedTeams: asCount(savedTeams) ?? 0, wins };
 }

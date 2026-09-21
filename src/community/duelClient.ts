@@ -12,7 +12,7 @@ import {
 	duelVetoActionSchema,
 	parseDuelCode,
 } from "./duel";
-import { type RankedResult, rankedResultSchema } from "./schema";
+import { parseRankedResult, type RankedResult } from "./schema";
 
 export type DuelClientResult<T> = { ok: true; value: T } | { ok: false; error: string };
 
@@ -173,9 +173,9 @@ export async function submitRankedResult(input: {
 		p_rounds_lost: input.roundsLost,
 	});
 	if (!result.ok) return result;
-	const parsed = rankedResultSchema.safeParse(result.value);
-	if (!parsed.success) return fail("Could not record that ranked result.");
-	return { ok: true, value: parsed.data };
+	const parsed = parseRankedResult(result.value);
+	if (!parsed) return fail("Could not record that ranked result.");
+	return { ok: true, value: parsed };
 }
 
 export type { DuelMapQueueRow };

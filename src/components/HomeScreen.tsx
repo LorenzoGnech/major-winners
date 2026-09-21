@@ -107,7 +107,7 @@ function SiteStatsNote({ stats }: { stats: SiteStats | null }) {
 	const items = [
 		[shown.gamesPlayed, "games played"],
 		[shown.savedTeams, "saved teams"],
-		[shown.wins, "wins"],
+		[shown.wins, "majors won"],
 	] as const;
 	return (
 		<p
@@ -264,7 +264,7 @@ export function RankedStatsPanel({ profile }: { profile: RankedProfile | null })
 			</h2>
 			<p className="mt-1 text-xs text-zinc-500">
 				{profile
-					? "Elo updates once both players report the same BO5 result."
+					? "Elo updates once both players report the same BO3 result."
 					: "Sign in with a username to queue ranked."}
 			</p>
 			<dl className="mt-5 grid grid-cols-2 gap-2">
@@ -500,7 +500,7 @@ export function HomeScreen({
 									<BetaChip />
 								</h2>
 								<p className="mt-2 text-sm text-zinc-400">
-									Ranked 1v1, private BO5, or a Major vs published teams.
+									Ranked 1v1, private BO3, or a Major vs published teams.
 								</p>
 							</div>
 							<button type="button" onClick={community.onRanked} className={PRIMARY_BUTTON}>
@@ -605,7 +605,7 @@ export function HomeScreen({
 					{view === "duel-join" ? (
 						<SetupForm
 							title="Join a lobby"
-							detail="Enter the room code. You both draft, then veto maps for a BO5."
+							detail="Enter the room code. You both draft, then veto maps for a BO3."
 							onBack={() => onView("private")}
 							onSubmit={community.onJoinDuel}
 							submitLabel="Join lobby"

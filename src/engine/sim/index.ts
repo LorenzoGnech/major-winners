@@ -109,9 +109,11 @@ export type {
 } from "./types";
 export {
 	applyVetoAction,
+	DUEL_SERIES_FORMAT,
 	DUEL_VETO_STEPS,
 	emptyVeto,
 	mapQueueFromVeto,
+	pickVetoDecider,
 	type VetoAction,
 	type VetoErrorCode,
 	type VetoKind,

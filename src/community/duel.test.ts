@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAP_POOL } from "../engine";
+import { DUEL_SERIES_FORMAT, MAP_POOL, pickVetoDecider } from "../engine";
 import type { DuelRoom } from "./duel";
 import {
 	applyRoomVeto,
@@ -72,12 +72,31 @@ describe("duel helpers", () => {
 			}),
 		);
 		expect(afterGuestBan.next).toEqual({ side: 0, kind: "pick" });
+		const finished = vetoStateFromRoom(
+			room({
+				seriesSeed: 11,
+				vetoLog: [
+					{ side: 0, kind: "ban", mapId: "mirage" },
+					{ side: 1, kind: "ban", mapId: "dust2" },
+					{ side: 0, kind: "pick", mapId: "inferno" },
+					{ side: 1, kind: "pick", mapId: "nuke" },
+				],
+			}),
+		);
+		expect(finished.complete).toBe(true);
+		expect(finished.mapQueue[2]?.mapId).toBe(
+			pickVetoDecider(["ancient", "anubis", "overpass", "cache", "cobble"], 11),
+		);
 	});
 
 	it("rejects a persisted duel without a secret", () => {
 		expect(
 			parsePersistedDuel(JSON.stringify({ version: 1, code: "K7M2QX", side: "host" })),
 		).toBeNull();
+	});
+
+	it("plays private and ranked series as BO3", () => {
+		expect(DUEL_SERIES_FORMAT).toBe("BO3");
 	});
 
 	it("keeps a ranked kind on restore", () => {

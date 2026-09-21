@@ -1393,30 +1393,38 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			return next;
 		});
 	}, [identity.day, mode, state, tournament]);
+	const duelViewer = sideIndex(duelSide);
+	const duelOther = duelViewer === 0 ? 1 : 0;
+	const duelSeriesComplete = Boolean(mode === "duel" && duelLive?.complete);
+	const duelMapsWon = duelSeriesComplete && duelLive ? duelLive.seriesScore[duelViewer] : 0;
+	const duelMapsLost = duelSeriesComplete && duelLive ? duelLive.seriesScore[duelOther] : 0;
+	const duelRoundTotals =
+		duelSeriesComplete && duelLive
+			? summarizeDuelSeries(seriesFromLive(duelLive), ["", ""]).rounds
+			: ([0, 0] as const);
+	const duelRoundsWon = duelRoundTotals[duelViewer];
+	const duelRoundsLost = duelRoundTotals[duelOther];
+	const rankedEloApplied = Boolean(rankedResult?.eloApplied);
 	useEffect(() => {
-		if (mode !== "duel" || !userId || !duelCode || !duelLive?.complete) return;
-		const viewer = sideIndex(duelSide);
-		const winner = duelLive.winner ?? (duelLive.seriesScore[0] >= duelLive.seriesScore[1] ? 0 : 1);
-		const other = viewer === 0 ? 1 : 0;
-		const series = seriesFromLive(duelLive);
-		const recap = summarizeDuelSeries(series, ["", ""]);
-		const mapsWon = duelLive.seriesScore[viewer];
-		const mapsLost = duelLive.seriesScore[other];
-		const roundsWon = recap.rounds[viewer];
-		const roundsLost = recap.rounds[other];
+		if (!duelSeriesComplete || !userId || !duelCode) return;
 		if (duelKind === "ranked") {
-			if (rankedResult?.eloApplied || !duelSecret) return;
+			if (rankedEloApplied || !duelSecret) return;
 			let cancelled = false;
 			const tick = async () => {
 				const result = await submitRankedResult({
 					code: duelCode,
 					secret: duelSecret,
-					mapsWon,
-					mapsLost,
-					roundsWon,
-					roundsLost,
+					mapsWon: duelMapsWon,
+					mapsLost: duelMapsLost,
+					roundsWon: duelRoundsWon,
+					roundsLost: duelRoundsLost,
 				});
-				if (cancelled || !result.ok) return;
+				if (cancelled) return;
+				if (!result.ok) {
+					setDuelError(result.error);
+					return;
+				}
+				setDuelError(null);
 				setRankedResult(result.value);
 				if (result.value.eloApplied) {
 					void fetchMyProfile(userId).then(setRankedProfile);
@@ -1438,18 +1446,29 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		void recordDuelResult({
 			userId,
 			roomCode: duelCode,
-			won: winner === viewer,
-			mapsWon,
-			mapsLost,
-			roundsWon,
-			roundsLost,
+			won: duelMapsWon > duelMapsLost,
+			mapsWon: duelMapsWon,
+			mapsLost: duelMapsLost,
+			roundsWon: duelRoundsWon,
+			roundsLost: duelRoundsLost,
 		}).then((error) => {
 			if (error) {
 				duelStatsRecorded.current = null;
 				return;
 			}
 		});
-	}, [duelCode, duelKind, duelLive, duelSecret, duelSide, mode, rankedResult, userId]);
+	}, [
+		duelCode,
+		duelKind,
+		duelMapsLost,
+		duelMapsWon,
+		duelRoundsLost,
+		duelRoundsWon,
+		duelSecret,
+		duelSeriesComplete,
+		rankedEloApplied,
+		userId,
+	]);
 	const dailyResult =
 		mode === "daily" && tournament
 			? dailyResultFromTournament(identity.day, tournament, completedDraft)
@@ -2039,7 +2058,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 										duelRoom.guestRoster?.teamName ?? "Guest",
 									]}
 									playersById={playersById}
-									eyebrow={duelKind === "ranked" ? "Ranked match · BO5" : "Private match · BO5"}
+									eyebrow={duelKind === "ranked" ? "Ranked match · BO3" : "Private match · BO3"}
 									onComplete={() => {
 										setSaveError(null);
 										setSaveMessage(null);
@@ -2073,6 +2092,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								playersById={playersById}
 								ranked={duelKind === "ranked"}
 								rankedResult={rankedResult}
+								rankedError={duelError}
 								onPlayAgain={abandonRun}
 								extras={
 									communityEnabled ? (

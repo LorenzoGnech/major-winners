@@ -26,16 +26,7 @@ export function DuelRoomBanner({
 	);
 }
 
-const VETO_STEP_IDS = [
-	"host-ban-1",
-	"guest-ban-1",
-	"host-pick-1",
-	"guest-pick-1",
-	"host-ban-2",
-	"guest-ban-2",
-	"host-pick-2",
-	"guest-pick-2",
-] as const;
+const VETO_STEP_IDS = ["host-ban", "guest-ban", "host-pick", "guest-pick"] as const;
 
 const STYLE_LABEL = {
 	aim: "Aim",
@@ -66,7 +57,7 @@ export function DuelVeto({
 	return (
 		<section className="rounded-2xl border border-white/10 bg-zinc-950/70 p-4 sm:p-6">
 			<p className="text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
-				BO5 · map veto
+				BO3 · map veto
 			</p>
 			<h3 className="mt-1 text-center text-xl font-semibold text-white">
 				{veto.complete
@@ -78,8 +69,8 @@ export function DuelVeto({
 						: `Waiting for ${theirs?.teamName ?? "opponent"}`}
 			</h3>
 			<p className="mx-auto mt-2 max-w-lg text-center text-sm text-zinc-400">
-				Ban two, pick two, ban two, pick two. Your picks get a small home edge. Last map is the
-				decider.
+				One ban each, then one pick each. Your picks get a small home edge. The decider is random
+				from the leftover maps.
 			</p>
 			<p className="mt-3 text-center text-xs text-zinc-500">
 				{yours?.teamName ?? "You"} vs {theirs?.teamName ?? "Opponent"} · room {room.code}

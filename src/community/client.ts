@@ -1,13 +1,14 @@
 import { createClient, type Session, type SupabaseClient } from "@supabase/supabase-js";
 import { ROLES } from "../data/schema";
 import {
+	aggregateSiteStats,
 	COMMUNITY_BOARD_SIZE,
 	COMMUNITY_FETCH_RUNS,
 	COMMUNITY_FETCH_TEAMS,
 	type DuelResultSnapshot,
 	duelResultSnapshotSchema,
 	type PublishedRunSnapshot,
-	parseSiteStats,
+	parseChampionshipSiteStats,
 	publishedRunSnapshotSchema,
 	type RankedProfile,
 	rankedProfileSchema,
@@ -172,28 +173,13 @@ export async function fetchSiteStats(): Promise<SiteStats | null> {
 	const supabase = getSupabase();
 	if (!supabase) return null;
 	const { data, error } = await supabase.rpc("site_stats");
-	const parsed = parseSiteStats(data);
-	// Prefer the RPC when it is the match-total definition (games >= wins).
-	if (!error && parsed && parsed.gamesPlayed >= parsed.wins) return parsed;
+	const parsed = parseChampionshipSiteStats(data);
+	if (!error && parsed) return parsed;
 	const [teams, records] = await Promise.all([
 		supabase.from("saved_teams").select("*", { count: "exact", head: true }),
-		supabase.from("published_runs").select("wins, losses"),
+		supabase.from("published_runs").select("wins, losses, finish"),
 	]);
-	const wins = (records.data ?? []).reduce((sum, row) => {
-		return sum + (typeof row.wins === "number" ? row.wins : 0);
-	}, 0);
-	const gamesPlayed = (records.data ?? []).reduce((sum, row) => {
-		const matchWins = typeof row.wins === "number" ? row.wins : 0;
-		const matchLosses = typeof row.losses === "number" ? row.losses : 0;
-		return sum + matchWins + matchLosses;
-	}, 0);
-	return (
-		parseSiteStats({
-			gamesPlayed,
-			savedTeams: teams.count ?? 0,
-			wins,
-		}) ?? { gamesPlayed: 0, savedTeams: 0, wins: 0 }
-	);
+	return aggregateSiteStats(teams.count ?? 0, records.data ?? []);
 }
 
 export async function fetchSavedTeams(): Promise<SavedTeamSnapshot[]> {

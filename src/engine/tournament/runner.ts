@@ -18,7 +18,7 @@ import type {
 export const FINAL_OPPONENT_OVERALL_FLOOR = 90;
 
 /** Semifinal opponents sit in this band. Stacked 90+ rosters wait for the title match. */
-export const SEMI_OPPONENT_OVERALL_FLOOR = 88;
+export const SEMI_OPPONENT_OVERALL_FLOOR = 86;
 export const SEMI_OPPONENT_OVERALL_CEILING = 90;
 
 /**
@@ -27,13 +27,9 @@ export const SEMI_OPPONENT_OVERALL_CEILING = 90;
  */
 export const COMMUNITY_OVERALL_SLACK = 3;
 
-/** Percentile of the remaining strength-sorted pool. Later matches sit higher. */
+/** Percentile of the remaining strength-sorted pool. Later Swiss/QF matches sit higher. */
 function desiredPercentile(state: TournamentState): number {
-	if (state.stage === "champions") {
-		if (state.playoffRound === "semifinal") return 0.98;
-		if (state.playoffRound === "final") return 1;
-		return 0.84;
-	}
+	if (state.stage === "champions") return 0.84;
 	const wins = swissRecord(state).wins;
 	if (state.stage === "challengers") return 0.14 + wins * 0.14;
 	return 0.55 + wins * 0.1;
@@ -66,11 +62,8 @@ function pickFromCandidates(
 	const minIndex = floorIndex === -1 ? candidates.length - 1 : floorIndex;
 	const target = Math.round(desiredPercentile(state) * (candidates.length - 1));
 	const start = Math.max(minIndex, target);
-	const jitter = hashStringToSeed(
-		`${state.rootSeed}:opponent:${state.stage}:${state.history.length}`,
-	);
 	const window = Math.max(1, Math.floor(candidates.length * 0.02));
-	const offset = jitter % (window + 1);
+	const offset = opponentJitter(state) % (window + 1);
 	const index = Math.min(candidates.length - 1, start + offset);
 	return candidates[index] as HistoricalOpponent;
 }
@@ -98,12 +91,23 @@ function playoffRoundIs(state: TournamentState, round: PlayoffRound): boolean {
 	return state.stage === "champions" && state.playoffRound === round;
 }
 
+function opponentJitter(state: TournamentState): number {
+	return hashStringToSeed(`${state.rootSeed}:opponent:${state.stage}:${state.history.length}`);
+}
+
+function pickFromBand(
+	state: TournamentState,
+	candidates: readonly HistoricalOpponent[],
+): HistoricalOpponent {
+	return candidates[opponentJitter(state) % candidates.length] as HistoricalOpponent;
+}
+
 function preferCommunityThenPick(
 	state: TournamentState,
 	candidates: readonly HistoricalOpponent[],
 ): HistoricalOpponent {
 	const community = candidates.filter((opponent) => opponent.source === "community");
-	return pickFromCandidates(state, community.length > 0 ? community : candidates);
+	return pickFromBand(state, community.length > 0 ? community : candidates);
 }
 
 function inOverallRange(

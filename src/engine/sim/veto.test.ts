@@ -1,38 +1,42 @@
 import { describe, expect, it } from "vitest";
 import { MAP_POOL } from "./maps";
-import { applyVetoAction, emptyVeto, mapQueueFromVeto, vetoFromActions } from "./veto";
+import {
+	applyVetoAction,
+	emptyVeto,
+	mapQueueFromVeto,
+	pickVetoDecider,
+	vetoFromActions,
+} from "./veto";
 
 describe("duel veto", () => {
-	it("runs ban-ban-pick-pick-ban-ban-pick-pick, leftover decider", () => {
+	it("runs ban-ban-pick-pick, then a seed-picked leftover decider", () => {
 		const order = MAP_POOL.map((map) => map.id);
-		let state = emptyVeto();
+		const seed = 11;
+		let state = emptyVeto(seed);
 		expect(state.next).toEqual({ side: 0, kind: "ban" });
-		for (const mapId of order.slice(0, 8)) {
+		for (const mapId of order.slice(0, 4)) {
 			const next = applyVetoAction(state, { side: state.next?.side ?? 0, mapId });
 			expect(next.ok).toBe(true);
 			if (next.ok) state = next.value;
 		}
-		expect(state.actions.map((action) => action.kind)).toEqual([
-			"ban",
-			"ban",
-			"pick",
-			"pick",
-			"ban",
-			"ban",
-			"pick",
-			"pick",
-		]);
+		expect(state.actions.map((action) => action.kind)).toEqual(["ban", "ban", "pick", "pick"]);
 		expect(state.complete).toBe(true);
-		expect(state.mapQueue).toHaveLength(5);
+		expect(state.mapQueue).toHaveLength(3);
 		expect(state.mapQueue[0]).toMatchObject({ mapId: order[2], pickedBy: 0, homePick: true });
 		expect(state.mapQueue[1]).toMatchObject({ mapId: order[3], pickedBy: 1, homePick: false });
-		expect(state.mapQueue[2]).toMatchObject({ mapId: order[6], pickedBy: 0, homePick: true });
-		expect(state.mapQueue[3]).toMatchObject({ mapId: order[7], pickedBy: 1, homePick: false });
-		expect(state.mapQueue[4]).toMatchObject({ mapId: order[8], homePick: false });
-		expect(state.mapQueue[4]?.pickedBy).toBeUndefined();
-		expect(mapQueueFromVeto(state.actions)?.map((map) => map.mapId)).toEqual(
+		expect(state.mapQueue[2]).toMatchObject({
+			mapId: pickVetoDecider(order.slice(4), seed),
+			homePick: false,
+		});
+		expect(state.mapQueue[2]?.pickedBy).toBeUndefined();
+		expect(mapQueueFromVeto(state.actions, seed)?.map((map) => map.mapId)).toEqual(
 			state.mapQueue.map((map) => map.mapId),
 		);
+	});
+
+	it("picks the leftover decider from the unsigned series seed", () => {
+		expect(pickVetoDecider(["nuke", "ancient", "anubis"], 11)).toBe("anubis");
+		expect(pickVetoDecider(["nuke", "ancient", "anubis"], 0)).toBe("nuke");
 	});
 
 	it("rejects the wrong side, a used map, and extra actions", () => {
@@ -52,9 +56,9 @@ describe("duel veto", () => {
 		if (!unknown.ok) expect(unknown.error).toBe("UNKNOWN_MAP");
 
 		const finished = vetoFromActions(
-			MAP_POOL.slice(0, 8).map((map, index) => ({
+			MAP_POOL.slice(0, 4).map((map, index) => ({
 				side: (index % 2 === 0 ? 0 : 1) as 0 | 1,
-				kind: Math.floor(index / 2) % 2 === 0 ? "ban" : "pick",
+				kind: index < 2 ? "ban" : "pick",
 				mapId: map.id,
 			})),
 		);

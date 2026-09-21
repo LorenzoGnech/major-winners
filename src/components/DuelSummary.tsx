@@ -120,6 +120,7 @@ export function DuelSummary({
 	extras,
 	ranked = false,
 	rankedResult = null,
+	rankedError = null,
 	onPlayAgain,
 	playAgainLabel = "Back to Home",
 }: {
@@ -129,6 +130,7 @@ export function DuelSummary({
 	extras?: ReactNode;
 	ranked?: boolean;
 	rankedResult?: RankedResult | null;
+	rankedError?: string | null;
 	onPlayAgain?: () => void;
 	playAgainLabel?: string;
 }) {
@@ -177,7 +179,7 @@ export function DuelSummary({
 						won ? "text-amber-200" : "text-zinc-500"
 					}`}
 				>
-					{ranked ? "Ranked match · BO5" : "Private match · BO5"}
+					{ranked ? "Ranked match · BO3" : "Private match · BO3"}
 				</p>
 				<h2
 					id="duel-summary-heading"
@@ -200,12 +202,18 @@ export function DuelSummary({
 					{summary.rounds[1]} rounds.
 				</p>
 				{ranked ? (
-					<p className="mt-2 text-sm text-amber-100/90">
+					<p
+						className={`mt-2 text-sm ${rankedError && !rankedResult?.eloApplied ? "text-red-200" : "text-amber-100/90"}`}
+					>
 						{rankedResult?.eloApplied && rankedResult.you && rankedResult.opponent
 							? `${rankedResult.you.displayName} ${rankedResult.you.elo} (${formatEloDelta(rankedResult.you.delta ?? 0)}) · ${rankedResult.opponent.displayName} ${rankedResult.opponent.elo}`
-							: rankedResult?.mismatch
-								? "Series reports do not match. Elo is unchanged."
-								: "Waiting for both sides to confirm the series."}
+							: rankedResult?.eloApplied
+								? "Elo updated."
+								: rankedResult?.mismatch
+									? "Series reports do not match. Elo is unchanged."
+									: rankedError
+										? rankedError
+										: "Waiting for both sides to confirm the series."}
 					</p>
 				) : null}
 				{summary.maps.length > 0 ? (

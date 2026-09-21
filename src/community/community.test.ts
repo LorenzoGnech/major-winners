@@ -12,10 +12,13 @@ import {
 	uniqueTeamsByRoster,
 } from "./ranking";
 import {
+	aggregateSiteStats,
 	authorNameFromProfile,
 	DEFAULT_AUTHOR_NAME,
 	type PublishedRunSnapshot,
 	parseAuthorName,
+	parseChampionshipSiteStats,
+	parseRankedResult,
 	parseSiteStats,
 	runFingerprint,
 	type SavedTeamSnapshot,
@@ -64,6 +67,29 @@ describe("community schema", () => {
 			wins: 3,
 		});
 		expect(parseSiteStats({ gamesPlayed: -1, savedTeams: 0, wins: 0 })).toBeNull();
+		expect(parseSiteStats({ games_played: 12, saved_teams: 8, wins: 47, majors_won: 2 })).toEqual({
+			gamesPlayed: 12,
+			savedTeams: 8,
+			wins: 2,
+		});
+		expect(parseChampionshipSiteStats({ games_played: 12, saved_teams: 8, wins: 47 })).toBeNull();
+		expect(
+			parseChampionshipSiteStats({ games_played: 12, saved_teams: 8, wins: 2, majors_won: 2 }),
+		).toEqual({
+			gamesPlayed: 12,
+			savedTeams: 8,
+			wins: 2,
+		});
+	});
+
+	it("counts homepage wins as published Major titles", () => {
+		expect(
+			aggregateSiteStats(8, [
+				{ wins: 9, losses: 0, finish: "Champion" },
+				{ wins: 3, losses: 3, finish: "Challengers Swiss" },
+				{ wins: 8, losses: 1, finish: "Final" },
+			]),
+		).toEqual({ gamesPlayed: 24, savedTeams: 8, wins: 1 });
 	});
 
 	it("defaults blank authors to Anonymous", () => {
@@ -255,5 +281,30 @@ describe("ranked elo", () => {
 		expect(rankedWinRate(0, 0)).toBeNull();
 		expect(rankedWinRate(1, 1)).toBe(50);
 		expect(rankedWinRate(2, 1)).toBe(67);
+	});
+
+	it("parses a ranked result even when side names are missing", () => {
+		expect(
+			parseRankedResult({
+				pending: true,
+				elo_applied: false,
+				you: { displayName: "lore", elo: "1000", delta: null },
+				opponent: { display_name: null, elo: null },
+			}),
+		).toEqual({
+			pending: true,
+			eloApplied: false,
+			mismatch: false,
+			you: { displayName: "lore", elo: 1000, delta: null },
+			opponent: null,
+		});
+		expect(parseRankedResult([{ pending: false, eloApplied: true, mismatch: false }])).toEqual({
+			pending: false,
+			eloApplied: true,
+			mismatch: false,
+			you: null,
+			opponent: null,
+		});
+		expect(parseRankedResult("not-json")).toBeNull();
 	});
 });

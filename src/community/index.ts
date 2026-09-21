@@ -93,6 +93,7 @@ export {
 } from "./ranking";
 export {
 	AUTHOR_NAME_MAX,
+	aggregateSiteStats,
 	authorNameFromProfile,
 	COMMUNITY_BOARD_SIZE,
 	type CommunityGameMode,
@@ -102,6 +103,8 @@ export {
 	PROFILE_BEST_TEAMS,
 	type PublishedRunSnapshot,
 	parseAuthorName,
+	parseChampionshipSiteStats,
+	parseRankedResult,
 	parseSiteStats,
 	type RankedProfile,
 	type RankedResult,

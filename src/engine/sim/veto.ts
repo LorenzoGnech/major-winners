@@ -14,11 +14,9 @@ export type VetoAction = VetoStep & {
 
 export type VetoErrorCode = "WRONG_TURN" | "MAP_GONE" | "UNKNOWN_MAP" | "ALREADY_COMPLETE";
 
+export const DUEL_SERIES_FORMAT = "BO3" as const;
+
 export const DUEL_VETO_STEPS: readonly VetoStep[] = [
-	{ side: 0, kind: "ban" },
-	{ side: 1, kind: "ban" },
-	{ side: 0, kind: "pick" },
-	{ side: 1, kind: "pick" },
 	{ side: 0, kind: "ban" },
 	{ side: 1, kind: "ban" },
 	{ side: 0, kind: "pick" },
@@ -31,6 +29,7 @@ export type VetoState = {
 	next?: VetoStep;
 	complete: boolean;
 	mapQueue: MapContext[];
+	seriesSeed: number;
 };
 
 export type VetoResult = { ok: true; value: VetoState } | { ok: false; error: VetoErrorCode };
@@ -40,12 +39,24 @@ function remainingFrom(actions: readonly VetoAction[]): SimMapId[] {
 	return MAP_POOL.map((map) => map.id).filter((id) => !used.has(id));
 }
 
-export function mapQueueFromVeto(actions: readonly VetoAction[]): MapContext[] | null {
+/** Same index as `submit_duel_veto`: unsigned series seed modulo leftover count. */
+export function pickVetoDecider(
+	remaining: readonly SimMapId[],
+	seriesSeed: number,
+): SimMapId | null {
+	if (remaining.length === 0) return null;
+	return remaining[(seriesSeed >>> 0) % remaining.length] ?? null;
+}
+
+export function mapQueueFromVeto(
+	actions: readonly VetoAction[],
+	seriesSeed = 0,
+): MapContext[] | null {
 	if (actions.length < DUEL_VETO_STEPS.length) return null;
 	const picks = actions.filter((action) => action.kind === "pick");
 	const leftover = remainingFrom(actions);
-	if (picks.length !== 4 || leftover.length !== 1) return null;
-	const deciderId = leftover[0];
+	if (picks.length !== 2 || leftover.length === 0) return null;
+	const deciderId = pickVetoDecider(leftover, seriesSeed);
 	if (!deciderId) return null;
 	const decider = getMap(deciderId);
 	if (!decider) return null;
@@ -58,7 +69,7 @@ export function mapQueueFromVeto(actions: readonly VetoAction[]): MapContext[] |
 	return [...pickContexts, mapContextFrom(decider, false)];
 }
 
-export function vetoFromActions(actions: readonly VetoAction[]): VetoState {
+export function vetoFromActions(actions: readonly VetoAction[], seriesSeed = 0): VetoState {
 	const remaining = remainingFrom(actions);
 	const complete = actions.length >= DUEL_VETO_STEPS.length;
 	return {
@@ -66,12 +77,13 @@ export function vetoFromActions(actions: readonly VetoAction[]): VetoState {
 		remaining,
 		next: complete ? undefined : DUEL_VETO_STEPS[actions.length],
 		complete,
-		mapQueue: complete ? (mapQueueFromVeto(actions) ?? []) : [],
+		mapQueue: complete ? (mapQueueFromVeto(actions, seriesSeed) ?? []) : [],
+		seriesSeed,
 	};
 }
 
-export function emptyVeto(): VetoState {
-	return vetoFromActions([]);
+export function emptyVeto(seriesSeed = 0): VetoState {
+	return vetoFromActions([], seriesSeed);
 }
 
 export function applyVetoAction(
@@ -93,9 +105,9 @@ export function applyVetoAction(
 	}
 	return {
 		ok: true,
-		value: vetoFromActions([
-			...state.actions,
-			{ side: action.side, kind: state.next.kind, mapId: map.id },
-		]),
+		value: vetoFromActions(
+			[...state.actions, { side: action.side, kind: state.next.kind, mapId: map.id }],
+			state.seriesSeed,
+		),
 	};
 }

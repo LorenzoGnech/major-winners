@@ -8,6 +8,7 @@ import { getMap, mapContextFrom } from "../engine/sim/maps";
 import type { LiveSeriesState, MapContext } from "../engine/sim/types";
 import {
 	applyVetoAction,
+	DUEL_SERIES_FORMAT,
 	emptyVeto,
 	type VetoAction,
 	type VetoState,
@@ -128,7 +129,9 @@ export function vetoStateFromRoom(room: DuelRoom): VetoState {
 			"cobble",
 		].includes(action.mapId),
 	) as VetoAction[];
-	return actions.length > 0 ? vetoFromActions(actions) : emptyVeto();
+	return actions.length > 0
+		? vetoFromActions(actions, room.seriesSeed)
+		: emptyVeto(room.seriesSeed);
 }
 
 export function applyRoomVeto(room: DuelRoom, side: DuelSide, mapId: string) {
@@ -234,7 +237,7 @@ export function liveSeriesFromDuelRoom(
 	return startLiveSeries({
 		teams: [host, guest],
 		seed: room.seriesSeed,
-		format: "BO5",
+		format: DUEL_SERIES_FORMAT,
 		mapQueue: mapContextsFromRows(room.mapQueue),
 		bothSidesPlayer: true,
 	});

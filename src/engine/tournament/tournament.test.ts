@@ -187,6 +187,26 @@ describe("Major tournament runner", () => {
 		}
 	});
 
+	it("samples the semifinal and final bands instead of always the strongest leftover", () => {
+		const semis = new Set<string>();
+		const finals = new Set<string>();
+		for (let rootSeed = 0; rootSeed < 40; rootSeed += 1) {
+			let state = createTournament({ rootSeed, playerTeam, opponents });
+			for (let index = 0; index < 7; index += 1) {
+				state = play(state, true);
+			}
+			const semiId = state.nextMatch?.opponent.id;
+			if (!semiId) throw new Error("expected a semifinal opponent");
+			semis.add(semiId);
+			state = play(state, true);
+			const finalId = state.nextMatch?.opponent.id;
+			if (!finalId) throw new Error("expected a final opponent");
+			finals.add(finalId);
+		}
+		expect(semis.size).toBeGreaterThanOrEqual(5);
+		expect(finals.size).toBeGreaterThanOrEqual(4);
+	});
+
 	it("prefers a community opponent near the historical target, not a stacked published roster", () => {
 		const firstTarget = opponents[Math.round(0.14 * (opponents.length - 1))];
 		const legendsTarget = opponents[Math.round(0.55 * (opponents.length - 1))];
