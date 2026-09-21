@@ -17,6 +17,7 @@ import {
 	fetchMyProfile,
 	fetchMyPublishedRuns,
 	fetchSavedTeams,
+	fetchSiteStats,
 	getSession,
 	isCommunityEnabled,
 	joinDuel,
@@ -42,6 +43,7 @@ import {
 	rosterForSide,
 	runFingerprint,
 	type SavedTeamSnapshot,
+	type SiteStats,
 	savePersistedDuel,
 	setDisplayName,
 	sideIndex,
@@ -503,6 +505,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [communityRuns, setCommunityRuns] = useState<PublishedRunSnapshot[]>([]);
 	const [myRuns, setMyRuns] = useState<PublishedRunSnapshot[]>([]);
 	const [communityTeams, setCommunityTeams] = useState<SavedTeamSnapshot[]>([]);
+	const [siteStats, setSiteStats] = useState<SiteStats | null>(null);
 	const [userEmail, setUserEmail] = useState<string | null>(null);
 	const [userId, setUserId] = useState<string | null>(null);
 	const [emailDraft, setEmailDraft] = useState("");
@@ -584,14 +587,18 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	useEffect(() => {
 		if (!communityEnabled) return;
 		let cancelled = false;
-		void Promise.all([fetchBestRuns(), fetchSavedTeams(), fetchEloLeaderboard()]).then(
-			([runs, teams, board]) => {
-				if (cancelled) return;
-				setCommunityRuns(runs);
-				setCommunityTeams(teams);
-				setEloBoard(board);
-			},
-		);
+		void Promise.all([
+			fetchBestRuns(),
+			fetchSavedTeams(),
+			fetchEloLeaderboard(),
+			fetchSiteStats(),
+		]).then(([runs, teams, board, stats]) => {
+			if (cancelled) return;
+			setCommunityRuns(runs);
+			setCommunityTeams(teams);
+			setEloBoard(board);
+			setSiteStats(stats);
+		});
 		return () => {
 			cancelled = true;
 		};
@@ -1505,6 +1512,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				// Remembering locally is best-effort.
 			}
 			void fetchSavedTeams().then(setCommunityTeams);
+			void fetchSiteStats().then(setSiteStats);
 			return;
 		}
 		if (!runSummary || !publishMode) return;
@@ -1533,6 +1541,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		}
 		void fetchBestRuns().then(setCommunityRuns);
 		void fetchSavedTeams().then(setCommunityTeams);
+		void fetchSiteStats().then(setSiteStats);
 		if (userId) void fetchMyPublishedRuns(userId).then(setMyRuns);
 	}
 	const simulating = Boolean(
@@ -1635,6 +1644,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					onLeaveQueue: () => {
 						void cancelRankedQueue();
 					},
+					siteStats,
 				}}
 				onView={(view) => {
 					if (homeView === "ranked" && view !== "ranked") {

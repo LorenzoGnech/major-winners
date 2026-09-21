@@ -16,6 +16,7 @@ import {
 	DEFAULT_AUTHOR_NAME,
 	type PublishedRunSnapshot,
 	parseAuthorName,
+	parseSiteStats,
 	runFingerprint,
 	type SavedTeamSnapshot,
 	teamFingerprint,
@@ -51,6 +52,20 @@ function snapshot(overrides: Partial<SavedTeamSnapshot> = {}): SavedTeamSnapshot
 }
 
 describe("community schema", () => {
+	it("parses homepage site totals from snake_case or camelCase", () => {
+		expect(parseSiteStats({ games_played: "12", saved_teams: "8", wins: "47" })).toEqual({
+			gamesPlayed: 12,
+			savedTeams: 8,
+			wins: 47,
+		});
+		expect(parseSiteStats([{ gamesPlayed: 1, savedTeams: 2, wins: 3 }])).toEqual({
+			gamesPlayed: 1,
+			savedTeams: 2,
+			wins: 3,
+		});
+		expect(parseSiteStats({ gamesPlayed: -1, savedTeams: 0, wins: 0 })).toBeNull();
+	});
+
 	it("defaults blank authors to Anonymous", () => {
 		expect(parseAuthorName("")).toBe(DEFAULT_AUTHOR_NAME);
 		expect(parseAuthorName("   ")).toBe(DEFAULT_AUTHOR_NAME);

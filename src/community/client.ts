@@ -7,11 +7,13 @@ import {
 	type DuelResultSnapshot,
 	duelResultSnapshotSchema,
 	type PublishedRunSnapshot,
+	parseSiteStats,
 	publishedRunSnapshotSchema,
 	type RankedProfile,
 	rankedProfileSchema,
 	runFingerprint,
 	type SavedTeamSnapshot,
+	type SiteStats,
 	savedTeamSnapshotSchema,
 } from "./schema";
 import type { PublishRunInput, PublishTeamInput } from "./snapshot";
@@ -164,6 +166,34 @@ export async function fetchMyPublishedRuns(userId: string): Promise<PublishedRun
 		const parsed = parseRunRow(row);
 		return parsed ? [parsed] : [];
 	});
+}
+
+export async function fetchSiteStats(): Promise<SiteStats | null> {
+	const supabase = getSupabase();
+	if (!supabase) return null;
+	const { data, error } = await supabase.rpc("site_stats");
+	const parsed = parseSiteStats(data);
+	// Prefer the RPC when it is the match-total definition (games >= wins).
+	if (!error && parsed && parsed.gamesPlayed >= parsed.wins) return parsed;
+	const [teams, records] = await Promise.all([
+		supabase.from("saved_teams").select("*", { count: "exact", head: true }),
+		supabase.from("published_runs").select("wins, losses"),
+	]);
+	const wins = (records.data ?? []).reduce((sum, row) => {
+		return sum + (typeof row.wins === "number" ? row.wins : 0);
+	}, 0);
+	const gamesPlayed = (records.data ?? []).reduce((sum, row) => {
+		const matchWins = typeof row.wins === "number" ? row.wins : 0;
+		const matchLosses = typeof row.losses === "number" ? row.losses : 0;
+		return sum + matchWins + matchLosses;
+	}, 0);
+	return (
+		parseSiteStats({
+			gamesPlayed,
+			savedTeams: teams.count ?? 0,
+			wins,
+		}) ?? { gamesPlayed: 0, savedTeams: 0, wins: 0 }
+	);
 }
 
 export async function fetchSavedTeams(): Promise<SavedTeamSnapshot[]> {

@@ -8,6 +8,7 @@ import {
 	type RankedProfile,
 	rankedWinRate,
 	type SavedTeamSnapshot,
+	type SiteStats,
 	uniqueBestPublishedRuns,
 } from "../community";
 import type { Dataset } from "../data";
@@ -67,6 +68,7 @@ export type HomeCommunityProps = {
 	onSaveUsername: () => void;
 	usernameBusy: boolean;
 	onLeaveQueue: () => void;
+	siteStats: SiteStats | null;
 };
 
 type HomeScreenProps = {
@@ -97,6 +99,36 @@ function BetaChip() {
 		<span className="inline-flex items-center rounded-full border border-white/22 bg-white/10 px-1.5 py-px text-[8px] font-bold uppercase tracking-[0.16em] text-zinc-300">
 			Beta
 		</span>
+	);
+}
+
+function SiteStatsNote({ stats }: { stats: SiteStats | null }) {
+	const shown = stats ?? { gamesPlayed: 0, savedTeams: 0, wins: 0 };
+	const items = [
+		[shown.gamesPlayed, "games played"],
+		[shown.savedTeams, "saved teams"],
+		[shown.wins, "wins"],
+	] as const;
+	return (
+		<p
+			className={`mb-3 w-full text-[9px] font-semibold uppercase tracking-[0.12em] text-zinc-500 lg:mb-[clamp(0.35rem,1vh,0.75rem)] sm:text-[10px] sm:tracking-[0.14em] ${
+				stats ? "" : "invisible"
+			}`}
+			aria-live="polite"
+			aria-hidden={!stats}
+		>
+			{items.map(([value, label], index) => (
+				<span key={label}>
+					{index > 0 ? (
+						<span className="mx-1.5 text-white/25" aria-hidden>
+							·
+						</span>
+					) : null}
+					<span className="tabular-nums text-zinc-300">{value.toLocaleString("en-US")}</span>
+					{` ${label}`}
+				</span>
+			))}
+		</p>
 	);
 }
 
@@ -379,6 +411,9 @@ export function HomeScreen({
 							: "max-w-md"
 					}`}
 				>
+					{view === "menu" && community.enabled ? (
+						<SiteStatsNote stats={community.siteStats} />
+					) : null}
 					<BrandMark size={view === "menu" ? "lg" : "sm"} />
 					<p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-400 lg:mt-[clamp(0.75rem,2vh,1.5rem)]">
 						Counter-Strike fantasy draft
@@ -393,7 +428,10 @@ export function HomeScreen({
 					) : null}
 
 					{view === "menu" ? (
-						<nav aria-label="Game modes" className="mt-10 flex w-full flex-col gap-3 lg:mt-[clamp(1rem,3vh,2.5rem)]">
+						<nav
+							aria-label="Game modes"
+							className="mt-10 flex w-full flex-col gap-3 lg:mt-[clamp(1rem,3vh,2.5rem)]"
+						>
 							<button type="button" onClick={() => onChoose("daily")} className={PRIMARY_BUTTON}>
 								{hasDailyAttempt ? "Continue today's challenge" : "Today's challenge"}
 							</button>

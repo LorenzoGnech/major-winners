@@ -135,3 +135,31 @@ export const rankedResultSchema = z.object({
 	opponent: rankedEloSideSchema.nullable(),
 });
 export type RankedResult = z.infer<typeof rankedResultSchema>;
+
+export type SiteStats = {
+	gamesPlayed: number;
+	savedTeams: number;
+	wins: number;
+};
+
+function asCount(value: unknown): number | null {
+	if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+		return Math.trunc(value);
+	}
+	if (typeof value === "string" && /^\d+$/.test(value)) {
+		const parsed = Number(value);
+		return Number.isSafeInteger(parsed) ? parsed : null;
+	}
+	return null;
+}
+
+export function parseSiteStats(value: unknown): SiteStats | null {
+	const row = Array.isArray(value) ? value[0] : value;
+	if (!row || typeof row !== "object") return null;
+	const record = row as Record<string, unknown>;
+	const gamesPlayed = asCount(record.gamesPlayed ?? record.games_played);
+	const savedTeams = asCount(record.savedTeams ?? record.saved_teams);
+	const wins = asCount(record.wins);
+	if (gamesPlayed === null || savedTeams === null || wins === null) return null;
+	return { gamesPlayed, savedTeams, wins };
+}
