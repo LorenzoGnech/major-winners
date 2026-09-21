@@ -145,6 +145,31 @@ export async function fetchBestRuns(): Promise<PublishedRunSnapshot[]> {
 	});
 }
 
+export async function fetchDailyRuns(seed: number): Promise<PublishedRunSnapshot[]> {
+	const supabase = getSupabase();
+	if (!supabase) return [];
+	const { data, error } = await supabase
+		.from("published_runs")
+		.select(
+			"id, mode, wins, losses, maps_won, maps_lost, rounds_won, rounds_lost, finish, perfect, fingerprint, created_at, saved_teams!inner (id, user_id, author_name, team_name, seed, roster, coach_id, traits, created_at)",
+		)
+		.eq("mode", "daily")
+		.eq("saved_teams.seed", seed)
+		.order("wins", { ascending: false })
+		.order("losses", { ascending: true })
+		.order("maps_lost", { ascending: true })
+		.order("rounds_lost", { ascending: true })
+		.order("maps_won", { ascending: false })
+		.order("rounds_won", { ascending: false })
+		.order("created_at", { ascending: true })
+		.limit(COMMUNITY_FETCH_RUNS);
+	if (error || !data) return [];
+	return (data as PublishedRunRow[]).flatMap((row) => {
+		const parsed = parseRunRow(row);
+		return parsed ? [parsed] : [];
+	});
+}
+
 export async function fetchMyPublishedRuns(userId: string): Promise<PublishedRunSnapshot[]> {
 	const supabase = getSupabase();
 	if (!supabase) return [];
@@ -177,7 +202,7 @@ export async function fetchSiteStats(): Promise<SiteStats | null> {
 	if (!error && parsed) return parsed;
 	const [teams, records] = await Promise.all([
 		supabase.from("saved_teams").select("*", { count: "exact", head: true }),
-		supabase.from("published_runs").select("wins, losses, finish"),
+		supabase.from("published_runs").select("wins, losses, finish, mode"),
 	]);
 	return aggregateSiteStats(teams.count ?? 0, records.data ?? []);
 }

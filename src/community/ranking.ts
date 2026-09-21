@@ -35,6 +35,17 @@ export function topPublishedRuns(
 	return [...runs].sort(compareBestRuns).slice(0, limit);
 }
 
+export function topDailyPublishedRuns(
+	runs: readonly PublishedRunSnapshot[],
+	seed: number,
+	limit: number,
+): PublishedRunSnapshot[] {
+	return topPublishedRuns(
+		runs.filter((run) => run.mode === "daily" && run.team.seed === seed),
+		limit,
+	);
+}
+
 export function uniqueBestPublishedRuns(
 	runs: readonly PublishedRunSnapshot[],
 	limit: number,

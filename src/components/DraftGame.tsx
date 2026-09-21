@@ -12,6 +12,7 @@ import {
 	type DuelSide,
 	displayNameTaken,
 	fetchBestRuns,
+	fetchDailyRuns,
 	fetchDuel,
 	fetchEloLeaderboard,
 	fetchMyProfile,
@@ -68,6 +69,7 @@ import {
 	type DailyResult,
 	type DailyStats,
 	type DraftState,
+	dailyDayLocked,
 	dailyIdentity,
 	dailyResultFromTournament,
 	EMPTY_DAILY_STATS,
@@ -503,6 +505,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const selectedPlayerIdRef = useRef<string | null>(null);
 	selectedPlayerIdRef.current = selectedPlayerId;
 	const [communityRuns, setCommunityRuns] = useState<PublishedRunSnapshot[]>([]);
+	const [dailyRuns, setDailyRuns] = useState<PublishedRunSnapshot[]>([]);
 	const [myRuns, setMyRuns] = useState<PublishedRunSnapshot[]>([]);
 	const [communityTeams, setCommunityTeams] = useState<SavedTeamSnapshot[]>([]);
 	const [siteStats, setSiteStats] = useState<SiteStats | null>(null);
@@ -589,12 +592,14 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		let cancelled = false;
 		void Promise.all([
 			fetchBestRuns(),
+			fetchDailyRuns(dailyIdentity().seed),
 			fetchSavedTeams(),
 			fetchEloLeaderboard(),
 			fetchSiteStats(),
-		]).then(([runs, teams, board, stats]) => {
+		]).then(([runs, daily, teams, board, stats]) => {
 			if (cancelled) return;
 			setCommunityRuns(runs);
+			setDailyRuns(daily);
 			setCommunityTeams(teams);
 			setEloBoard(board);
 			setSiteStats(stats);
@@ -669,10 +674,16 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		let stats = dailyStats;
 		try {
 			attempt = loadDailyAttempt(window.localStorage, dataset, today.day, today.seed);
-			stats = markDailyPlayed(loadDailyStats(window.localStorage), today.day);
+			stats = loadDailyStats(window.localStorage);
+		} catch {
+			stats = fallbackDailyStats();
+		}
+		if (!attempt && dailyDayLocked(stats, today.day)) return;
+		try {
+			stats = markDailyPlayed(stats, today.day);
 			saveDailyStats(window.localStorage, stats);
 		} catch {
-			stats = markDailyPlayed(fallbackDailyStats(), today.day);
+			stats = markDailyPlayed(stats, today.day);
 		}
 		setIdentity(today);
 		setDailyStats(stats);
@@ -1068,6 +1079,8 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setMode(null);
 		try {
 			const today = dailyIdentity();
+			setIdentity(today);
+			setDailyStats(loadDailyStats(window.localStorage));
 			setHasDailyAttempt(
 				Boolean(loadDailyAttempt(window.localStorage, dataset, today.day, today.seed)),
 			);
@@ -1111,13 +1124,13 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	}
 
 	function requestNewDraft() {
-		if (mode === "duel") return;
+		if (mode === "duel" || mode === "daily") return;
 		setPendingRestart(true);
 		setNameError(null);
 	}
 
 	function confirmNewDraft() {
-		if (mode === "duel") return;
+		if (mode === "duel" || mode === "daily") return;
 		setTeamName(DEFAULT_TEAM_NAME);
 		setNameDraft("");
 		setNameError(null);
@@ -1125,7 +1138,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setSelectedPlayerId(null);
 		setSaveError(null);
 		setSaveMessage(null);
-		setState(startDraft(dataset, mode === "daily" ? identity.seed : freePlaySeed()));
+		setState(startDraft(dataset, freePlaySeed()));
 		setRollKind("full");
 		setSettledCardKey(null);
 		setError(null);
@@ -1559,6 +1572,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			// Remembering locally is best-effort.
 		}
 		void fetchBestRuns().then(setCommunityRuns);
+		void fetchDailyRuns(identity.seed).then(setDailyRuns);
 		void fetchSavedTeams().then(setCommunityTeams);
 		void fetchSiteStats().then(setSiteStats);
 		if (userId) void fetchMyPublishedRuns(userId).then(setMyRuns);
@@ -1606,6 +1620,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				view={homeView}
 				stats={dailyStats}
 				hasDailyAttempt={hasDailyAttempt}
+				dailyLocked={dailyDayLocked(dailyStats, dailyIdentity().day) && !hasDailyAttempt}
 				hasFreePlaySave={hasFreePlaySave}
 				seedDraft={seedDraft}
 				seedError={seedError}
@@ -1629,6 +1644,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 					authError,
 					emailDraft,
 					runs: communityRuns,
+					dailyRuns,
+					dailyDay: dailyIdentity().day,
+					dailySeed: dailyIdentity().seed,
 					teams: communityTeams,
 					dataset,
 					ratedPlayers,
@@ -1732,7 +1750,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								Five picks from Major history, one coach, then the full bracket.
 							</p>
 						</div>
-						{!tournament && !pendingRestart && mode !== "duel" && (
+						{!tournament && !pendingRestart && mode !== "duel" && mode !== "daily" && (
 							<button
 								type="button"
 								onClick={requestNewDraft}
@@ -1830,7 +1848,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								playersById={playersById}
 								onChange={setTournament}
 								onAbandon={abandonRun}
-								onPlayAgain={confirmNewDraft}
+								onPlayAgain={mode === "daily" ? undefined : confirmNewDraft}
 								terminalExtras={
 									communityEnabled && runSummary ? (
 										<div className="mt-4 space-y-4">

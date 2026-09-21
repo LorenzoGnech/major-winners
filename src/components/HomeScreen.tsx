@@ -48,6 +48,9 @@ export type HomeCommunityProps = {
 	authError: string | null;
 	emailDraft: string;
 	runs: readonly PublishedRunSnapshot[];
+	dailyRuns: readonly PublishedRunSnapshot[];
+	dailyDay: string;
+	dailySeed: number;
 	teams: readonly SavedTeamSnapshot[];
 	dataset: Dataset;
 	ratedPlayers: readonly RatedPlayer[];
@@ -75,6 +78,7 @@ type HomeScreenProps = {
 	view: HomeView;
 	stats: DailyStats;
 	hasDailyAttempt: boolean;
+	dailyLocked: boolean;
 	hasFreePlaySave: boolean;
 	seedDraft: string;
 	seedError: string | null;
@@ -103,11 +107,22 @@ function BetaChip() {
 }
 
 function SiteStatsNote({ stats }: { stats: SiteStats | null }) {
-	const shown = stats ?? { gamesPlayed: 0, savedTeams: 0, wins: 0 };
+	const shown = stats ?? {
+		gamesPlayed: 0,
+		savedTeams: 0,
+		wins: 0,
+		dailyRunsWon: 0,
+		dailyRunsPlayed: 0,
+	};
 	const items = [
-		[shown.gamesPlayed, "games played"],
-		[shown.savedTeams, "saved teams"],
-		[shown.wins, "majors won"],
+		[shown.gamesPlayed.toLocaleString("en-US"), "games played", "games played"],
+		[shown.savedTeams.toLocaleString("en-US"), "saved teams", "saved teams"],
+		[shown.wins.toLocaleString("en-US"), "majors won", "majors won"],
+		[
+			`${shown.dailyRunsWon.toLocaleString("en-US")}/${shown.dailyRunsPlayed.toLocaleString("en-US")}`,
+			"daily runs",
+			"daily runs won / daily runs played",
+		],
 	] as const;
 	return (
 		<p
@@ -117,14 +132,14 @@ function SiteStatsNote({ stats }: { stats: SiteStats | null }) {
 			aria-live="polite"
 			aria-hidden={!stats}
 		>
-			{items.map(([value, label], index) => (
-				<span key={label}>
+			{items.map(([value, label, spoken], index) => (
+				<span key={label} title={spoken}>
 					{index > 0 ? (
 						<span className="mx-1.5 text-white/25" aria-hidden>
 							·
 						</span>
 					) : null}
-					<span className="tabular-nums text-zinc-300">{value.toLocaleString("en-US")}</span>
+					<span className="tabular-nums text-zinc-300">{value}</span>
 					{` ${label}`}
 				</span>
 			))}
@@ -385,6 +400,7 @@ export function HomeScreen({
 	view,
 	stats,
 	hasDailyAttempt,
+	dailyLocked,
 	hasFreePlaySave,
 	seedDraft,
 	seedError,
@@ -432,8 +448,17 @@ export function HomeScreen({
 							aria-label="Game modes"
 							className="mt-10 flex w-full flex-col gap-3 lg:mt-[clamp(1rem,3vh,2.5rem)]"
 						>
-							<button type="button" onClick={() => onChoose("daily")} className={PRIMARY_BUTTON}>
-								{hasDailyAttempt ? "Continue today's challenge" : "Today's challenge"}
+							<button
+								type="button"
+								onClick={() => onChoose("daily")}
+								disabled={dailyLocked}
+								className={`${PRIMARY_BUTTON} disabled:cursor-not-allowed disabled:opacity-50`}
+							>
+								{hasDailyAttempt
+									? "Continue today's challenge"
+									: dailyLocked
+										? "Today's challenge complete"
+										: "Today's challenge"}
 							</button>
 							<button type="button" onClick={() => onChoose("free")} className={SECONDARY_BUTTON}>
 								{hasFreePlaySave ? "Continue free play" : "Free play"}
@@ -762,6 +787,9 @@ export function HomeScreen({
 						<div className="mt-8 flex w-full flex-col items-center gap-6">
 							<HomeLeaderboards
 								runs={community.runs}
+								dailyRuns={community.dailyRuns}
+								dailySeed={community.dailySeed}
+								dailyDay={community.dailyDay}
 								teams={community.teams}
 								eloBoard={community.eloBoard}
 								dataset={community.dataset}

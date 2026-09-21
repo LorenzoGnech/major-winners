@@ -70,6 +70,10 @@ export function markDailyPlayed(stats: DailyStats, day: string): DailyStats {
 	if (!isDay(day) || stats.playedDays.includes(day)) return stats;
 	return { ...stats, playedDays: uniqueDays([...stats.playedDays, day]) };
 }
+
+export function dailyDayLocked(stats: DailyStats, day: string): boolean {
+	return isDay(day) && stats.playedDays.includes(day);
+}
 export function dailyResultFromTournament(
 	day: string,
 	state: TournamentState,

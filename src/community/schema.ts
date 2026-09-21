@@ -184,6 +184,8 @@ export type SiteStats = {
 	gamesPlayed: number;
 	savedTeams: number;
 	wins: number;
+	dailyRunsWon: number;
+	dailyRunsPlayed: number;
 };
 
 function asCount(value: unknown): number | null {
@@ -204,8 +206,18 @@ export function parseSiteStats(value: unknown): SiteStats | null {
 	const gamesPlayed = asCount(record.gamesPlayed ?? record.games_played);
 	const savedTeams = asCount(record.savedTeams ?? record.saved_teams);
 	const wins = asCount(record.majorsWon ?? record.majors_won) ?? asCount(record.wins);
-	if (gamesPlayed === null || savedTeams === null || wins === null) return null;
-	return { gamesPlayed, savedTeams, wins };
+	const dailyRunsWon = asCount(record.dailyRunsWon ?? record.daily_runs_won);
+	const dailyRunsPlayed = asCount(record.dailyRunsPlayed ?? record.daily_runs_played);
+	if (
+		gamesPlayed === null ||
+		savedTeams === null ||
+		wins === null ||
+		dailyRunsWon === null ||
+		dailyRunsPlayed === null
+	) {
+		return null;
+	}
+	return { gamesPlayed, savedTeams, wins, dailyRunsWon, dailyRunsPlayed };
 }
 
 export function parseChampionshipSiteStats(value: unknown): SiteStats | null {
@@ -213,18 +225,32 @@ export function parseChampionshipSiteStats(value: unknown): SiteStats | null {
 	if (!row || typeof row !== "object") return null;
 	const record = row as Record<string, unknown>;
 	if (!("majorsWon" in record) && !("majors_won" in record)) return null;
+	if (!("dailyRunsWon" in record) && !("daily_runs_won" in record)) return null;
+	if (!("dailyRunsPlayed" in record) && !("daily_runs_played" in record)) return null;
 	return parseSiteStats(value);
 }
 
 export function aggregateSiteStats(
 	savedTeams: number,
-	runs: readonly { wins?: unknown; losses?: unknown; finish?: unknown }[],
+	runs: readonly { wins?: unknown; losses?: unknown; finish?: unknown; mode?: unknown }[],
 ): SiteStats {
 	let gamesPlayed = 0;
 	let wins = 0;
+	let dailyRunsPlayed = 0;
+	let dailyRunsWon = 0;
 	for (const row of runs) {
 		gamesPlayed += (asCount(row.wins) ?? 0) + (asCount(row.losses) ?? 0);
 		if (row.finish === "Champion") wins += 1;
+		if (row.mode === "daily") {
+			dailyRunsPlayed += 1;
+			if (row.finish === "Champion") dailyRunsWon += 1;
+		}
 	}
-	return { gamesPlayed, savedTeams: asCount(savedTeams) ?? 0, wins };
+	return {
+		gamesPlayed,
+		savedTeams: asCount(savedTeams) ?? 0,
+		wins,
+		dailyRunsWon,
+		dailyRunsPlayed,
+	};
 }

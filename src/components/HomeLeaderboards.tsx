@@ -6,6 +6,7 @@ import {
 	type RankedProfile,
 	type SavedTeamSnapshot,
 	teamOverallFromSnapshot,
+	topDailyPublishedRuns,
 	topPublishedRuns,
 	uniqueTeamsByRoster,
 } from "../community";
@@ -15,6 +16,13 @@ import { PlayerCrest } from "./PlayerCrest";
 
 export function rankedBestRuns(runs: readonly PublishedRunSnapshot[]): PublishedRunSnapshot[] {
 	return topPublishedRuns(runs, COMMUNITY_BOARD_SIZE);
+}
+
+export function rankedDailyRuns(
+	runs: readonly PublishedRunSnapshot[],
+	seed: number,
+): PublishedRunSnapshot[] {
+	return topDailyPublishedRuns(runs, seed, COMMUNITY_BOARD_SIZE);
 }
 
 export function rankedTopTeams(
@@ -101,61 +109,95 @@ export function RosterStrip({
 	);
 }
 
+function RunBoard({
+	runs,
+	nicks,
+	photos,
+	empty,
+}: {
+	runs: readonly PublishedRunSnapshot[];
+	nicks: ReadonlyMap<string, string>;
+	photos: ReadonlyMap<string, { playerId: string; nick: string; photo?: string }>;
+	empty: string;
+}) {
+	if (runs.length === 0) {
+		return <p className="text-sm text-zinc-500">{empty}</p>;
+	}
+	return (
+		<ol className="space-y-2">
+			{runs.map((run, index) => {
+				const saved = formatSavedAt(run.createdAt);
+				return (
+					<li key={run.id} className="border border-white/10 px-2.5 py-2">
+						<div className="flex items-start justify-between gap-3">
+							<div className="min-w-0">
+								<p className="truncate text-sm font-semibold text-white">
+									<span className="mr-2 tabular-nums text-zinc-500">{index + 1}</span>
+									{run.team.teamName}
+								</p>
+								<p className="truncate text-[11px] text-zinc-500">
+									{run.team.authorName} · {run.finish}
+									{saved ? ` · ${saved}` : ""}
+								</p>
+							</div>
+							<p className="max-w-[42%] shrink-0 text-right text-[11px] tabular-nums text-zinc-300 sm:text-xs">
+								{run.wins}–{run.losses}
+								<span className="mt-0.5 block text-[9px] leading-tight text-zinc-500 sm:text-[10px]">
+									maps {run.mapsWon}–{run.mapsLost} · rnd {run.roundsWon}–{run.roundsLost}
+								</span>
+							</p>
+						</div>
+						<RosterStrip roster={run.team.roster} nicks={nicks} photos={photos} />
+					</li>
+				);
+			})}
+		</ol>
+	);
+}
+
 export function HomeLeaderboards({
 	runs,
+	dailyRuns,
+	dailySeed,
+	dailyDay,
 	teams,
 	eloBoard,
 	dataset,
 	ratedPlayers,
 }: {
 	runs: readonly PublishedRunSnapshot[];
+	dailyRuns: readonly PublishedRunSnapshot[];
+	dailySeed: number;
+	dailyDay: string;
 	teams: readonly SavedTeamSnapshot[];
 	eloBoard: readonly RankedProfile[];
 	dataset: Dataset;
 	ratedPlayers: readonly RatedPlayer[];
 }) {
 	const best = rankedBestRuns(runs);
+	const daily = rankedDailyRuns(dailyRuns, dailySeed);
 	const top = rankedTopTeams(teams, dataset, ratedPlayers);
 	const nicks = new Map(dataset.playerSeasons.map((player) => [player.id, player.nick]));
 	const photos = new Map(dataset.playerSeasons.map((player) => [player.id, player]));
+	const dailySaved = formatSavedAt(`${dailyDay}T00:00:00.000Z`);
 
 	return (
-		<div className="grid w-full grid-cols-1 gap-4 min-[900px]:grid-cols-2 xl:grid-cols-3">
+		<div className="grid w-full grid-cols-1 gap-4 min-[900px]:grid-cols-2">
+			<BoardShell title={dailySaved ? `Today's Daily · ${dailySaved}` : "Today's Daily"}>
+				<RunBoard
+					runs={daily}
+					nicks={nicks}
+					photos={photos}
+					empty="No saved finishes for today's Daily yet."
+				/>
+			</BoardShell>
 			<BoardShell title="Best runs">
-				{best.length > 0 ? (
-					<ol className="space-y-2">
-						{best.map((run, index) => {
-							const saved = formatSavedAt(run.createdAt);
-							return (
-								<li key={run.id} className="border border-white/10 px-2.5 py-2">
-									<div className="flex items-start justify-between gap-3">
-										<div className="min-w-0">
-											<p className="truncate text-sm font-semibold text-white">
-												<span className="mr-2 tabular-nums text-zinc-500">{index + 1}</span>
-												{run.team.teamName}
-											</p>
-											<p className="truncate text-[11px] text-zinc-500">
-												{run.team.authorName} · {run.finish}
-												{saved ? ` · ${saved}` : ""}
-											</p>
-										</div>
-										<p className="max-w-[42%] shrink-0 text-right text-[11px] tabular-nums text-zinc-300 sm:text-xs">
-											{run.wins}–{run.losses}
-											<span className="mt-0.5 block text-[9px] leading-tight text-zinc-500 sm:text-[10px]">
-												maps {run.mapsWon}–{run.mapsLost} · rnd {run.roundsWon}–{run.roundsLost}
-											</span>
-										</p>
-									</div>
-									<RosterStrip roster={run.team.roster} nicks={nicks} photos={photos} />
-								</li>
-							);
-						})}
-					</ol>
-				) : (
-					<p className="text-sm text-zinc-500">
-						Nothing here yet. Finish a Major and save your team.
-					</p>
-				)}
+				<RunBoard
+					runs={best}
+					nicks={nicks}
+					photos={photos}
+					empty="Nothing here yet. Finish a Major and save your team."
+				/>
 			</BoardShell>
 			<BoardShell title="Highest rated teams">
 				{top.length > 0 ? (

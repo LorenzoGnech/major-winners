@@ -3,9 +3,11 @@ import { loadDataset } from "../../data";
 import { startDraft } from "../draft";
 import {
 	type DailyResult,
+	dailyDayLocked,
 	dailyIdentity,
 	EMPTY_DAILY_STATS,
 	formatDailyShare,
+	markDailyPlayed,
 	parseDailyStats,
 	recordDailyResult,
 	summarizeDailyStats,
@@ -86,6 +88,16 @@ describe("daily challenge", () => {
 		);
 		expect(parseDailyStats("{bad")).toEqual(EMPTY_DAILY_STATS);
 		expect(parseDailyStats('{"version":99}')).toEqual(EMPTY_DAILY_STATS);
+	});
+	it("locks a UTC day after the Daily is started or finished", () => {
+		expect(dailyDayLocked(EMPTY_DAILY_STATS, "2026-09-21")).toBe(false);
+		expect(dailyDayLocked(markDailyPlayed(EMPTY_DAILY_STATS, "2026-09-21"), "2026-09-21")).toBe(
+			true,
+		);
+		expect(
+			dailyDayLocked(recordDailyResult(EMPTY_DAILY_STATS, result("2026-09-21")), "2026-09-21"),
+		).toBe(true);
+		expect(dailyDayLocked(markDailyPlayed(EMPTY_DAILY_STATS, "2026-09-21"), "nope")).toBe(false);
 	});
 	it("groups share grids without spoilers", () => {
 		const share = formatDailyShare(result("2026-09-15"), "https://example.test/");

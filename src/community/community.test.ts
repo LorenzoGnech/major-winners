@@ -7,6 +7,7 @@ import { buildCommunityOpponents, mergeOpponentPools } from "./opponents";
 import {
 	compareBestRuns,
 	compareHighestRated,
+	topDailyPublishedRuns,
 	topPublishedRuns,
 	uniqueBestPublishedRuns,
 	uniqueTeamsByRoster,
@@ -56,40 +57,97 @@ function snapshot(overrides: Partial<SavedTeamSnapshot> = {}): SavedTeamSnapshot
 
 describe("community schema", () => {
 	it("parses homepage site totals from snake_case or camelCase", () => {
-		expect(parseSiteStats({ games_played: "12", saved_teams: "8", wins: "47" })).toEqual({
+		expect(
+			parseSiteStats({
+				games_played: "12",
+				saved_teams: "8",
+				wins: "47",
+				daily_runs_won: "3",
+				daily_runs_played: "20",
+			}),
+		).toEqual({
 			gamesPlayed: 12,
 			savedTeams: 8,
 			wins: 47,
+			dailyRunsWon: 3,
+			dailyRunsPlayed: 20,
 		});
-		expect(parseSiteStats([{ gamesPlayed: 1, savedTeams: 2, wins: 3 }])).toEqual({
+		expect(
+			parseSiteStats([
+				{ gamesPlayed: 1, savedTeams: 2, wins: 3, dailyRunsWon: 0, dailyRunsPlayed: 1 },
+			]),
+		).toEqual({
 			gamesPlayed: 1,
 			savedTeams: 2,
 			wins: 3,
+			dailyRunsWon: 0,
+			dailyRunsPlayed: 1,
 		});
-		expect(parseSiteStats({ gamesPlayed: -1, savedTeams: 0, wins: 0 })).toBeNull();
-		expect(parseSiteStats({ games_played: 12, saved_teams: 8, wins: 47, majors_won: 2 })).toEqual({
-			gamesPlayed: 12,
-			savedTeams: 8,
-			wins: 2,
-		});
-		expect(parseChampionshipSiteStats({ games_played: 12, saved_teams: 8, wins: 47 })).toBeNull();
 		expect(
-			parseChampionshipSiteStats({ games_played: 12, saved_teams: 8, wins: 2, majors_won: 2 }),
+			parseSiteStats({
+				gamesPlayed: -1,
+				savedTeams: 0,
+				wins: 0,
+				dailyRunsWon: 0,
+				dailyRunsPlayed: 0,
+			}),
+		).toBeNull();
+		expect(
+			parseSiteStats({ games_played: 12, saved_teams: 8, wins: 47, majors_won: 2 }),
+		).toBeNull();
+		expect(
+			parseSiteStats({
+				games_played: 12,
+				saved_teams: 8,
+				wins: 47,
+				majors_won: 2,
+				daily_runs_won: 1,
+				daily_runs_played: 9,
+			}),
 		).toEqual({
 			gamesPlayed: 12,
 			savedTeams: 8,
 			wins: 2,
+			dailyRunsWon: 1,
+			dailyRunsPlayed: 9,
+		});
+		expect(parseChampionshipSiteStats({ games_played: 12, saved_teams: 8, wins: 47 })).toBeNull();
+		expect(
+			parseChampionshipSiteStats({ games_played: 12, saved_teams: 8, wins: 2, majors_won: 2 }),
+		).toBeNull();
+		expect(
+			parseChampionshipSiteStats({
+				games_played: 12,
+				saved_teams: 8,
+				wins: 2,
+				majors_won: 2,
+				daily_runs_won: 1,
+				daily_runs_played: 9,
+			}),
+		).toEqual({
+			gamesPlayed: 12,
+			savedTeams: 8,
+			wins: 2,
+			dailyRunsWon: 1,
+			dailyRunsPlayed: 9,
 		});
 	});
 
 	it("counts homepage wins as published Major titles", () => {
 		expect(
 			aggregateSiteStats(8, [
-				{ wins: 9, losses: 0, finish: "Champion" },
-				{ wins: 3, losses: 3, finish: "Challengers Swiss" },
-				{ wins: 8, losses: 1, finish: "Final" },
+				{ wins: 9, losses: 0, finish: "Champion", mode: "free" },
+				{ wins: 3, losses: 3, finish: "Challengers Swiss", mode: "daily" },
+				{ wins: 8, losses: 1, finish: "Final", mode: "daily" },
+				{ wins: 9, losses: 0, finish: "Champion", mode: "daily" },
 			]),
-		).toEqual({ gamesPlayed: 24, savedTeams: 8, wins: 1 });
+		).toEqual({
+			gamesPlayed: 33,
+			savedTeams: 8,
+			wins: 2,
+			dailyRunsWon: 1,
+			dailyRunsPlayed: 3,
+		});
 	});
 
 	it("defaults blank authors to Anonymous", () => {
@@ -198,6 +256,43 @@ describe("community ranking", () => {
 				3,
 			).map((row) => row.id),
 		).toEqual(["b", "c"]);
+	});
+
+	it("ranks today's Daily finishes even when nobody won the Major", () => {
+		const todaySeed = 99;
+		const otherSeed = 100;
+		const daily = (
+			id: string,
+			wins: number,
+			losses: number,
+			seed = todaySeed,
+		): PublishedRunSnapshot => ({
+			id,
+			team: snapshot({ id: `team-${id}`, seed }),
+			mode: "daily",
+			wins,
+			losses,
+			mapsWon: wins,
+			mapsLost: losses,
+			roundsWon: wins * 13,
+			roundsLost: losses * 13,
+			finish: wins === 9 ? "Champion" : "Legends Swiss",
+			perfect: wins === 9 && losses === 0,
+			fingerprint: id,
+			createdAt: "2026-09-21T00:00:00.000Z",
+		});
+		expect(
+			topDailyPublishedRuns(
+				[
+					daily("miss", 8, 1, otherSeed),
+					daily("mid", 3, 3),
+					{ ...daily("freeish", 9, 0), mode: "free" },
+					daily("best", 6, 3),
+				],
+				todaySeed,
+				10,
+			).map((row) => row.id),
+		).toEqual(["best", "mid"]);
 	});
 });
 

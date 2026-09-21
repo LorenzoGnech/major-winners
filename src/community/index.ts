@@ -2,6 +2,7 @@ export {
 	type DisplayNameResult,
 	displayNameTaken,
 	fetchBestRuns,
+	fetchDailyRuns,
 	fetchEloLeaderboard,
 	fetchMyProfile,
 	fetchMyPublishedRuns,
@@ -87,6 +88,7 @@ export {
 export {
 	compareBestRuns,
 	compareHighestRated,
+	topDailyPublishedRuns,
 	topPublishedRuns,
 	uniqueBestPublishedRuns,
 	uniqueTeamsByRoster,

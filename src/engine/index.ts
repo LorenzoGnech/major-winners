@@ -25,6 +25,7 @@ export {
 	type DailyResult,
 	type DailyRoster,
 	type DailyStats,
+	dailyDayLocked,
 	dailyFinish,
 	dailyIdentity,
 	dailyResultFromTournament,
