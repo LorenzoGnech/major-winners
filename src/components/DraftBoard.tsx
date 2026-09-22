@@ -165,6 +165,7 @@ export function PlayerDraftCard({
 	traits,
 	dragging,
 	selected,
+	rosteredRole,
 	onPointerDown,
 	onAssign,
 }: {
@@ -172,6 +173,8 @@ export function PlayerDraftCard({
 	traits?: readonly BonusId[];
 	dragging: boolean;
 	selected?: boolean;
+	/** Role slot already holding this player's career (a different season), if any. */
+	rosteredRole?: Role | null;
 	onPointerDown: (event: ReactPointerEvent<HTMLElement>) => void;
 	onAssign: (role: Role) => void;
 }) {
@@ -181,10 +184,15 @@ export function PlayerDraftCard({
 	const ovrColor = ovrTone(rated.ovr);
 	const secondaries = player.roles.filter((role) => role !== player.primaryRole);
 	const stats = playerCardStats(player, rated.attributes);
+	const locked = Boolean(rosteredRole);
 	const traitNames =
 		traits && traits.length > 0 ? `. ${traits.map((id) => bonusById(id).name).join(", ")}` : "";
+	const lockedNote = locked
+		? `Already on your roster as ${ROLE_LABELS[rosteredRole as Role]} (different season).`
+		: "";
 
 	function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+		if (locked) return;
 		const index = Number(event.key) - 1;
 		if (index < 0 || index >= ROLES.length) {
 			return;
@@ -198,20 +206,25 @@ export function PlayerDraftCard({
 
 	return (
 		<div
-			className={`overflow-hidden rounded-2xl bg-zinc-900 ${
+			className={`overflow-hidden rounded-2xl bg-zinc-900 ${locked ? "opacity-50" : ""} ${
 				selected ? "ring-2 ring-emerald-300" : ""
 			}`}
 		>
 			<button
 				type="button"
+				disabled={locked}
 				aria-grabbed={dragging}
 				aria-pressed={selected}
-				aria-label={`${playerDisplayNick(player)}, ${player.year}, ${ROLE_LABELS[player.primaryRole]}${traitNames}. Tap to select a role, drag onto a slot, or press 1 through 5.`}
-				onPointerDown={onPointerDown}
+				aria-label={
+					locked
+						? `${playerDisplayNick(player)}, ${player.year}. ${lockedNote}`
+						: `${playerDisplayNick(player)}, ${player.year}, ${ROLE_LABELS[player.primaryRole]}${traitNames}. Tap to select a role, drag onto a slot, or press 1 through 5.`
+				}
+				onPointerDown={locked ? undefined : onPointerDown}
 				onKeyDown={onKeyDown}
 				onDragStart={(event) => event.preventDefault()}
 				className={`flex min-h-[8.25rem] w-full touch-pan-y text-left outline-offset-2 focus-visible:outline-2 focus-visible:outline-emerald-300 ${
-					dragging ? "opacity-40" : "cursor-grab"
+					locked ? "cursor-not-allowed" : dragging ? "opacity-40" : "cursor-grab"
 				}`}
 			>
 				<div
@@ -249,6 +262,11 @@ export function PlayerDraftCard({
 								<span aria-hidden>{flagEmoji(player.nationality)}</span>
 								<span>{player.year}</span>
 							</p>
+							{locked ? (
+								<p aria-hidden className="mt-1 text-xs font-semibold text-amber-300">
+									{lockedNote}
+								</p>
+							) : null}
 						</div>
 						<div className="flex min-w-0 flex-wrap justify-end gap-1.5">
 							<span className="rounded-full bg-emerald-400/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">

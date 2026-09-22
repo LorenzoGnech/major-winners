@@ -235,7 +235,12 @@ describe("applyAction", () => {
 			players: navi[0].playerSeasonIds.map((id) => {
 				const season = dataset.playerSeasons.find((row) => row.id === id);
 				if (!season) throw new Error(id);
-				return { id: season.id, primaryRole: season.primaryRole, roles: [...season.roles] };
+				return {
+					id: season.id,
+					playerId: season.playerId,
+					primaryRole: season.primaryRole,
+					roles: [...season.roles],
+				};
 			}),
 		};
 		const withNavi: DraftState = {
@@ -268,7 +273,12 @@ describe("applyAction", () => {
 			players: singleton.playerSeasonIds.map((id) => {
 				const season = dataset.playerSeasons.find((row) => row.id === id);
 				if (!season) throw new Error(id);
-				return { id: season.id, primaryRole: season.primaryRole, roles: [...season.roles] };
+				return {
+					id: season.id,
+					playerId: season.playerId,
+					primaryRole: season.primaryRole,
+					roles: [...season.roles],
+				};
 			}),
 		};
 		const withSingleton: DraftState = {
@@ -398,6 +408,54 @@ describe("applyAction", () => {
 		const secondPlayer = opened.cards[1].players[0];
 		expect(swapped.roster.igl?.fit).toBe(roleFit(firstPlayer, "igl"));
 		expect(swapped.roster.awp?.fit).toBe(roleFit(secondPlayer, "awp"));
+	});
+
+	it("refuses to pick a player whose career is already rostered under a different season", () => {
+		const opened = startDraft(dataset, "duplicate-career");
+		const shared: DraftState = {
+			...opened,
+			phase: { type: "player", round: 1 },
+			cards: [
+				{
+					orgYearId: "test-org-a",
+					majorId: null,
+					kind: "major",
+					tier: "strong",
+					players: [
+						{ id: "donk-2021-natus-vincere", playerId: "donk", primaryRole: "igl", roles: ["igl"] },
+					],
+				},
+				{
+					orgYearId: "test-org-b",
+					majorId: null,
+					kind: "major",
+					tier: "strong",
+					players: [
+						{ id: "donk-2024-natus-vincere", playerId: "donk", primaryRole: "igl", roles: ["igl"] },
+					],
+				},
+			],
+			roster: {
+				awp: {
+					orgYearId: "test-org-a",
+					playerSeasonId: "donk-2021-natus-vincere",
+					role: "awp",
+					fit: 1,
+				},
+			},
+		};
+		const snapshot = structuredClone(shared);
+		const result = applyAction(shared, {
+			type: "pickPlayer",
+			playerSeasonId: "donk-2024-natus-vincere",
+			role: "igl",
+		});
+		expect(result.ok).toBe(false);
+		if (result.ok) {
+			return;
+		}
+		expect(result.error.code).toBe("duplicate_player");
+		expect(shared).toEqual(snapshot);
 	});
 
 	it("does not mutate when moving a player who is not on the roster", () => {

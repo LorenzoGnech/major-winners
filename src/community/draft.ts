@@ -71,6 +71,7 @@ export function completedDraftFromSnapshot(
 				tier: orgYear.tier,
 				players: rows.map((row) => ({
 					id: row.seasonId,
+					playerId: playersById.get(row.seasonId)?.playerId ?? row.seasonId,
 					primaryRole: playersById.get(row.seasonId)?.primaryRole ?? row.role,
 					roles: playersById.get(row.seasonId)?.roles ?? [row.role],
 					revealedTraitIds: traitsForSnapshot(snapshot.traits, row.seasonId),

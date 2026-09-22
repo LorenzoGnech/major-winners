@@ -4,6 +4,7 @@ import type { RoleFit } from "./fit";
 
 export type DraftablePlayer = {
 	id: string;
+	playerId: string;
 	primaryRole: Role;
 	roles: readonly Role[];
 	revealedTraitIds?: readonly BonusId[];

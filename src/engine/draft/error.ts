@@ -6,6 +6,7 @@ export type DraftErrorCode =
 	| "player_not_on_card"
 	| "player_not_on_roster"
 	| "role_occupied"
+	| "duplicate_player"
 	| "unknown_coach"
 	| "reroll_exhausted"
 	| "reroll_unavailable";

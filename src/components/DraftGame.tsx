@@ -1992,6 +1992,11 @@ export function DraftGame({ dataset }: DraftGameProps) {
 												if (!player) {
 													return null;
 												}
+												const rosteredElsewhere = pickedPlayers.find(
+													({ pick, player: rostered }) =>
+														rostered.playerId === player.playerId &&
+														pick.playerSeasonId !== player.id,
+												);
 												return (
 													<PlayerDraftCard
 														key={player.id}
@@ -1999,6 +2004,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 														traits={draftable.revealedTraitIds}
 														dragging={drag?.playerId === player.id}
 														selected={selectedPlayerId === player.id}
+														rosteredRole={rosteredElsewhere?.pick.role ?? null}
 														onPointerDown={(event) => startDrag(player.id, event)}
 														onAssign={(role) => assignPlayer(player.id, role)}
 													/>

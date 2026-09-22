@@ -31,6 +31,7 @@ function snapshotPlayer(
 ): DraftablePlayer {
 	return {
 		id: season.id,
+		playerId: season.playerId,
 		primaryRole: season.primaryRole,
 		roles: [...season.roles],
 		revealedTraitIds: revealTraits(seed, round, rerollIndex, season.id),
@@ -275,6 +276,16 @@ function pickPlayer(state: DraftState, action: PickPlayerAction): DraftResult<Dr
 	}
 	if (state.roster[action.role]) {
 		return fail("role_occupied", `role slot "${action.role}" is already filled`);
+	}
+	const duplicate = ROLES.some((role) => {
+		const pick = state.roster[role];
+		return pick && draftableForPick(state, pick)?.playerId === player.playerId;
+	});
+	if (duplicate) {
+		return fail(
+			"duplicate_player",
+			`"${player.playerId}" is already on the roster from a different season`,
+		);
 	}
 
 	const pick: PlayerPick = {
