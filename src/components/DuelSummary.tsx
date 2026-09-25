@@ -122,7 +122,6 @@ export function DuelSummary({
 	rankedResult = null,
 	rankedError = null,
 	onPlayAgain,
-	playAgainLabel = "Back to Home",
 }: {
 	summary: DuelSeriesSummary;
 	viewerSide: 0 | 1;
@@ -132,7 +131,6 @@ export function DuelSummary({
 	rankedResult?: RankedResult | null;
 	rankedError?: string | null;
 	onPlayAgain?: () => void;
-	playAgainLabel?: string;
 }) {
 	const won = summary.winner === viewerSide;
 	const winner = summary.sides[summary.winner];
@@ -225,12 +223,6 @@ export function DuelSummary({
 						))}
 					</ul>
 				) : null}
-				{onPlayAgain ? (
-					<div className="mt-6">
-						<RecapPlayButton onClick={onPlayAgain}>{playAgainLabel}</RecapPlayButton>
-					</div>
-				) : null}
-
 				<div className="mt-6 grid gap-4 lg:grid-cols-2">
 					<TeamRecap
 						label="Winning team"
@@ -250,8 +242,8 @@ export function DuelSummary({
 
 				{extras ? <div className="mt-5">{extras}</div> : null}
 				{onPlayAgain ? (
-					<div className={extras ? "mt-6" : "mt-5"}>
-						<RecapPlayButton onClick={onPlayAgain}>{playAgainLabel}</RecapPlayButton>
+					<div className="mt-6">
+						<RecapPlayButton onClick={onPlayAgain}>Back to Home</RecapPlayButton>
 					</div>
 				) : null}
 			</div>

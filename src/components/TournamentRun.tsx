@@ -41,7 +41,6 @@ type TournamentRunProps = {
 	onChange: (state: TournamentState) => void;
 	onAbandon: () => void;
 	onPlayAgain?: () => void;
-	playAgainLabel?: string;
 	terminalExtras?: ReactNode;
 };
 
@@ -85,7 +84,6 @@ export function TournamentRun({
 	onChange,
 	onAbandon,
 	onPlayAgain,
-	playAgainLabel = "Play again",
 	terminalExtras,
 }: TournamentRunProps) {
 	const [confirmAbandon, setConfirmAbandon] = useState(false);
@@ -177,8 +175,6 @@ export function TournamentRun({
 					playerTeam={playerTeam}
 					playerTeamName={playerTeamName}
 					playersById={playersById}
-					onPlayAgain={onPlayAgain}
-					playAgainLabel={playAgainLabel}
 				/>
 			) : null}
 			<div
@@ -279,12 +275,6 @@ export function TournamentRun({
 
 				{terminal ? terminalExtras : null}
 
-				{terminal && onPlayAgain ? (
-					<div className="mt-6">
-						<RecapPlayButton onClick={onPlayAgain}>{playAgainLabel}</RecapPlayButton>
-					</div>
-				) : null}
-
 				{error && (
 					<p role="alert" className="mt-4 text-sm text-red-200">
 						{error}
@@ -338,6 +328,12 @@ export function TournamentRun({
 					</ol>
 				</section>
 			)}
+
+			{terminal && onPlayAgain ? (
+				<div className="mt-6">
+					<RecapPlayButton onClick={onPlayAgain}>Back to Home</RecapPlayButton>
+				</div>
+			) : null}
 
 			{terminal ? null : (
 				<div className="mt-5">

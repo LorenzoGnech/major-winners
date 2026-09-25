@@ -117,7 +117,6 @@ import { MajorCrest } from "./MajorCrest";
 import { MatchPlayback } from "./MatchPlayback";
 import { resetMobileViewport } from "./mobileViewport";
 import { OrgCrest } from "./OrgCrest";
-import { SaveTeamPanel, saveResultMessage } from "./SaveTeam";
 import { TournamentRun } from "./TournamentRun";
 import { DEFAULT_TEAM_NAME, parseTeamName, TEAM_NAME_MAX } from "./teamName";
 import {
@@ -517,8 +516,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const [authError, setAuthError] = useState<string | null>(null);
 	const [saveBusy, setSaveBusy] = useState(false);
 	const [saveError, setSaveError] = useState<string | null>(null);
-	const [saveMessage, setSaveMessage] = useState<string | null>(null);
 	const [savedFingerprints, setSavedFingerprints] = useState<Set<string>>(() => new Set());
+	const [storageHydrated, setStorageHydrated] = useState(false);
+	const autoSaveKeyRef = useRef<string | null>(null);
 	const communityEnabled = isCommunityEnabled();
 
 	const playersById = useMemo(
@@ -585,6 +585,7 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		} catch {
 			// Storage may be unavailable in privacy-restricted browser contexts.
 		}
+		setStorageHydrated(true);
 	}, [dataset]);
 
 	useEffect(() => {
@@ -707,7 +708,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setError(null);
 		setPendingRestart(false);
 		setSaveError(null);
-		setSaveMessage(null);
 		const key = persistKey(nextMode);
 		if (options.restore && key) {
 			let persisted = null;
@@ -1137,7 +1137,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		setPendingRestart(false);
 		setSelectedPlayerId(null);
 		setSaveError(null);
-		setSaveMessage(null);
 		setState(startDraft(dataset, freePlaySeed()));
 		setRollKind("full");
 		setSettledCardKey(null);
@@ -1523,7 +1522,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			if (!duelTeamFingerprint) return;
 			setSaveBusy(true);
 			setSaveError(null);
-			setSaveMessage(null);
 			const result = await publishSavedTeam({
 				authorName,
 				teamName,
@@ -1536,7 +1534,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 				setSaveError(result.error);
 				return;
 			}
-			setSaveMessage(saveResultMessage(result));
 			setSavedFingerprints((current) => new Set(current).add(result.fingerprint));
 			try {
 				rememberPublishedFingerprint(window.localStorage, result.fingerprint);
@@ -1550,7 +1547,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		if (!runSummary || !publishMode) return;
 		setSaveBusy(true);
 		setSaveError(null);
-		setSaveMessage(null);
 		const result = await publishFinishedRun({
 			authorName,
 			teamName,
@@ -1564,7 +1560,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 			setSaveError(result.error);
 			return;
 		}
-		setSaveMessage(saveResultMessage(result));
 		setSavedFingerprints((current) => new Set(current).add(result.fingerprint));
 		try {
 			rememberPublishedFingerprint(window.localStorage, result.fingerprint);
@@ -1607,6 +1602,34 @@ export function DraftGame({ dataset }: DraftGameProps) {
 	const showDuelVeto = mode === "duel" && duelRoom?.status === "veto";
 	const showDuelRecap = mode === "duel" && Boolean(duelLive?.complete && duelRecap);
 	const showDuelMatch = mode === "duel" && Boolean(duelLive) && !showDuelRecap;
+	const saveFinishedTeamRef = useRef(saveFinishedTeam);
+	saveFinishedTeamRef.current = saveFinishedTeam;
+
+	useEffect(() => {
+		if (!storageHydrated || !communityEnabled || alreadySaved || saveBusy) return;
+		const key =
+			mode === "duel"
+				? showDuelRecap
+					? duelTeamFingerprint
+					: null
+				: runSummary && publishMode
+					? publishFingerprint
+					: null;
+		if (!key || autoSaveKeyRef.current === key) return;
+		autoSaveKeyRef.current = key;
+		void saveFinishedTeamRef.current();
+	}, [
+		alreadySaved,
+		communityEnabled,
+		duelTeamFingerprint,
+		mode,
+		publishFingerprint,
+		publishMode,
+		runSummary,
+		saveBusy,
+		showDuelRecap,
+		storageHydrated,
+	]);
 	const showSideRoster = Boolean(
 		!simulating &&
 			!showDuelVeto &&
@@ -1706,26 +1729,9 @@ export function DraftGame({ dataset }: DraftGameProps) {
 		);
 	}
 
-	const showRecapHome =
-		!pendingRestart &&
-		Boolean(tournament && !tournament.liveSeries && tournament.status !== "active");
-
 	return (
 		<>
-			<AppNav
-				onGoHome={goHome}
-				action={
-					showRecapHome ? (
-						<button
-							type="button"
-							onClick={abandonRun}
-							className="rounded-lg bg-emerald-300 px-3 py-1.5 text-xs font-bold text-zinc-950 transition hover:bg-emerald-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 sm:px-4 sm:py-2 sm:text-sm"
-						>
-							Back to Home
-						</button>
-					) : null
-				}
-			/>
+			<AppNav onGoHome={goHome} />
 			<div
 				className={`mx-auto w-full overflow-x-clip px-4 pb-5 pt-4 sm:px-6 sm:pb-8 sm:pt-5 ${simulating ? "max-w-360 max-lg:px-3 max-lg:pt-2 max-lg:pb-2" : "max-w-7xl"} ${state.phase.type === "player" && !rolling && !simulating ? "max-lg:pb-28" : ""}`}
 			>
@@ -1848,22 +1854,15 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								playersById={playersById}
 								onChange={setTournament}
 								onAbandon={abandonRun}
-								onPlayAgain={mode === "daily" ? undefined : confirmNewDraft}
+								onPlayAgain={abandonRun}
 								terminalExtras={
-									communityEnabled && runSummary ? (
+									saveError || dailyResult ? (
 										<div className="mt-4 space-y-4">
-											<SaveTeamPanel
-												teamName={teamName}
-												alreadySaved={alreadySaved}
-												busy={saveBusy}
-												message={saveMessage}
-												error={saveError}
-												authorName={authorNameFromProfile(rankedProfile?.displayName)}
-												signedIn={Boolean(userEmail)}
-												onSave={() => {
-													void saveFinishedTeam();
-												}}
-											/>
+											{saveError ? (
+												<p role="alert" className="text-sm text-red-200">
+													{saveError}
+												</p>
+											) : null}
 											{dailyResult ? (
 												<DailySharePanel
 													result={dailyResult}
@@ -1872,8 +1871,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 												/>
 											) : null}
 										</div>
-									) : dailyResult ? (
-										<DailySharePanel result={dailyResult} stats={dailyStats} dataset={dataset} />
 									) : undefined
 								}
 							/>
@@ -2085,7 +2082,6 @@ export function DraftGame({ dataset }: DraftGameProps) {
 									eyebrow={duelKind === "ranked" ? "Ranked match · BO3" : "Private match · BO3"}
 									onComplete={() => {
 										setSaveError(null);
-										setSaveMessage(null);
 										setDuelRecap(true);
 									}}
 									onAwaitingNextMap={() => {
@@ -2119,19 +2115,10 @@ export function DraftGame({ dataset }: DraftGameProps) {
 								rankedError={duelError}
 								onPlayAgain={abandonRun}
 								extras={
-									communityEnabled ? (
-										<SaveTeamPanel
-											teamName={teamName}
-											alreadySaved={alreadySaved}
-											busy={saveBusy}
-											message={saveMessage}
-											error={saveError}
-											authorName={authorNameFromProfile(rankedProfile?.displayName)}
-											signedIn={Boolean(userEmail)}
-											onSave={() => {
-												void saveFinishedTeam();
-											}}
-										/>
+									saveError ? (
+										<p role="alert" className="text-sm text-red-200">
+											{saveError}
+										</p>
 									) : undefined
 								}
 							/>
